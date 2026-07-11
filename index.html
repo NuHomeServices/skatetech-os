@@ -1,0 +1,4331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>SkateTech OS</title>
+    <meta name="theme-color" content="#050507">
+    <meta name="description" content="Inline skate wheel wear tracking for rockered frames.">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="SkateTech">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <link rel="icon" type="image/png" href="icon-192.png">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+    <style>
+        :root {
+            --bg: #050507;
+            --panel: rgba(24, 25, 29, 0.74);
+            --panel-strong: rgba(38, 40, 47, 0.78);
+            --field: rgba(9, 10, 13, 0.72);
+            --border: rgba(255, 255, 255, 0.105);
+            --border-strong: rgba(255, 255, 255, 0.18);
+            --text: #fbfbfd;
+            --muted: #9b9ca3;
+            --soft: #d7d9df;
+            --accent: #42d6ca;
+            --accent-strong: #7df4e8;
+            --accent-blue: #64a9ff;
+            --accent-soft: rgba(66, 214, 202, 0.16);
+            --success: #6ee28f;
+            --warning: #ffcc66;
+            --danger: #ff766d;
+            --shadow: 0 24px 70px rgba(0, 0, 0, 0.48);
+            --inner-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.075);
+            --nav-height: 74px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            letter-spacing: 0;
+        }
+
+        html {
+            background: var(--bg);
+            color-scheme: dark;
+            -webkit-text-size-adjust: 100%;
+        }
+
+        body {
+            min-height: 100vh;
+            background:
+                linear-gradient(180deg, rgba(255, 255, 255, 0.045), transparent 130px),
+                linear-gradient(145deg, rgba(66, 214, 202, 0.09) 0%, transparent 34%),
+                linear-gradient(225deg, rgba(100, 169, 255, 0.08) 0%, transparent 38%),
+                linear-gradient(180deg, #050507 0%, #0b0c10 50%, #050507 100%);
+            color: var(--text);
+            overflow-x: hidden;
+            padding: calc(env(safe-area-inset-top) + 14px) 12px calc(var(--nav-height) + env(safe-area-inset-bottom) + 20px);
+            font-feature-settings: "case" 1, "tnum" 1;
+        }
+
+        button,
+        input,
+        select {
+            font: inherit;
+        }
+
+        button,
+        select {
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        button {
+            cursor: pointer;
+        }
+
+        .app {
+            width: min(100%, 820px);
+            margin: 0 auto;
+        }
+
+        header {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(128px, 42%);
+            gap: 12px;
+            align-items: center;
+            margin-bottom: 16px;
+            padding: 2px 0 4px;
+        }
+
+        .brand-zone {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 0;
+        }
+
+        .brand-logo {
+            width: 46px;
+            height: 46px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.16);
+            background-image: url("logo.png");
+            background-position: center;
+            background-size: cover;
+            flex: 0 0 auto;
+            box-shadow:
+                0 12px 30px rgba(0, 0, 0, 0.48),
+                inset 0 1px 0 rgba(255, 255, 255, 0.18);
+        }
+
+        h1 {
+            font-size: 24px;
+            line-height: 1;
+            font-weight: 900;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .subtitle {
+            color: var(--muted);
+            font-size: 12px;
+            margin-top: 5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .select-wrap {
+            position: relative;
+        }
+
+        .select-wrap::after {
+            content: "";
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            width: 8px;
+            height: 8px;
+            border-right: 2px solid var(--muted);
+            border-bottom: 2px solid var(--muted);
+            transform: translateY(-65%) rotate(45deg);
+            pointer-events: none;
+        }
+
+        select,
+        input[type="text"],
+        input[type="number"] {
+            width: 100%;
+            min-height: 46px;
+            background:
+                linear-gradient(180deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.015)),
+                var(--field);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            outline: none;
+            appearance: none;
+            transition: border-color 160ms ease, box-shadow 160ms ease, background 160ms ease;
+        }
+
+        select {
+            padding: 0 34px 0 12px;
+            font-size: 13px;
+            font-weight: 780;
+        }
+
+        input[type="text"],
+        input[type="number"] {
+            padding: 0 12px;
+            font-size: 15px;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: var(--accent);
+            box-shadow:
+                0 0 0 3px var(--accent-soft),
+                var(--inner-highlight);
+        }
+
+        .view-shell {
+            position: relative;
+        }
+
+        .app-view {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transform: translate3d(12px, 0, 0);
+            transition: opacity 220ms ease, transform 220ms ease, visibility 220ms;
+            position: absolute;
+            inset: 0;
+            width: 100%;
+        }
+
+        .app-view.active {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+            transform: translate3d(0, 0, 0);
+            position: relative;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .app-view,
+            .action-btn,
+            .nav-item,
+            .pill-btn {
+                transition: none;
+            }
+        }
+
+        .card {
+            background:
+                linear-gradient(180deg, rgba(255, 255, 255, 0.082), rgba(255, 255, 255, 0.022)),
+                var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 14px;
+            box-shadow: var(--shadow), var(--inner-highlight);
+            backdrop-filter: blur(24px) saturate(1.25);
+            -webkit-backdrop-filter: blur(24px) saturate(1.25);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .section-title {
+            font-size: 11px;
+            font-weight: 900;
+            text-transform: uppercase;
+            color: var(--muted);
+            letter-spacing: 0.04em;
+        }
+
+        .section-value {
+            font-size: 12px;
+            color: var(--soft);
+            font-weight: 700;
+        }
+
+        .pill-btn,
+        .ghost-btn,
+        .danger-btn {
+            min-height: 38px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            color: var(--text);
+            background:
+                linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.018)),
+                var(--panel-strong);
+            padding: 0 12px;
+            font-size: 12px;
+            font-weight: 800;
+            box-shadow: var(--inner-highlight);
+            transition: transform 160ms ease, border-color 160ms ease, background 160ms ease, color 160ms ease;
+        }
+
+        .pill-btn.active {
+            color: #031816;
+            background: linear-gradient(135deg, var(--accent-strong), #9cf3bb);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .ghost-btn {
+            background: rgba(255, 255, 255, 0.035);
+        }
+
+        .danger-btn {
+            background: rgba(239, 107, 95, 0.14);
+            border-color: rgba(239, 107, 95, 0.45);
+            color: #ffb4ac;
+        }
+
+        .action-btn {
+            width: 100%;
+            min-height: 52px;
+            border: none;
+            border-radius: 8px;
+            background:
+                linear-gradient(135deg, #88fff4 0%, #7bc7ff 48%, #a8f2a0 100%);
+            color: #041415;
+            font-size: 15px;
+            font-weight: 900;
+            box-shadow:
+                0 18px 42px rgba(66, 214, 202, 0.22),
+                inset 0 1px 0 rgba(255, 255, 255, 0.55);
+            transition: transform 160ms ease, filter 160ms ease;
+        }
+
+        .action-btn:active,
+        .pill-btn:active,
+        .ghost-btn:active,
+        .danger-btn:active,
+        .nav-item:active {
+            transform: scale(0.98);
+        }
+
+        button:disabled {
+            cursor: not-allowed;
+            opacity: 0.48;
+            transform: none;
+        }
+
+        .caliper-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(128px, 1fr));
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .input-tile {
+            min-width: 0;
+            background:
+                linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.015)),
+                rgba(11, 12, 16, 0.78);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 10px 8px;
+            text-align: center;
+            box-shadow:
+                0 10px 24px rgba(0, 0, 0, 0.26),
+                var(--inner-highlight);
+            transition: border-color 160ms ease, background 160ms ease, transform 160ms ease;
+        }
+
+        .input-tile:focus-within {
+            border-color: var(--accent);
+            background:
+                linear-gradient(180deg, rgba(125, 244, 232, 0.09), rgba(255, 255, 255, 0.018)),
+                rgba(13, 17, 20, 0.86);
+        }
+
+        .input-tile label {
+            display: block;
+            color: var(--muted);
+            font-size: 11px;
+            font-weight: 850;
+            margin-bottom: 6px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .input-tile input[type="number"] {
+            min-height: 36px;
+            border: none;
+            background: transparent;
+            padding: 0;
+            text-align: center;
+            color: var(--text);
+            font-size: 22px;
+            font-weight: 900;
+            box-shadow: none;
+        }
+
+        .name-edit-input {
+            display: none;
+            width: 100%;
+            min-height: 30px;
+            margin-top: 6px;
+            padding: 0 6px;
+            border-radius: 6px;
+            background: var(--panel-strong);
+            border: 1px solid var(--border);
+            color: var(--text);
+            font-size: 11px;
+            text-align: center;
+            appearance: none;
+        }
+
+        .renaming .name-edit-input {
+            display: block;
+        }
+
+        .apex-diagnostic {
+            margin-top: 10px;
+            padding-top: 9px;
+            border-top: 1px solid rgba(255, 255, 255, 0.075);
+        }
+
+        .apex-label {
+            color: var(--muted);
+            font-size: 8px;
+            font-weight: 850;
+            margin-bottom: 4px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .apex-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3px;
+        }
+
+        .apex-btn {
+            min-width: 0;
+            min-height: 30px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.035);
+            color: var(--muted);
+            padding: 0 4px;
+            font-size: 9px;
+            font-weight: 900;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .apex-btn.active {
+            color: #031816;
+            background: linear-gradient(135deg, var(--accent-strong), #9cf3bb);
+            border-color: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 18px rgba(66, 214, 202, 0.18);
+        }
+
+        .status-banner {
+            display: none;
+            border-radius: 8px;
+            padding: 13px 14px;
+            margin-bottom: 14px;
+            border: 1px solid;
+            font-size: 13px;
+            line-height: 1.42;
+            box-shadow: var(--inner-highlight);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+        }
+
+        .status-banner.show {
+            display: block;
+        }
+
+        .status-banner.ok {
+            background: rgba(87, 199, 133, 0.11);
+            border-color: rgba(87, 199, 133, 0.38);
+            color: #c9f5d7;
+        }
+
+        .status-banner.warn {
+            background: rgba(244, 185, 66, 0.14);
+            border-color: rgba(244, 185, 66, 0.48);
+            color: #ffe3a3;
+        }
+
+        .status-banner.error {
+            background: rgba(239, 107, 95, 0.14);
+            border-color: rgba(239, 107, 95, 0.48);
+            color: #ffc8c2;
+        }
+
+        .skate-viewport {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .frame-column {
+            min-width: 0;
+            background:
+                linear-gradient(180deg, rgba(255, 255, 255, 0.048), rgba(255, 255, 255, 0.012)),
+                rgba(8, 9, 12, 0.66);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 10px;
+            box-shadow: var(--inner-highlight);
+        }
+
+        .frame-column h3 {
+            font-size: 11px;
+            text-align: center;
+            color: var(--muted);
+            font-weight: 900;
+            margin-bottom: 8px;
+        }
+
+        .target-stack {
+            display: grid;
+            gap: 8px;
+        }
+
+        .mount-slot {
+            min-height: 84px;
+            background:
+                linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.016)),
+                rgba(22, 23, 28, 0.78);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 10px 8px;
+            text-align: center;
+            overflow: hidden;
+            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.18), var(--inner-highlight);
+        }
+
+        .mount-lbl {
+            font-size: 10px;
+            color: var(--muted);
+            text-transform: uppercase;
+            font-weight: 900;
+        }
+
+        .mount-name {
+            color: var(--text);
+            font-size: 14px;
+            font-weight: 900;
+            margin: 4px 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .mount-val {
+            color: var(--success);
+            font-size: 13px;
+            font-weight: 900;
+        }
+
+        .mount-flip {
+            display: inline-block;
+            margin-top: 7px;
+            padding: 4px 7px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            color: var(--soft);
+            background: rgba(255, 255, 255, 0.04);
+            font-size: 9px;
+            font-weight: 900;
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .mount-flip.flipped {
+            color: var(--accent-strong);
+            border-color: rgba(39, 197, 184, 0.4);
+            background: var(--accent-soft);
+        }
+
+        .session-panel,
+        .rotation-preview {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background:
+                linear-gradient(180deg, rgba(255, 255, 255, 0.058), rgba(255, 255, 255, 0.014)),
+                rgba(9, 10, 13, 0.72);
+            padding: 12px;
+            margin-bottom: 12px;
+            box-shadow: var(--inner-highlight);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+        }
+
+        .session-grid,
+        .rotation-actions,
+        .preview-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .rotation-actions .action-btn,
+        .preview-actions .action-btn {
+            min-height: 44px;
+        }
+
+        .preview-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 8px;
+        }
+
+        .preview-move {
+            min-width: 0;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background:
+                linear-gradient(180deg, rgba(255, 255, 255, 0.058), rgba(255, 255, 255, 0.014)),
+                rgba(18, 19, 24, 0.82);
+            padding: 10px;
+            box-shadow: var(--inner-highlight);
+        }
+
+        .preview-path {
+            color: var(--accent-strong);
+            font-size: 11px;
+            font-weight: 900;
+            margin-bottom: 5px;
+        }
+
+        .preview-wheel {
+            color: var(--text);
+            font-size: 13px;
+            font-weight: 850;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .preview-detail {
+            color: var(--muted);
+            font-size: 11px;
+            font-weight: 750;
+            margin-top: 4px;
+        }
+
+        .preview-script {
+            grid-column: 1 / -1;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background:
+                linear-gradient(180deg, rgba(255, 255, 255, 0.066), rgba(255, 255, 255, 0.016)),
+                rgba(18, 19, 24, 0.84);
+            padding: 12px;
+            box-shadow: 0 12px 26px rgba(0, 0, 0, 0.24), var(--inner-highlight);
+        }
+
+        .preview-script-title {
+            color: var(--accent-strong);
+            font-size: 11px;
+            font-weight: 950;
+            margin-bottom: 10px;
+        }
+
+        .preview-steps {
+            display: grid;
+            gap: 7px;
+            padding-left: 18px;
+            color: var(--soft);
+            font-size: 12px;
+            font-weight: 800;
+            line-height: 1.35;
+        }
+
+        .preview-steps li::marker {
+            color: var(--accent-strong);
+            font-weight: 950;
+        }
+
+        .preview-path-summary {
+            margin-top: 10px;
+            padding-top: 8px;
+            border-top: 1px solid rgba(255, 255, 255, 0.07);
+            color: var(--accent-strong);
+            font-size: 12px;
+            font-weight: 900;
+            line-height: 1.35;
+        }
+
+        .creator-grid,
+        .form-grid,
+        .profile-actions {
+            display: grid;
+            gap: 10px;
+        }
+
+        .backup-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .system-lifeline {
+            gap: 12px;
+        }
+
+        .lifeline-label {
+            display: block;
+            color: var(--muted);
+            font-size: 11px;
+            font-weight: 950;
+            letter-spacing: 0.02em;
+            text-transform: uppercase;
+        }
+
+        .backbone-field {
+            width: 100%;
+            min-height: 104px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 12px;
+            padding: 12px;
+            background: rgba(5, 8, 12, 0.74);
+            color: var(--soft);
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+            font-size: 11px;
+            font-weight: 700;
+            line-height: 1.45;
+            resize: vertical;
+            outline: none;
+        }
+
+        .backbone-field:focus {
+            border-color: rgba(76, 215, 201, 0.48);
+            box-shadow: 0 0 0 4px rgba(76, 215, 201, 0.10);
+        }
+
+        .backbone-field[readonly] {
+            color: rgba(244, 242, 236, 0.72);
+        }
+
+        .lifeline-restore {
+            display: grid;
+            gap: 10px;
+        }
+
+        .restore-field {
+            min-height: 72px;
+        }
+
+        .cloud-sync-card {
+            gap: 12px;
+        }
+
+        .cloud-grid,
+        .cloud-actions {
+            display: grid;
+            gap: 10px;
+        }
+
+        .cloud-actions {
+            grid-template-columns: repeat(auto-fit, minmax(138px, 1fr));
+        }
+
+        .wear-list {
+            display: grid;
+            gap: 8px;
+        }
+
+        .heat-map {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .heat-column {
+            display: grid;
+            gap: 8px;
+        }
+
+        .heat-column h3 {
+            color: var(--muted);
+            font-size: 11px;
+            font-weight: 900;
+            text-align: center;
+        }
+
+        .heat-tile {
+            display: grid;
+            grid-template-columns: 40px minmax(0, 1fr);
+            align-items: center;
+            gap: 8px;
+            min-height: 52px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 9px;
+            background:
+                linear-gradient(180deg, rgba(255, 255, 255, 0.052), rgba(255, 255, 255, 0.012)),
+                rgba(9, 10, 13, 0.72);
+            box-shadow: var(--inner-highlight);
+        }
+
+        .heat-slot {
+            color: var(--text);
+            font-size: 14px;
+            font-weight: 950;
+        }
+
+        .heat-stat {
+            min-width: 0;
+            color: var(--soft);
+            font-size: 11px;
+            font-weight: 800;
+            line-height: 1.35;
+        }
+
+        .wear-row {
+            display: grid;
+            grid-template-columns: 42px minmax(0, 1fr) auto;
+            gap: 10px;
+            align-items: center;
+            min-height: 48px;
+            padding: 9px 10px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background:
+                linear-gradient(180deg, rgba(255, 255, 255, 0.048), rgba(255, 255, 255, 0.012)),
+                rgba(9, 10, 13, 0.72);
+            box-shadow: var(--inner-highlight);
+        }
+
+        .wear-slot {
+            color: var(--text);
+            font-size: 13px;
+            font-weight: 900;
+        }
+
+        .wear-bar {
+            height: 8px;
+            overflow: hidden;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .wear-fill {
+            height: 100%;
+            min-width: 3px;
+            border-radius: inherit;
+            background: linear-gradient(90deg, var(--accent), var(--accent-blue), var(--warning));
+        }
+
+        .wear-value {
+            color: var(--soft);
+            font-size: 11px;
+            font-weight: 850;
+            text-align: right;
+            white-space: nowrap;
+        }
+
+        .creator-row,
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .stat {
+            min-height: 68px;
+            background:
+                linear-gradient(180deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.012)),
+                rgba(9, 10, 13, 0.72);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 11px;
+            box-shadow: var(--inner-highlight);
+        }
+
+        .stat span {
+            display: block;
+            color: var(--muted);
+            font-size: 10px;
+            font-weight: 850;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+
+        .stat strong {
+            display: block;
+            color: var(--text);
+            font-size: 16px;
+            overflow-wrap: anywhere;
+        }
+
+        .mini-copy {
+            color: var(--muted);
+            font-size: 12px;
+            line-height: 1.45;
+        }
+
+        .loop-grid {
+            display: grid;
+            gap: 8px;
+        }
+
+        .loop-line {
+            display: grid;
+            grid-template-columns: repeat(var(--loop-cols, 4), minmax(0, 1fr));
+            gap: 6px;
+        }
+
+        .loop-line span {
+            min-height: 38px;
+            display: grid;
+            place-items: center;
+            border-radius: 7px;
+            background:
+                linear-gradient(180deg, rgba(255, 255, 255, 0.052), rgba(255, 255, 255, 0.012)),
+                rgba(9, 10, 13, 0.72);
+            border: 1px solid var(--border);
+            color: var(--soft);
+            font-size: 12px;
+            font-weight: 900;
+            box-shadow: var(--inner-highlight);
+        }
+
+        .loop-line .loop-label {
+            color: var(--accent-strong);
+            background: rgba(39, 197, 184, 0.1);
+            border-color: rgba(39, 197, 184, 0.32);
+        }
+
+        .log-list {
+            display: grid;
+            gap: 8px;
+        }
+
+        .log-item {
+            border: 1px solid var(--border);
+            background:
+                linear-gradient(180deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.012)),
+                rgba(9, 10, 13, 0.72);
+            border-radius: 8px;
+            padding: 11px;
+            box-shadow: var(--inner-highlight);
+        }
+
+        .log-top {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            color: var(--text);
+            font-size: 13px;
+            font-weight: 850;
+        }
+
+        .log-meta {
+            margin-top: 6px;
+            color: var(--muted);
+            font-size: 12px;
+            line-height: 1.4;
+        }
+
+        .log-sizes {
+            margin-top: 8px;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            padding-top: 8px;
+        }
+
+        .log-sizes summary {
+            cursor: pointer;
+            color: var(--accent-strong);
+            font-size: 11px;
+            font-weight: 900;
+        }
+
+        .size-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(138px, 1fr));
+            gap: 6px;
+            margin-top: 8px;
+        }
+
+        .size-chip {
+            border: 1px solid var(--border);
+            border-radius: 7px;
+            background: rgba(255, 255, 255, 0.03);
+            padding: 7px;
+            color: var(--soft);
+            font-size: 11px;
+            font-weight: 800;
+            line-height: 1.35;
+        }
+
+        .size-chip strong {
+            display: block;
+            color: var(--text);
+            font-size: 12px;
+            margin-bottom: 2px;
+        }
+
+        .empty-state {
+            min-height: 130px;
+            display: grid;
+            place-items: center;
+            text-align: center;
+            color: var(--muted);
+            border: 1px dashed var(--border-strong);
+            border-radius: 8px;
+            padding: 18px;
+            background: rgba(255, 255, 255, 0.025);
+            font-size: 13px;
+            line-height: 1.45;
+        }
+
+        .nav-dock {
+            position: fixed;
+            z-index: 20;
+            left: 12px;
+            right: 12px;
+            bottom: calc(12px + env(safe-area-inset-bottom));
+            max-width: 520px;
+            height: 62px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+            padding: 7px;
+            background:
+                linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.035)),
+                rgba(11, 12, 16, 0.78);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            border-radius: 20px;
+            box-shadow:
+                0 22px 60px rgba(0, 0, 0, 0.56),
+                inset 0 1px 0 rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(26px) saturate(1.3);
+            -webkit-backdrop-filter: blur(26px) saturate(1.3);
+        }
+
+        .nav-item {
+            min-width: 0;
+            min-height: 48px;
+            border: 1px solid transparent;
+            border-radius: 16px;
+            background: transparent;
+            color: var(--muted);
+            display: grid;
+            place-items: center;
+            gap: 2px;
+            font-size: 10px;
+            font-weight: 850;
+            transition: color 160ms ease, background 160ms ease, border-color 160ms ease, transform 160ms ease;
+        }
+
+        .nav-item svg {
+            width: 20px;
+            height: 20px;
+            stroke-width: 2.1;
+        }
+
+        .nav-item.active {
+            color: #eafffd;
+            background:
+                linear-gradient(180deg, rgba(125, 244, 232, 0.24), rgba(100, 169, 255, 0.10)),
+                rgba(66, 214, 202, 0.09);
+            border-color: rgba(125, 244, 232, 0.36);
+            box-shadow:
+                0 12px 22px rgba(66, 214, 202, 0.13),
+                inset 0 1px 0 rgba(255, 255, 255, 0.12);
+        }
+
+        .toast {
+            position: fixed;
+            left: 12px;
+            right: 12px;
+            bottom: calc(var(--nav-height) + env(safe-area-inset-bottom) + 12px);
+            z-index: 30;
+            max-width: 520px;
+            margin: 0 auto;
+            background:
+                linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(222, 236, 239, 0.9));
+            color: #071113;
+            border-radius: 8px;
+            padding: 11px 12px;
+            font-size: 13px;
+            font-weight: 800;
+            border: 1px solid rgba(255, 255, 255, 0.65);
+            box-shadow: 0 18px 48px rgba(0, 0, 0, 0.36);
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(12px);
+            transition: opacity 180ms ease, transform 180ms ease;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        @media (max-width: 380px) {
+            body {
+                padding-left: 8px;
+                padding-right: 8px;
+            }
+
+            header {
+                grid-template-columns: 1fr;
+            }
+
+            h1 {
+                font-size: 20px;
+            }
+
+            .caliper-grid {
+                gap: 6px;
+                grid-template-columns: repeat(auto-fit, minmax(138px, 1fr));
+            }
+
+            .input-tile {
+                padding-left: 6px;
+                padding-right: 6px;
+            }
+
+            .mount-slot {
+                min-height: 86px;
+            }
+
+            .session-grid,
+            .rotation-actions,
+            .preview-actions,
+            .creator-row,
+            .stats-grid,
+            .backup-actions {
+                grid-template-columns: 1fr;
+            }
+
+            .skate-viewport,
+            .heat-map {
+                gap: 8px;
+            }
+
+            .nav-dock {
+                left: 8px;
+                right: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app" id="appRoot">
+        <header>
+            <div class="brand-zone">
+                <div class="brand-logo" aria-hidden="true"></div>
+                <div>
+                    <h1>SkateTech OS</h1>
+                    <div class="subtitle">Rocker-safe wheel tracking</div>
+                </div>
+            </div>
+            <label class="select-wrap" aria-label="Active wheel setup">
+                <select id="setSelector"></select>
+            </label>
+        </header>
+
+        <main class="view-shell">
+            <section id="view-calibrate" class="app-view active" aria-labelledby="tab-calibrate">
+                <div class="card">
+                    <div class="section-header">
+                        <div>
+                            <div class="section-title">Caliper Inputs</div>
+                            <div class="mini-copy" id="caliperSummary">Endless 90 ES / 2.0 mm limit</div>
+                        </div>
+                        <button id="renameToggleBtn" class="pill-btn" type="button">Rename</button>
+                    </div>
+
+                    <div class="caliper-grid" id="leftInputContainer"></div>
+                    <div class="caliper-grid" id="rightInputContainer"></div>
+
+                    <div class="session-panel">
+                        <div class="section-header">
+                            <div>
+                                <div class="section-title">Session</div>
+                                <div class="mini-copy" id="sessionSummary">Saved against the current rotation.</div>
+                            </div>
+                        </div>
+                        <div class="session-grid">
+                            <input id="sessionMinutes" type="number" inputmode="numeric" min="0" max="480" step="5" placeholder="Minutes skated" aria-label="Minutes skated">
+                            <input id="sessionMiles" type="number" inputmode="decimal" min="0" max="100" step="0.1" placeholder="Miles skated" aria-label="Miles skated">
+                            <label class="select-wrap" aria-label="Session type">
+                                <select id="sessionType">
+                                    <option value="normal">Normal</option>
+                                    <option value="slide-heavy">Slide-heavy</option>
+                                    <option value="cruising">Cruising</option>
+                                </select>
+                            </label>
+                            <button class="ghost-btn" id="saveSessionBtn" type="button">Save Session</button>
+                        </div>
+                    </div>
+
+                    <div class="rotation-actions">
+                        <button class="action-btn" id="mainSubmitBtn" type="button">Preview Rotation</button>
+                        <button class="ghost-btn" id="undoRotationBtn" type="button">Undo Last Rotation</button>
+                    </div>
+
+                    <div id="rotationPreview" class="rotation-preview" hidden>
+                        <div class="section-header">
+                            <div>
+                                <div class="section-title">Rotation Preview</div>
+                                <div class="mini-copy" id="previewSummary">Review before saving.</div>
+                            </div>
+                        </div>
+                        <div id="previewMoveList" class="preview-list"></div>
+                        <div class="preview-actions">
+                            <button class="action-btn" id="confirmRotationBtn" type="button">Confirm Rotation</button>
+                            <button class="ghost-btn" id="cancelRotationBtn" type="button">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="statusBanner" class="status-banner" role="status"></div>
+
+                <div class="card">
+                    <div class="section-header">
+                        <div class="section-title">Target Mapping</div>
+                        <div class="section-value" id="rotationCountLabel">0 rotations</div>
+                    </div>
+                    <div class="skate-viewport">
+                        <div class="frame-column">
+                            <h3>Left Frame</h3>
+                            <div id="targetLeftContainer" class="target-stack"></div>
+                        </div>
+                        <div class="frame-column">
+                            <h3>Right Frame</h3>
+                            <div id="targetRightContainer" class="target-stack"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="view-profiles" class="app-view" aria-labelledby="tab-profiles" aria-hidden="true">
+                <div class="card">
+                    <div class="section-title">Create Profile</div>
+                    <div class="creator-grid" style="margin-top: 10px;">
+                        <input type="text" id="newSetName" placeholder="My street setup" autocomplete="off">
+                        <div class="creator-row">
+                            <input type="text" id="newWheelModel" placeholder="Wheel model or brand" autocomplete="off" value="Endless">
+                            <label class="select-wrap" aria-label="Wheel durometer">
+                                <select id="newWheelDurometer">
+                                    <option value="84A">84A</option>
+                                    <option value="85A">85A</option>
+                                    <option value="86A">86A</option>
+                                    <option value="87A" selected>87A</option>
+                                    <option value="89A">89A</option>
+                                    <option value="98A">98A</option>
+                                </select>
+                            </label>
+                        </div>
+                        <div class="creator-row">
+                            <label class="select-wrap" aria-label="Starting wheel size">
+                                <select id="newSetSize">
+                                    <option value="80">80 mm Base</option>
+                                    <option value="84">84 mm Base</option>
+                                    <option value="90" selected>90 mm Base</option>
+                                    <option value="100">100 mm Base</option>
+                                    <option value="110">110 mm Base</option>
+                                </select>
+                            </label>
+                            <label class="select-wrap" aria-label="Frame preset">
+                                <select id="newSetFrame">
+                                    <option value="endless_90es">Endless 90 ES</option>
+                                    <option value="endless_arc_es">Endless Arc ES</option>
+                                    <option value="wizard_nr90">Wizard NR90</option>
+                                    <option value="nn_ninja">NN Ninja 90</option>
+                                    <option value="custom_rocker">Custom Continuous Rocker</option>
+                                    <option value="custom_flat">Standard Flat Frame</option>
+                                </select>
+                            </label>
+                        </div>
+                        <button class="action-btn" id="createSetBtn" type="button">Add Profile</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="section-header">
+                        <div class="section-title">Active Profile</div>
+                        <button class="ghost-btn" id="deleteProfileBtn" type="button">Delete</button>
+                    </div>
+                    <div class="form-grid">
+                        <input type="text" id="activeSetName" aria-label="Profile name" autocomplete="off">
+                        <div class="creator-row">
+                            <input type="text" id="activeWheelModel" aria-label="Wheel model or brand" placeholder="Wheel model or brand" autocomplete="off">
+                            <label class="select-wrap" aria-label="Active wheel durometer">
+                                <select id="activeWheelDurometer">
+                                    <option value="84A">84A</option>
+                                    <option value="85A">85A</option>
+                                    <option value="86A">86A</option>
+                                    <option value="87A">87A</option>
+                                    <option value="89A">89A</option>
+                                    <option value="98A">98A</option>
+                                </select>
+                            </label>
+                        </div>
+                        <div class="creator-row">
+                            <label class="select-wrap" aria-label="Active frame">
+                                <select id="activeFrameSelect">
+                                    <option value="endless_90es">Endless 90 ES</option>
+                                    <option value="endless_arc_es">Endless Arc ES</option>
+                                    <option value="wizard_nr90">Wizard NR90</option>
+                                    <option value="nn_ninja">NN Ninja 90</option>
+                                    <option value="custom_rocker">Custom Continuous Rocker</option>
+                                    <option value="custom_flat">Standard Flat Frame</option>
+                                </select>
+                            </label>
+                            <label class="select-wrap" aria-label="Reset wheel size">
+                                <select id="activeBaseSize">
+                                    <option value="80">80 mm</option>
+                                    <option value="84">84 mm</option>
+                                    <option value="90">90 mm</option>
+                                    <option value="100">100 mm</option>
+                                    <option value="110">110 mm</option>
+                                </select>
+                            </label>
+                        </div>
+                        <div class="stats-grid">
+                            <div class="stat">
+                                <span>Frame limit</span>
+                                <strong id="frameLimitStat">2.0 mm</strong>
+                            </div>
+                            <div class="stat">
+                                <span>Current spread</span>
+                                <strong id="spreadStat">0.0 mm</strong>
+                            </div>
+                            <div class="stat">
+                                <span>Last saved</span>
+                                <strong id="savedStat">Now</strong>
+                            </div>
+                            <div class="stat">
+                                <span>Profiles</span>
+                                <strong id="profileCountStat">1</strong>
+                            </div>
+                        </div>
+                        <div class="profile-actions">
+                            <button class="ghost-btn" id="resetSizesBtn" type="button">Reset Active Wheels To Base Size</button>
+                            <div class="backup-actions">
+                                <button class="ghost-btn" id="exportDataBtn" type="button">Backup Now</button>
+                                <button class="ghost-btn" id="importDataBtn" type="button">Restore Backup</button>
+                            </div>
+                            <button class="ghost-btn" id="restoreArchiveBtn" type="button">Recover Last Local Save</button>
+                            <div class="mini-copy" id="backupReminder">No external backup yet.</div>
+                            <input type="file" id="importDataFile" accept="application/json,.json" style="display:none">
+                            <button class="danger-btn" id="factoryResetBtn" type="button">Factory Reset</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="section-title" style="margin-bottom: 10px;">Rocket Loop</div>
+                    <div id="loopDisplay" class="loop-grid" aria-label="Forced rocket loop"></div>
+                </div>
+
+                <div class="card">
+                    <div class="section-header">
+                        <div>
+                            <div class="section-title">Position Heat Map</div>
+                            <div class="mini-copy" id="heatSummary">No wear samples yet.</div>
+                        </div>
+                    </div>
+                    <div id="heatMap" class="heat-map"></div>
+                </div>
+
+                <div class="card">
+                    <div class="section-header">
+                        <div>
+                            <div class="section-title">Wear Hotspots</div>
+                            <div class="mini-copy" id="wearSummary">No wear samples yet.</div>
+                        </div>
+                    </div>
+                    <div id="wearRankingList" class="wear-list"></div>
+                </div>
+
+                <div class="card cloud-sync-card">
+                    <div class="section-header">
+                        <div>
+                            <div class="section-title">Cloud Sync</div>
+                            <div class="mini-copy" id="cloudSyncStatus">Not connected.</div>
+                        </div>
+                    </div>
+                    <div class="cloud-grid">
+                        <input type="url" id="supabaseUrlInput" placeholder="Supabase project URL" autocomplete="off" spellcheck="false" aria-label="Supabase project URL">
+                        <input type="password" id="supabaseAnonInput" placeholder="Supabase anon public key" autocomplete="off" spellcheck="false" aria-label="Supabase anon public key">
+                        <input type="email" id="cloudEmailInput" placeholder="Your email for magic-link login" autocomplete="email" aria-label="Cloud sync email">
+                    </div>
+                    <div class="cloud-actions">
+                        <button class="ghost-btn" id="saveCloudSettingsBtn" type="button">Save Cloud Settings</button>
+                        <button class="ghost-btn" id="sendMagicLinkBtn" type="button">Send Login Link</button>
+                        <button class="ghost-btn" id="syncCloudNowBtn" type="button">Sync Now</button>
+                        <button class="ghost-btn" id="pullCloudBtn" type="button">Pull Cloud Save</button>
+                        <button class="danger-btn" id="cloudSignOutBtn" type="button">Sign Out Cloud</button>
+                    </div>
+                    <div class="mini-copy">Use the Supabase anon public key only. Never paste a service-role key into the app.</div>
+                </div>
+
+                <div class="card system-lifeline">
+                    <div class="section-header">
+                        <div>
+                            <div class="section-title">🛠️ SYSTEM DATA LIFE-LINE</div>
+                            <div class="mini-copy">Copy this backbone before replacing the app file or moving to another browser.</div>
+                        </div>
+                    </div>
+                    <label class="lifeline-label" for="backboneString">Your Backup Backbone String</label>
+                    <textarea id="backboneString" class="backbone-field" readonly spellcheck="false" aria-label="Your Backup Backbone String"></textarea>
+                    <div class="backup-actions">
+                        <button class="ghost-btn" id="copyBackboneBtn" type="button">Copy Backbone</button>
+                        <button class="ghost-btn" id="downloadBackboneBtn" type="button">Download Backbone</button>
+                    </div>
+                    <div class="lifeline-restore">
+                        <textarea id="backboneRestoreInput" class="backbone-field restore-field" spellcheck="false" aria-label="Paste backup backbone string"></textarea>
+                        <button class="ghost-btn" id="restoreBackboneBtn" type="button">Restore Backup Backbone</button>
+                    </div>
+                </div>
+            </section>
+
+            <section id="view-logs" class="app-view" aria-labelledby="tab-logs" aria-hidden="true">
+                <div class="card">
+                    <div class="section-header">
+                        <div>
+                            <div class="section-title">Session Logs</div>
+                            <div class="mini-copy" id="sessionLogSummary">No sessions yet.</div>
+                        </div>
+                        <button class="ghost-btn" id="clearSessionLogsBtn" type="button">Clear</button>
+                    </div>
+                    <div id="sessionLogList" class="log-list"></div>
+                </div>
+
+                <div class="card">
+                    <div class="section-header">
+                        <div>
+                            <div class="section-title">Rotation Logs</div>
+                            <div class="mini-copy" id="logSummary">No rotations yet.</div>
+                        </div>
+                        <button class="ghost-btn" id="clearLogsBtn" type="button">Clear</button>
+                    </div>
+                    <div id="logList" class="log-list"></div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <nav class="nav-dock" aria-label="App sections">
+        <button class="nav-item active" id="tab-calibrate" type="button" data-view="calibrate" aria-current="page">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+                <path d="M4 17h16"></path><path d="M6 17V7"></path><path d="M18 17V7"></path><path d="M8 7h8"></path><path d="M10 11h4"></path>
+            </svg>
+            <span>Calibrate</span>
+        </button>
+        <button class="nav-item" id="tab-profiles" type="button" data-view="profiles">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+                <path d="M4 6h16"></path><path d="M4 12h16"></path><path d="M4 18h16"></path><path d="M8 6v12"></path>
+            </svg>
+            <span>Profiles</span>
+        </button>
+        <button class="nav-item" id="tab-logs" type="button" data-view="logs">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+                <path d="M7 4h10"></path><path d="M7 20h10"></path><path d="M6 8h12"></path><path d="M6 12h12"></path><path d="M6 16h8"></path>
+            </svg>
+            <span>Logs</span>
+        </button>
+    </nav>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+    <script>
+        "use strict";
+
+        const STORAGE_KEY = "skatetech_v5_db";
+        const V4_STORAGE_KEY = "skatetech_v4_db";
+        const LEGACY_STORAGE_KEY = "skatetech.os.state.v1";
+        const BACKUP_KEY = "skatetech.os.backup.v1";
+        const ARCHIVE_KEY = "skatetech.os.archive.v1";
+        const STORAGE_LOOKUP_KEYS = Object.freeze([STORAGE_KEY, V4_STORAGE_KEY, LEGACY_STORAGE_KEY, BACKUP_KEY]);
+        const STORAGE_WRITE_KEYS = Object.freeze([STORAGE_KEY, LEGACY_STORAGE_KEY]);
+        const DURABLE_DB_NAME = "SkateTechOSDurableCache";
+        const DURABLE_STORE_NAME = "state";
+        const DURABLE_STATE_KEY = "latest";
+        const CLOUD_CONFIG_KEY = "skatetech.supabase.config.v1";
+        const CLOUD_TABLE_NAME = "skatetech_app_state";
+        const DEFAULT_PROFILE_REVISION = 4;
+        const FOUR_WHEEL_LEFT_SLOTS = Object.freeze(["L1", "L2", "L3", "L4"]);
+        const FOUR_WHEEL_RIGHT_SLOTS = Object.freeze(["R1", "R2", "R3", "R4"]);
+        const ARC_LEFT_SLOTS = Object.freeze(["L1", "L2", "L3", "L4", "L5"]);
+        const ARC_RIGHT_SLOTS = Object.freeze(["R1", "R2", "R3", "R4", "R5"]);
+        const ARC_OUTER_SLOTS = Object.freeze(["L1", "L5", "R1", "R5"]);
+        const ARC_INNER_SLOTS = Object.freeze(["L2", "L3", "L4", "R2", "R3", "R4"]);
+        const SLOT_ORDER = Object.freeze([...FOUR_WHEEL_LEFT_SLOTS, ...FOUR_WHEEL_RIGHT_SLOTS]);
+        const LEFT_SLOTS = FOUR_WHEEL_LEFT_SLOTS;
+        const RIGHT_SLOTS = FOUR_WHEEL_RIGHT_SLOTS;
+        const DUROMETER_OPTIONS = Object.freeze(["84A", "85A", "86A", "87A", "89A", "98A"]);
+        const DEFAULT_SETUP_ID = "default_setup";
+
+        const FOUR_WHEEL_SLOT_WHEEL_KEYS = Object.freeze({
+            L1: "W1",
+            L2: "W2",
+            L3: "W3",
+            L4: "W4",
+            R1: "W5",
+            R2: "W6",
+            R3: "W7",
+            R4: "W8"
+        });
+
+        const ARC_SLOT_WHEEL_KEYS = Object.freeze({
+            L1: "W1",
+            L2: "W2",
+            L3: "W3",
+            L4: "W4",
+            L5: "W5",
+            R1: "W6",
+            R2: "W7",
+            R3: "W8",
+            R4: "W9",
+            R5: "W10"
+        });
+
+        const DEFAULT_SLOT_WHEEL_KEYS = FOUR_WHEEL_SLOT_WHEEL_KEYS;
+
+        const DEFAULT_USED_ENDLESS_90_ES = Object.freeze({
+            id: DEFAULT_SETUP_ID,
+            name: "Endless 90 ES Base Profile",
+            baseSize: 90,
+            frameKey: "endless_90es",
+            wheelModel: "Hydrogen",
+            wheelDurometer: "85A",
+            wheelNames: Object.freeze({
+                W1: "Wheel 1",
+                W2: "Wheel 2",
+                W3: "Wheel 3",
+                W4: "Wheel 4",
+                W5: "Wheel 5",
+                W6: "Wheel 6",
+                W7: "Wheel 7",
+                W8: "Wheel 8"
+            }),
+            sizes: Object.freeze({
+                W1: 81.1,
+                W2: 81.9,
+                W3: 82.0,
+                W4: 82.0,
+                W5: 80.9,
+                W6: 81.7,
+                W7: 81.2,
+                W8: 81.4
+            }),
+            apexSides: Object.freeze({
+                W1: "logo",
+                W2: "logo",
+                W3: "logo",
+                W4: "logo",
+                W5: "logo",
+                W6: "logo",
+                W7: "logo",
+                W8: "logo"
+            }),
+            trackingState: Object.freeze({
+                L1: Object.freeze({ wheelKey: "W2", sideFlipped: true }),
+                L2: Object.freeze({ wheelKey: "W6", sideFlipped: true }),
+                L3: Object.freeze({ wheelKey: "W8", sideFlipped: true }),
+                L4: Object.freeze({ wheelKey: "W7", sideFlipped: true }),
+                R1: Object.freeze({ wheelKey: "W4", sideFlipped: true }),
+                R2: Object.freeze({ wheelKey: "W3", sideFlipped: true }),
+                R3: Object.freeze({ wheelKey: "W1", sideFlipped: true }),
+                R4: Object.freeze({ wheelKey: "W5", sideFlipped: true })
+            })
+        });
+
+        const FRAME_PRESETS = Object.freeze({
+            endless_90es: Object.freeze({
+                name: "Endless 90 ES",
+                safetyLimit: 2.0,
+                defaultSize: 90,
+                slotCount: 4,
+                note: "Enhanced rocker safety window for 90 mm Endless frames."
+            }),
+            endless_arc_es: Object.freeze({
+                name: "Endless Arc ES",
+                safetyLimit: 2.0,
+                defaultSize: 84,
+                slotCount: 5,
+                note: "Five-wheel asymmetric Arc layout: 84 mm outers and 76 mm inner wheels."
+            }),
+            wizard_nr90: Object.freeze({
+                name: "Wizard NR90",
+                safetyLimit: 1.8,
+                defaultSize: 90,
+                slotCount: 4,
+                note: "Wizard-style natural rocker with a tighter spread target."
+            }),
+            nn_ninja: Object.freeze({
+                name: "NN Ninja 90",
+                safetyLimit: 2.0,
+                defaultSize: 90,
+                slotCount: 4,
+                note: "Rockered urban frame with a 2.0 mm spread ceiling."
+            }),
+            custom_rocker: Object.freeze({
+                name: "Custom Continuous Rocker",
+                safetyLimit: 2.0,
+                defaultSize: 90,
+                slotCount: 4,
+                note: "Manual rocker profile using the standard warning ceiling."
+            }),
+            custom_flat: Object.freeze({
+                name: "Standard Flat Frame",
+                safetyLimit: 1.0,
+                defaultSize: 90,
+                slotCount: 4,
+                note: "Flat frames get an earlier warning to prevent accidental rocker."
+            })
+        });
+
+        // Core Rocket Loop: keep this forced conveyor pattern intact.
+        const ROCKET_LOOPS = Object.freeze([
+            Object.freeze(["L4", "R1", "L2", "R3"]),
+            Object.freeze(["L1", "R2", "L3", "R4"])
+        ]);
+
+        const ROCKET_CONVEYOR_STEPS = Object.freeze([
+            Object.freeze({ line: "A", from: "L4", to: "R1" }),
+            Object.freeze({ line: "A", from: "R1", to: "L2" }),
+            Object.freeze({ line: "A", from: "L2", to: "R3" }),
+            Object.freeze({ line: "A", from: "R3", to: "L4" }),
+            Object.freeze({ line: "B", from: "L1", to: "R2" }),
+            Object.freeze({ line: "B", from: "R2", to: "L3" }),
+            Object.freeze({ line: "B", from: "L3", to: "R4" }),
+            Object.freeze({ line: "B", from: "R4", to: "L1" })
+        ]);
+
+        const ARC_LOOPS = Object.freeze([
+            Object.freeze(["84 Cross-X", "L5", "R1"]),
+            Object.freeze(["84 Cross-X", "R5", "L1"]),
+            Object.freeze(["76 Stagger", "L2", "R3", "L4", "R2", "L3", "R4"])
+        ]);
+
+        const ARC_CONVEYOR_STEPS = Object.freeze([
+            Object.freeze({ line: "Outer 84", from: "L5", to: "R1" }),
+            Object.freeze({ line: "Outer 84", from: "R1", to: "L5" }),
+            Object.freeze({ line: "Outer 84", from: "R5", to: "L1" }),
+            Object.freeze({ line: "Outer 84", from: "L1", to: "R5" }),
+            Object.freeze({ line: "Inner 76", from: "L2", to: "R3" }),
+            Object.freeze({ line: "Inner 76", from: "L3", to: "R4" }),
+            Object.freeze({ line: "Inner 76", from: "L4", to: "R2" }),
+            Object.freeze({ line: "Inner 76", from: "R2", to: "L3" }),
+            Object.freeze({ line: "Inner 76", from: "R3", to: "L4" }),
+            Object.freeze({ line: "Inner 76", from: "R4", to: "L2" })
+        ]);
+
+        let appState = null;
+        let activeView = "calibrate";
+        let renameMode = false;
+        let saveTimer = 0;
+        let toastTimer = 0;
+        let pendingRotationPreview = null;
+        let lastLoadedStorageRecord = null;
+        let cloudConfig = null;
+        let cloudClient = null;
+        let cloudSession = null;
+        let cloudSaveTimer = 0;
+        let cloudBusy = false;
+
+        const els = {};
+
+        document.addEventListener("DOMContentLoaded", initApp);
+
+        function initApp() {
+            cacheElements();
+            cloudConfig = loadCloudConfig();
+            appState = loadState();
+            bindEvents();
+            requestPersistentStorage();
+            registerServiceWorker();
+            renderAll();
+            updateStatusBanner(calculateSpread(getActiveSet()));
+            initCloudSync();
+            hydrateFromDurableCache().finally(saveStateDebounced);
+        }
+
+        function cacheElements() {
+            [
+                "setSelector", "leftInputContainer", "rightInputContainer", "renameToggleBtn",
+                "mainSubmitBtn", "statusBanner", "rotationCountLabel", "caliperSummary",
+                "sessionMinutes", "sessionMiles", "sessionType", "sessionSummary", "saveSessionBtn",
+                "undoRotationBtn", "rotationPreview",
+                "previewSummary", "previewMoveList", "confirmRotationBtn", "cancelRotationBtn",
+                "newSetName", "newSetSize", "newSetFrame", "createSetBtn", "activeSetName",
+                "newWheelModel", "newWheelDurometer", "activeWheelModel", "activeWheelDurometer",
+                "activeFrameSelect", "activeBaseSize", "frameLimitStat", "spreadStat",
+                "savedStat", "profileCountStat", "resetSizesBtn", "factoryResetBtn",
+                "deleteProfileBtn", "clearLogsBtn", "logList", "logSummary", "sessionLogList",
+                "sessionLogSummary", "clearSessionLogsBtn", "toast",
+                "exportDataBtn", "importDataBtn", "importDataFile", "restoreArchiveBtn", "backupReminder",
+                "backboneString", "copyBackboneBtn", "downloadBackboneBtn", "backboneRestoreInput", "restoreBackboneBtn",
+                "supabaseUrlInput", "supabaseAnonInput", "cloudEmailInput", "cloudSyncStatus",
+                "saveCloudSettingsBtn", "sendMagicLinkBtn", "syncCloudNowBtn", "pullCloudBtn", "cloudSignOutBtn",
+                "wearSummary", "wearRankingList", "heatSummary", "heatMap",
+                "targetLeftContainer", "targetRightContainer", "loopDisplay"
+            ].forEach((id) => {
+                els[id] = document.getElementById(id);
+            });
+        }
+
+        function bindEvents() {
+            document.querySelector(".nav-dock").addEventListener("click", (event) => {
+                const button = event.target.closest("[data-view]");
+                if (button) showView(button.dataset.view);
+            });
+
+            els.setSelector.addEventListener("change", switchWheelSet);
+            els.renameToggleBtn.addEventListener("click", toggleRenameFields);
+            els.mainSubmitBtn.addEventListener("click", requestRotationPreview);
+            els.confirmRotationBtn.addEventListener("click", confirmRotationPreview);
+            els.cancelRotationBtn.addEventListener("click", cancelRotationPreview);
+            els.undoRotationBtn.addEventListener("click", undoLastRotation);
+            els.sessionMinutes.addEventListener("input", updateSessionMeta);
+            els.sessionMiles.addEventListener("input", updateSessionMeta);
+            els.sessionType.addEventListener("change", updateSessionMeta);
+            els.saveSessionBtn.addEventListener("click", saveSessionEntry);
+            els.createSetBtn.addEventListener("click", createNewWheelSet);
+            els.newSetSize.addEventListener("change", () => {
+                els.newSetSize.dataset.touched = "true";
+            });
+            els.newSetFrame.addEventListener("change", autoFillFrameSpecs);
+            els.activeSetName.addEventListener("input", updateActiveSetName);
+            els.activeWheelModel.addEventListener("input", updateActiveWheelMeta);
+            els.activeWheelDurometer.addEventListener("change", updateActiveWheelMeta);
+            els.activeFrameSelect.addEventListener("change", updateActiveFrame);
+            els.activeBaseSize.addEventListener("change", updateActiveBaseSize);
+            els.resetSizesBtn.addEventListener("click", resetActiveWheelsToBaseSize);
+            els.deleteProfileBtn.addEventListener("click", deleteActiveProfile);
+            els.factoryResetBtn.addEventListener("click", factoryResetApp);
+            els.exportDataBtn.addEventListener("click", exportBackupFile);
+            els.importDataBtn.addEventListener("click", () => els.importDataFile.click());
+            els.importDataFile.addEventListener("change", importBackupFile);
+            els.restoreArchiveBtn.addEventListener("click", restoreArchivedState);
+            els.copyBackboneBtn.addEventListener("click", copyBackboneString);
+            els.downloadBackboneBtn.addEventListener("click", downloadBackboneString);
+            els.restoreBackboneBtn.addEventListener("click", restoreBackupBackbone);
+            els.saveCloudSettingsBtn.addEventListener("click", saveCloudSettings);
+            els.sendMagicLinkBtn.addEventListener("click", sendCloudMagicLink);
+            els.syncCloudNowBtn.addEventListener("click", () => pushCloudState({ showToastOnSuccess: true }));
+            els.pullCloudBtn.addEventListener("click", () => pullCloudState({ force: true, showToastOnSuccess: true }));
+            els.cloudSignOutBtn.addEventListener("click", signOutCloud);
+            els.clearLogsBtn.addEventListener("click", clearLogs);
+            els.clearSessionLogsBtn.addEventListener("click", clearSessionLogs);
+            window.addEventListener("beforeunload", saveStateNow);
+            window.addEventListener("pagehide", saveStateNow);
+            document.addEventListener("visibilitychange", () => {
+                if (document.visibilityState === "hidden") saveStateNow();
+            });
+
+            els.leftInputContainer.addEventListener("input", handleWheelInput);
+            els.rightInputContainer.addEventListener("input", handleWheelInput);
+            els.leftInputContainer.addEventListener("click", handleApexSelection);
+            els.rightInputContainer.addEventListener("click", handleApexSelection);
+            els.leftInputContainer.addEventListener("blur", normalizeWheelField, true);
+            els.rightInputContainer.addEventListener("blur", normalizeWheelField, true);
+        }
+
+        function createDefaultState() {
+            const defaultSet = createDefaultUsedSet();
+
+            return {
+                version: 1,
+                activeSetId: defaultSet.id,
+                sets: [defaultSet],
+                lastBackupAt: "",
+                lastSavedAt: new Date().toISOString()
+            };
+        }
+
+        function createDefaultUsedSet() {
+            return createWheelSet({
+                id: DEFAULT_USED_ENDLESS_90_ES.id,
+                defaultProfileKey: DEFAULT_SETUP_ID,
+                name: DEFAULT_USED_ENDLESS_90_ES.name,
+                baseSize: DEFAULT_USED_ENDLESS_90_ES.baseSize,
+                frameKey: DEFAULT_USED_ENDLESS_90_ES.frameKey,
+                wheelModel: DEFAULT_USED_ENDLESS_90_ES.wheelModel,
+                wheelDurometer: DEFAULT_USED_ENDLESS_90_ES.wheelDurometer,
+                slotWheelKeys: DEFAULT_SLOT_WHEEL_KEYS,
+                wheelNames: DEFAULT_USED_ENDLESS_90_ES.wheelNames,
+                sizes: DEFAULT_USED_ENDLESS_90_ES.sizes,
+                apexSides: DEFAULT_USED_ENDLESS_90_ES.apexSides,
+                trackingState: DEFAULT_USED_ENDLESS_90_ES.trackingState,
+                defaultProfileRevision: DEFAULT_PROFILE_REVISION
+            });
+        }
+
+        function createWheelSet(options) {
+            const now = new Date().toISOString();
+            const frameKey = FRAME_PRESETS[options.frameKey] ? options.frameKey : "endless_90es";
+            const frame = FRAME_PRESETS[frameKey];
+            const baseSize = toWheelSize(options.baseSize, frame.defaultSize);
+            const slotOrder = getSlotOrderForFrame(frameKey);
+            const wheelNames = {};
+            const sizes = {};
+            const baselineSizes = {};
+            const apexSides = {};
+            const trackingState = {};
+
+            slotOrder.forEach((slot) => {
+                const slotState = getTrackingStateForSlot(options, slot);
+                const wheelKey = slotState.wheelKey || getWheelKeyForSlot(options, slot);
+                const slotDefaultSize = getDefaultSizeForSlot(frameKey, slot, baseSize);
+                wheelNames[wheelKey] = cleanName(readWheelOption(options, "wheelNames", slot, wheelKey, getDefaultWheelName(wheelKey)), getDefaultWheelName(wheelKey));
+                sizes[wheelKey] = toWheelSize(readWheelOption(options, "sizes", slot, wheelKey, slotDefaultSize), slotDefaultSize);
+                baselineSizes[wheelKey] = sizes[wheelKey];
+                apexSides[wheelKey] = normalizeApexSide(readWheelOption(options, "apexSides", slot, wheelKey, "logo"));
+                trackingState[slot] = {
+                    wheelKey,
+                    sideFlipped: calculateMountSideFlipped(slot, apexSides[wheelKey]),
+                    rotations: 0
+                };
+            });
+
+            return {
+                id: options.id || createId(),
+                defaultProfileKey: options.defaultProfileKey || "",
+                defaultProfileRevision: options.defaultProfileRevision || 0,
+                name: cleanName(options.name, "Skate Setup"),
+                frameKey,
+                wheelModel: cleanName(options.wheelModel, "Endless"),
+                wheelDurometer: normalizeDurometer(options.wheelDurometer || "87A"),
+                baseSize,
+                wheelNames,
+                sizes,
+                baselineSizes,
+                caliperDrafts: {},
+                apexSides,
+                trackingState,
+                wearStats: createEmptyWearStats(frameKey),
+                undoSnapshot: null,
+                lastSessionMeta: normalizeSessionMeta(options.lastSessionMeta),
+                sessions: [],
+                rotationSnapshots: [],
+                logs: [],
+                rotationCount: 0,
+                createdAt: now,
+                updatedAt: now
+            };
+        }
+
+        function isArcFrame(frameKey) {
+            return frameKey === "endless_arc_es";
+        }
+
+        function getFrameKeyForValue(value) {
+            return FRAME_PRESETS[value] ? value : "endless_90es";
+        }
+
+        function getLeftSlotsForFrame(frameKey) {
+            return isArcFrame(frameKey) ? ARC_LEFT_SLOTS : FOUR_WHEEL_LEFT_SLOTS;
+        }
+
+        function getRightSlotsForFrame(frameKey) {
+            return isArcFrame(frameKey) ? ARC_RIGHT_SLOTS : FOUR_WHEEL_RIGHT_SLOTS;
+        }
+
+        function getSlotOrderForFrame(frameKey) {
+            return Object.freeze([...getLeftSlotsForFrame(frameKey), ...getRightSlotsForFrame(frameKey)]);
+        }
+
+        function getSlotWheelKeysForFrame(frameKey) {
+            return isArcFrame(frameKey) ? ARC_SLOT_WHEEL_KEYS : FOUR_WHEEL_SLOT_WHEEL_KEYS;
+        }
+
+        function getWheelKeysForFrame(frameKey) {
+            return getSlotOrderForFrame(frameKey).map((slot) => getSlotWheelKeysForFrame(frameKey)[slot]);
+        }
+
+        function getDefaultWheelName(wheelKey) {
+            const wheelNumber = String(wheelKey || "").replace(/^W/i, "");
+            return wheelNumber ? `Wheel ${wheelNumber}` : "Wheel";
+        }
+
+        function getDefaultSizeForSlot(frameKey, slot, fallbackSize) {
+            if (!isArcFrame(frameKey)) return toWheelSize(fallbackSize, 90);
+            return slot === "L1" || slot === "L5" || slot === "R1" || slot === "R5" ? 84 : 76;
+        }
+
+        function getConveyorStepsForFrame(frameKey) {
+            return isArcFrame(frameKey) ? ARC_CONVEYOR_STEPS : ROCKET_CONVEYOR_STEPS;
+        }
+
+        function getLoopRowsForFrame(frameKey) {
+            return isArcFrame(frameKey) ? ARC_LOOPS : ROCKET_LOOPS;
+        }
+
+        function getTrackingStateForSlot(options, slot) {
+            const trackingState = options.trackingState || {};
+            return trackingState[slot] || {};
+        }
+
+        function getWheelKeyForSlot(options, slot) {
+            if (options.slotWheelKeys && options.slotWheelKeys[slot]) {
+                return options.slotWheelKeys[slot];
+            }
+            return getSlotWheelKeysForFrame(getFrameKeyForValue(options.frameKey))[slot] || slot;
+        }
+
+        function readWheelOption(options, field, slot, wheelKey, fallback) {
+            const collection = options[field] || {};
+            if (Object.prototype.hasOwnProperty.call(collection, slot)) {
+                return collection[slot];
+            }
+            if (Object.prototype.hasOwnProperty.call(collection, wheelKey)) {
+                return collection[wheelKey];
+            }
+            return fallback;
+        }
+
+        function normalizeApexSide(value) {
+            return value === "blank" ? "blank" : "logo";
+        }
+
+        function normalizeDurometer(value) {
+            const text = String(value || "").toUpperCase().replace(/\s+/g, "");
+            const normalized = text.endsWith("A") ? text : `${text}A`;
+            return DUROMETER_OPTIONS.includes(normalized) ? normalized : "87A";
+        }
+
+        function createEmptyWearStats(frameKey = "endless_90es") {
+            const stats = {};
+            getSlotOrderForFrame(frameKey).forEach((slot) => {
+                stats[slot] = {
+                    totalLoss: 0,
+                    samples: 0,
+                    lastLoss: 0,
+                    maxLoss: 0,
+                    totalMinutes: 0,
+                    totalMiles: 0,
+                    slideSamples: 0
+                };
+            });
+            return stats;
+        }
+
+        function normalizeWearStats(value, frameKey = "endless_90es") {
+            const stats = createEmptyWearStats(frameKey);
+            getSlotOrderForFrame(frameKey).forEach((slot) => {
+                const incoming = value && value[slot] ? value[slot] : {};
+                const totalLoss = Number(incoming.totalLoss);
+                const samples = Number(incoming.samples);
+                const lastLoss = Number(incoming.lastLoss);
+                const maxLoss = Number(incoming.maxLoss);
+                const totalMinutes = Number(incoming.totalMinutes);
+                const totalMiles = Number(incoming.totalMiles);
+                const slideSamples = Number(incoming.slideSamples);
+
+                stats[slot] = {
+                    totalLoss: Number.isFinite(totalLoss) ? Math.max(0, totalLoss) : 0,
+                    samples: Number.isFinite(samples) ? Math.max(0, Math.round(samples)) : 0,
+                    lastLoss: Number.isFinite(lastLoss) ? Math.max(0, lastLoss) : 0,
+                    maxLoss: Number.isFinite(maxLoss) ? Math.max(0, maxLoss) : 0,
+                    totalMinutes: Number.isFinite(totalMinutes) ? Math.max(0, totalMinutes) : 0,
+                    totalMiles: Number.isFinite(totalMiles) ? Math.max(0, totalMiles) : 0,
+                    slideSamples: Number.isFinite(slideSamples) ? Math.max(0, Math.round(slideSamples)) : 0
+                };
+            });
+            return stats;
+        }
+
+        function normalizeSessionMeta(value) {
+            const rawMinutes = Number(value && value.minutes);
+            const minutes = Number.isFinite(rawMinutes) ? Math.round(clamp(rawMinutes, 0, 480)) : 0;
+            const rawMiles = Number(value && value.miles);
+            const miles = Number.isFinite(rawMiles) ? Number(clamp(rawMiles, 0, 100).toFixed(2)) : 0;
+            const type = ["normal", "slide-heavy", "cruising"].includes(value && value.type)
+                ? value.type
+                : "normal";
+            return { minutes, miles, type };
+        }
+
+        function normalizeSessionEntries(value) {
+            if (!Array.isArray(value)) return [];
+            return value.map(normalizeSessionEntry).filter(Boolean).slice(0, 300);
+        }
+
+        function normalizeSessionEntry(value) {
+            if (!value || typeof value !== "object") return null;
+            const session = normalizeSessionMeta(value);
+            const rotationNumber = Number(value.rotationNumber);
+
+            return {
+                id: value.id || createId(),
+                createdAt: value.createdAt || new Date().toISOString(),
+                rotationNumber: Number.isFinite(rotationNumber) ? Math.max(0, Math.round(rotationNumber)) : 0,
+                minutes: session.minutes,
+                miles: session.miles,
+                type: session.type,
+                frameKey: getFrameKeyForValue(value.frameKey),
+                wheelModel: cleanName(value.wheelModel, ""),
+                wheelDurometer: normalizeDurometer(value.wheelDurometer || "87A"),
+                slotMap: value.slotMap && typeof value.slotMap === "object" ? clonePlain(value.slotMap) : {}
+            };
+        }
+
+        function normalizeUndoSnapshot(value) {
+            if (!value || typeof value !== "object" || !value.profile || typeof value.profile !== "object") {
+                return null;
+            }
+            return {
+                createdAt: value.createdAt || new Date().toISOString(),
+                label: cleanName(value.label, "Last rotation"),
+                profile: clonePlain(value.profile)
+            };
+        }
+
+        function normalizeRotationSnapshots(value) {
+            if (!Array.isArray(value)) return [];
+            return value.filter((item) => item && typeof item === "object").map((item) => clonePlain(item)).slice(0, 100);
+        }
+
+        function normalizeCaliperDrafts(value, frameKey, sizes, trackingState) {
+            const drafts = {};
+            if (!value || typeof value !== "object") return drafts;
+
+            getSlotOrderForFrame(frameKey).forEach((slot) => {
+                if (!Object.prototype.hasOwnProperty.call(value, slot)) return;
+                const wheelKey = trackingState && trackingState[slot] && trackingState[slot].wheelKey;
+                const fallback = wheelKey && sizes && Object.prototype.hasOwnProperty.call(sizes, wheelKey)
+                    ? sizes[wheelKey]
+                    : getDefaultSizeForSlot(frameKey, slot, FRAME_PRESETS[frameKey].defaultSize);
+                const draft = toWheelSize(value[slot], fallback);
+                if (Number.isFinite(draft)) drafts[slot] = draft;
+            });
+
+            return drafts;
+        }
+
+        function migrateMutatedSizesToDrafts(set) {
+            if (!set || !set.trackingState || !set.sizes || !set.baselineSizes) return;
+            if (set.caliperDrafts && Object.keys(set.caliperDrafts).length > 0) return;
+
+            getSlotOrderForFrame(set.frameKey).forEach((slot) => {
+                const slotState = set.trackingState[slot];
+                const wheelKey = slotState && slotState.wheelKey;
+                if (!wheelKey) return;
+                const current = Number(set.sizes[wheelKey]);
+                const baseline = Number(set.baselineSizes[wheelKey]);
+                if (!Number.isFinite(current) || !Number.isFinite(baseline)) return;
+                if (Math.abs(current - baseline) < 0.05) return;
+
+                set.caliperDrafts[slot] = toWheelSize(current, baseline);
+                set.sizes[wheelKey] = toWheelSize(baseline, current);
+            });
+        }
+
+        function getSessionTypeLabel(type) {
+            if (type === "slide-heavy") return "Slide-heavy";
+            if (type === "cruising") return "Cruising";
+            return "Normal";
+        }
+
+        function getTargetFrameSide(slot) {
+            return String(slot).startsWith("L") ? "left" : "right";
+        }
+
+        function calculateMountSideFlipped(targetSlot, apexSide) {
+            const thickSide = normalizeApexSide(apexSide);
+            void targetSlot;
+            return thickSide === "logo";
+        }
+
+        function calculateMountInstruction(targetSlot, apexSide) {
+            const sideFlipped = calculateMountSideFlipped(targetSlot, apexSide);
+            return {
+                frameSide: getTargetFrameSide(targetSlot),
+                apexSide: normalizeApexSide(apexSide),
+                sideFlipped,
+                label: getOrientationLabel(sideFlipped)
+            };
+        }
+
+        function loadState() {
+            const storedRecord = findStoredStateRecord();
+            if (storedRecord) {
+                lastLoadedStorageRecord = storedRecord;
+                return storedRecord.state;
+            }
+
+            lastLoadedStorageRecord = null;
+            return createDefaultState();
+        }
+
+        function findStoredStateRecord() {
+            for (const key of STORAGE_LOOKUP_KEYS) {
+                const raw = window.localStorage.getItem(key);
+                if (!raw) continue;
+
+                try {
+                    return {
+                        key,
+                        raw,
+                        state: parseStoredState(raw)
+                    };
+                } catch (error) {
+                    console.warn(`SkateTech could not hydrate ${key}. Trying the next cache.`, error);
+                }
+            }
+
+            return null;
+        }
+
+        function parseStoredState(raw) {
+            const parsed = JSON.parse(raw);
+            const payload = extractStoredStatePayload(parsed);
+            if (!payload || !Array.isArray(payload.sets) || payload.sets.length === 0) {
+                throw new Error("Stored SkateTech payload has no wheel profiles.");
+            }
+            return normalizeState(payload);
+        }
+
+        function extractStoredStatePayload(parsed) {
+            const payload = parsed && parsed.data ? parsed.data : parsed;
+            if (payload && Array.isArray(payload.sets)) return payload;
+
+            if (payload && Array.isArray(payload.profiles)) {
+                return {
+                    version: payload.version || 1,
+                    activeSetId: payload.activeSetId || payload.activeProfileId || payload.currentProfileId || (payload.profiles[0] && payload.profiles[0].id),
+                    sets: payload.profiles,
+                    lastBackupAt: payload.lastBackupAt || "",
+                    lastSavedAt: payload.lastSavedAt || ""
+                };
+            }
+
+            if (payload && Array.isArray(payload.wheelSets)) {
+                return {
+                    version: payload.version || 1,
+                    activeSetId: payload.activeSetId || payload.activeWheelSetId || (payload.wheelSets[0] && payload.wheelSets[0].id),
+                    sets: payload.wheelSets,
+                    lastBackupAt: payload.lastBackupAt || "",
+                    lastSavedAt: payload.lastSavedAt || ""
+                };
+            }
+
+            return payload;
+        }
+
+        async function hydrateFromDurableCache() {
+            try {
+                const raw = await readDurableState();
+                if (!raw) return;
+                const durableState = parseStoredState(raw);
+                if (!shouldAdoptStoredState(durableState, appState)) return;
+
+                appState = durableState;
+                lastLoadedStorageRecord = { key: "indexedDB", raw, state: appState };
+                renameMode = false;
+                pendingRotationPreview = null;
+                renderAll();
+                updateStatusBanner(calculateSpread(getActiveSet()));
+                showToast("Recovered a durable browser save.");
+            } catch (error) {
+                console.warn("SkateTech durable cache could not be hydrated.", error);
+            }
+        }
+
+        function shouldAdoptStoredState(candidate, current) {
+            if (!candidate || !Array.isArray(candidate.sets) || candidate.sets.length === 0) return false;
+            if (!current || !Array.isArray(current.sets) || current.sets.length === 0) return true;
+
+            const candidateScore = getStateCompletenessScore(candidate);
+            const currentScore = getStateCompletenessScore(current);
+            if (candidateScore > currentScore) return true;
+            if (candidateScore < currentScore) return false;
+
+            return new Date(candidate.lastSavedAt || 0).getTime() > new Date(current.lastSavedAt || 0).getTime();
+        }
+
+        function getStateCompletenessScore(state) {
+            if (!state || !Array.isArray(state.sets)) return 0;
+            return state.sets.reduce((score, set) => {
+                return score +
+                    1000 +
+                    (Number(set.rotationCount || 0) * 100) +
+                    ((set.sessions || []).length * 25) +
+                    ((set.logs || []).length * 25) +
+                    ((set.rotationSnapshots || []).length * 30) +
+                    (Object.keys(set.caliperDrafts || {}).length * 8);
+            }, 0);
+        }
+
+        function openDurableDb() {
+            return new Promise((resolve, reject) => {
+                if (!window.indexedDB) {
+                    resolve(null);
+                    return;
+                }
+
+                const request = window.indexedDB.open(DURABLE_DB_NAME, 1);
+                request.onupgradeneeded = () => {
+                    const db = request.result;
+                    if (!db.objectStoreNames.contains(DURABLE_STORE_NAME)) {
+                        db.createObjectStore(DURABLE_STORE_NAME, { keyPath: "id" });
+                    }
+                };
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = () => reject(request.error);
+            });
+        }
+
+        async function readDurableState() {
+            const db = await openDurableDb();
+            if (!db) return "";
+
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction(DURABLE_STORE_NAME, "readonly");
+                const store = transaction.objectStore(DURABLE_STORE_NAME);
+                const request = store.get(DURABLE_STATE_KEY);
+                request.onsuccess = () => resolve(request.result && request.result.raw ? request.result.raw : "");
+                request.onerror = () => reject(request.error);
+                transaction.oncomplete = () => db.close();
+                transaction.onerror = () => {
+                    db.close();
+                    reject(transaction.error);
+                };
+            });
+        }
+
+        async function writeDurableState(raw) {
+            try {
+                const db = await openDurableDb();
+                if (!db) return;
+
+                await new Promise((resolve, reject) => {
+                    const transaction = db.transaction(DURABLE_STORE_NAME, "readwrite");
+                    const store = transaction.objectStore(DURABLE_STORE_NAME);
+                    store.put({
+                        id: DURABLE_STATE_KEY,
+                        raw,
+                        updatedAt: new Date().toISOString()
+                    });
+                    transaction.oncomplete = () => {
+                        db.close();
+                        resolve();
+                    };
+                    transaction.onerror = () => {
+                        db.close();
+                        reject(transaction.error);
+                    };
+                });
+            } catch (error) {
+                console.warn("SkateTech durable cache could not be saved.", error);
+            }
+        }
+
+        function loadCloudConfig() {
+            try {
+                const raw = window.localStorage.getItem(CLOUD_CONFIG_KEY);
+                const parsed = raw ? JSON.parse(raw) : {};
+                return {
+                    url: cleanUrl(parsed.url || ""),
+                    anonKey: String(parsed.anonKey || ""),
+                    email: String(parsed.email || "")
+                };
+            } catch (error) {
+                console.warn("SkateTech cloud config could not be loaded.", error);
+                return { url: "", anonKey: "", email: "" };
+            }
+        }
+
+        function saveCloudConfig(config) {
+            cloudConfig = {
+                url: cleanUrl(config.url || ""),
+                anonKey: String(config.anonKey || ""),
+                email: String(config.email || "")
+            };
+            window.localStorage.setItem(CLOUD_CONFIG_KEY, JSON.stringify(cloudConfig));
+        }
+
+        function cleanUrl(value) {
+            return String(value || "").trim().replace(/\/+$/, "");
+        }
+
+        function hasCloudConfig() {
+            return Boolean(cloudConfig && cloudConfig.url && cloudConfig.anonKey);
+        }
+
+        function getCloudClient() {
+            if (!hasCloudConfig()) return null;
+            if (!window.supabase || !window.supabase.createClient) return null;
+            if (cloudClient) return cloudClient;
+
+            cloudClient = window.supabase.createClient(cloudConfig.url, cloudConfig.anonKey, {
+                auth: {
+                    persistSession: true,
+                    autoRefreshToken: true,
+                    detectSessionInUrl: true
+                }
+            });
+            return cloudClient;
+        }
+
+        async function initCloudSync() {
+            renderCloudPanel();
+            if (!hasCloudConfig()) return;
+
+            const client = getCloudClient();
+            if (!client) {
+                renderCloudStatus("Supabase client is not loaded yet.");
+                return;
+            }
+
+            try {
+                const { data, error } = await client.auth.getSession();
+                if (error) throw error;
+                cloudSession = data && data.session ? data.session : null;
+                client.auth.onAuthStateChange((_event, session) => {
+                    cloudSession = session || null;
+                    renderCloudPanel();
+                    if (cloudSession) pullCloudState({ showToastOnSuccess: false }).then(() => pushCloudState({ showToastOnSuccess: false }));
+                });
+                renderCloudPanel();
+                if (cloudSession) {
+                    await pullCloudState({ showToastOnSuccess: false });
+                    await pushCloudState({ showToastOnSuccess: false });
+                }
+            } catch (error) {
+                renderCloudStatus(`Cloud auth error: ${error.message || error}`);
+                console.warn("SkateTech cloud init failed.", error);
+            }
+        }
+
+        function saveCloudSettings() {
+            const nextConfig = {
+                url: els.supabaseUrlInput.value,
+                anonKey: els.supabaseAnonInput.value,
+                email: els.cloudEmailInput.value
+            };
+            if (!cleanUrl(nextConfig.url) || !nextConfig.anonKey.trim()) {
+                showToast("Enter your Supabase URL and anon public key.");
+                return;
+            }
+
+            saveCloudConfig(nextConfig);
+            cloudClient = null;
+            cloudSession = null;
+            renderCloudPanel();
+            initCloudSync();
+            showToast("Cloud settings saved.");
+        }
+
+        async function sendCloudMagicLink() {
+            saveCloudSettings();
+            const email = String(els.cloudEmailInput.value || "").trim();
+            if (!email) {
+                showToast("Enter your email first.");
+                return;
+            }
+
+            const client = getCloudClient();
+            if (!client) {
+                showToast("Supabase is not ready yet.");
+                return;
+            }
+
+            try {
+                renderCloudStatus("Sending login link...");
+                const { error } = await client.auth.signInWithOtp({
+                    email,
+                    options: {
+                        emailRedirectTo: getAppRedirectUrl()
+                    }
+                });
+                if (error) throw error;
+                showToast("Login link sent. Open it on this device.");
+                renderCloudStatus("Login link sent. Check your email.");
+            } catch (error) {
+                showToast("Could not send login link.");
+                renderCloudStatus(`Login link failed: ${error.message || error}`);
+                console.warn("SkateTech magic link failed.", error);
+            }
+        }
+
+        function getAppRedirectUrl() {
+            return window.location.href.split("#")[0].split("?")[0];
+        }
+
+        async function signOutCloud() {
+            const client = getCloudClient();
+            if (!client) return;
+            try {
+                await client.auth.signOut();
+                cloudSession = null;
+                renderCloudPanel();
+                showToast("Cloud signed out.");
+            } catch (error) {
+                showToast("Cloud sign out failed.");
+                console.warn("SkateTech cloud sign out failed.", error);
+            }
+        }
+
+        function queueCloudSave() {
+            if (!cloudSession || cloudBusy) return;
+            window.clearTimeout(cloudSaveTimer);
+            cloudSaveTimer = window.setTimeout(() => {
+                pushCloudState({ showToastOnSuccess: false });
+            }, 900);
+        }
+
+        async function pushCloudState(options = {}) {
+            const client = getCloudClient();
+            const user = cloudSession && cloudSession.user;
+            if (!client || !user) {
+                if (options.showToastOnSuccess) showToast("Sign in to cloud first.");
+                renderCloudPanel();
+                return false;
+            }
+
+            try {
+                cloudBusy = true;
+                renderCloudStatus("Saving to Supabase...");
+                const payload = JSON.parse(JSON.stringify(appState));
+                const { error } = await client
+                    .from(CLOUD_TABLE_NAME)
+                    .upsert({
+                        user_id: user.id,
+                        payload,
+                        client_updated_at: payload.lastSavedAt || new Date().toISOString(),
+                        updated_at: new Date().toISOString()
+                    }, { onConflict: "user_id" });
+                if (error) throw error;
+                renderCloudStatus(`Cloud saved as ${user.email || "signed-in user"}.`);
+                if (options.showToastOnSuccess) showToast("Cloud sync saved.");
+                return true;
+            } catch (error) {
+                renderCloudStatus(`Cloud save failed: ${error.message || error}`);
+                if (options.showToastOnSuccess) showToast("Cloud save failed.");
+                console.warn("SkateTech cloud save failed.", error);
+                return false;
+            } finally {
+                cloudBusy = false;
+                renderCloudPanel();
+            }
+        }
+
+        async function pullCloudState(options = {}) {
+            const client = getCloudClient();
+            const user = cloudSession && cloudSession.user;
+            if (!client || !user) {
+                if (options.showToastOnSuccess) showToast("Sign in to cloud first.");
+                renderCloudPanel();
+                return false;
+            }
+
+            try {
+                cloudBusy = true;
+                renderCloudStatus("Checking Supabase save...");
+                const { data, error } = await client
+                    .from(CLOUD_TABLE_NAME)
+                    .select("payload, updated_at, client_updated_at")
+                    .eq("user_id", user.id)
+                    .maybeSingle();
+                if (error) throw error;
+                if (!data || !data.payload) {
+                    await pushCloudState({ showToastOnSuccess: false });
+                    if (options.showToastOnSuccess) showToast("No cloud save existed, so local data was uploaded.");
+                    return true;
+                }
+
+                const remoteState = normalizeState(data.payload);
+                const shouldAdopt = options.force || shouldAdoptStoredState(remoteState, appState);
+                if (shouldAdopt) {
+                    if (options.force && !window.confirm("Replace this device with the Supabase cloud save?")) return false;
+                    appState = remoteState;
+                    renameMode = false;
+                    pendingRotationPreview = null;
+                    renderAll();
+                    updateStatusBanner(calculateSpread(getActiveSet()));
+                    saveStateNow();
+                    if (options.showToastOnSuccess) showToast("Cloud save pulled onto this device.");
+                    return true;
+                }
+
+                renderCloudStatus("Local save is current. Cloud pull skipped.");
+                if (options.showToastOnSuccess) showToast("Local save is already current.");
+                return false;
+            } catch (error) {
+                renderCloudStatus(`Cloud pull failed: ${error.message || error}`);
+                if (options.showToastOnSuccess) showToast("Cloud pull failed.");
+                console.warn("SkateTech cloud pull failed.", error);
+                return false;
+            } finally {
+                cloudBusy = false;
+                renderCloudPanel();
+            }
+        }
+
+        function renderCloudPanel() {
+            if (!els.supabaseUrlInput) return;
+            const config = cloudConfig || { url: "", anonKey: "", email: "" };
+            if (document.activeElement !== els.supabaseUrlInput) els.supabaseUrlInput.value = config.url || "";
+            if (document.activeElement !== els.supabaseAnonInput) els.supabaseAnonInput.value = config.anonKey || "";
+            if (document.activeElement !== els.cloudEmailInput) els.cloudEmailInput.value = config.email || "";
+
+            if (!hasCloudConfig()) {
+                renderCloudStatus("Not connected. Add your Supabase URL and anon key.");
+            } else if (!window.supabase || !window.supabase.createClient) {
+                renderCloudStatus("Supabase library is loading. Refresh if this stays here.");
+            } else if (cloudBusy) {
+                renderCloudStatus("Cloud sync in progress...");
+            } else if (cloudSession && cloudSession.user) {
+                renderCloudStatus(`Signed in as ${cloudSession.user.email || "Supabase user"}.`);
+            } else {
+                renderCloudStatus("Cloud configured. Send a login link to start syncing.");
+            }
+        }
+
+        function renderCloudStatus(message) {
+            if (els.cloudSyncStatus) els.cloudSyncStatus.textContent = message;
+        }
+
+        function normalizeState(value) {
+            if (!value || !Array.isArray(value.sets) || value.sets.length === 0) {
+                return createDefaultState();
+            }
+
+            const sets = value.sets.map(normalizeSet).filter(Boolean);
+            if (sets.length === 0) return createDefaultState();
+            const defaultProfileResult = ensureDefaultUsedProfile(sets);
+
+            const activeSetId = defaultProfileResult.changed
+                ? defaultProfileResult.activeSetId
+                : sets.some((set) => set.id === value.activeSetId)
+                    ? value.activeSetId
+                    : sets[0].id;
+
+            return {
+                version: 1,
+                activeSetId,
+                sets,
+                lastBackupAt: value.lastBackupAt || "",
+                lastSavedAt: value.lastSavedAt || new Date().toISOString()
+            };
+        }
+
+        function normalizeSet(set) {
+            if (!set || typeof set !== "object") return null;
+            const frameKey = getFrameKeyForValue(set.frameKey);
+            const baseSize = toWheelSize(set.baseSize, FRAME_PRESETS[frameKey].defaultSize);
+            const slotOrder = getSlotOrderForFrame(frameKey);
+            const slotWheelKeys = getSlotWheelKeysForFrame(frameKey);
+            const wheelNames = {};
+            const sizes = {};
+            const baselineSizes = {};
+            const apexSides = {};
+            const trackingState = {};
+
+            slotOrder.forEach((slot) => {
+                const legacyWheel = set.wheels && set.wheels[slot] ? set.wheels[slot] : {};
+                const incomingState = set.trackingState && set.trackingState[slot] ? set.trackingState[slot] : {};
+                const wheelKey = incomingState.wheelKey || legacyWheel.wheelKey || slotWheelKeys[slot] || slot;
+                const incomingSize = set.sizes && Object.prototype.hasOwnProperty.call(set.sizes, wheelKey)
+                    ? set.sizes[wheelKey]
+                    : legacyWheel.size;
+                const incomingName = set.wheelNames && Object.prototype.hasOwnProperty.call(set.wheelNames, wheelKey)
+                    ? set.wheelNames[wheelKey]
+                    : legacyWheel.name;
+                const incomingApexSide = set.apexSides && Object.prototype.hasOwnProperty.call(set.apexSides, wheelKey)
+                    ? set.apexSides[wheelKey]
+                    : "logo";
+                const incomingBaselineSize = set.baselineSizes && Object.prototype.hasOwnProperty.call(set.baselineSizes, wheelKey)
+                    ? set.baselineSizes[wheelKey]
+                    : incomingSize;
+                const slotDefaultSize = getDefaultSizeForSlot(frameKey, slot, baseSize);
+
+                wheelNames[wheelKey] = cleanName(incomingName, getDefaultWheelName(wheelKey));
+                sizes[wheelKey] = toWheelSize(incomingSize, slotDefaultSize);
+                baselineSizes[wheelKey] = toWheelSize(incomingBaselineSize, sizes[wheelKey]);
+                apexSides[wheelKey] = normalizeApexSide(incomingApexSide);
+                trackingState[slot] = {
+                    wheelKey,
+                    sideFlipped: calculateMountSideFlipped(slot, apexSides[wheelKey]),
+                    rotations: Number.isFinite(Number(incomingState.rotations ?? legacyWheel.rotations))
+                        ? Number(incomingState.rotations ?? legacyWheel.rotations)
+                        : 0
+                };
+            });
+
+            const normalized = {
+                id: set.id || createId(),
+                defaultProfileKey: set.defaultProfileKey || "",
+                defaultProfileRevision: Number.isFinite(Number(set.defaultProfileRevision)) ? Number(set.defaultProfileRevision) : 0,
+                name: cleanName(set.name, "Skate Setup"),
+                frameKey,
+                wheelModel: cleanName(set.wheelModel, "Endless"),
+                wheelDurometer: normalizeDurometer(set.wheelDurometer || "87A"),
+                baseSize,
+                wheelNames,
+                sizes,
+                baselineSizes,
+                caliperDrafts: normalizeCaliperDrafts(set.caliperDrafts, frameKey, sizes, trackingState),
+                apexSides,
+                trackingState,
+                wearStats: normalizeWearStats(set.wearStats, frameKey),
+                undoSnapshot: normalizeUndoSnapshot(set.undoSnapshot),
+                lastSessionMeta: normalizeSessionMeta(set.lastSessionMeta),
+                sessions: normalizeSessionEntries(set.sessions),
+                rotationSnapshots: normalizeRotationSnapshots(set.rotationSnapshots),
+                logs: Array.isArray(set.logs) ? set.logs.slice(0, 100) : [],
+                rotationCount: Number.isFinite(Number(set.rotationCount)) ? Number(set.rotationCount) : 0,
+                createdAt: set.createdAt || new Date().toISOString(),
+                updatedAt: set.updatedAt || new Date().toISOString()
+            };
+
+            migrateMutatedSizesToDrafts(normalized);
+            return normalized;
+        }
+
+        function ensureDefaultUsedProfile(sets) {
+            const existingIndex = sets.findIndex(isDefaultUsedProfile);
+
+            if (existingIndex >= 0) {
+                const existingSet = sets[existingIndex];
+                if (needsDefaultProfileRevision(existingSet)) {
+                    if (canSafelyRefreshDefaultProfile(existingSet)) {
+                        applyDefaultUsedValues(existingSet);
+                        return { changed: true, activeSetId: existingSet.id };
+                    }
+                    existingSet.defaultProfileRevision = DEFAULT_PROFILE_REVISION;
+                }
+                return { changed: false, activeSetId: existingSet.id };
+            }
+
+            const freshIndex = sets.findIndex(isFreshGeneratedEndlessBaseProfile);
+            if (freshIndex >= 0) {
+                applyDefaultUsedValues(sets[freshIndex]);
+                return { changed: true, activeSetId: sets[freshIndex].id };
+            }
+
+            const defaultSet = createDefaultUsedSet();
+            sets.unshift(defaultSet);
+            return { changed: true, activeSetId: defaultSet.id };
+        }
+
+        function canSafelyRefreshDefaultProfile(set) {
+            return isFreshGeneratedEndlessBaseProfile(set);
+        }
+
+        function isDefaultUsedProfile(set) {
+            return set.defaultProfileKey === DEFAULT_SETUP_ID ||
+                set.id === DEFAULT_SETUP_ID ||
+                set.name === DEFAULT_USED_ENDLESS_90_ES.name;
+        }
+
+        function isFreshGeneratedEndlessBaseProfile(set) {
+            return set.frameKey === "endless_90es" &&
+                set.baseSize === DEFAULT_USED_ENDLESS_90_ES.baseSize &&
+                hasNoRotationHistory(set) &&
+                (set.name === "Endless 90 ES" || set.name === DEFAULT_USED_ENDLESS_90_ES.name) &&
+                SLOT_ORDER.every((slot) => Math.abs(getWheelViewForSlot(set, slot).size - DEFAULT_USED_ENDLESS_90_ES.baseSize) < 0.05);
+        }
+
+        function hasNoRotationHistory(set) {
+            return Number(set.rotationCount || 0) === 0 &&
+                (!set.logs || set.logs.length === 0) &&
+                (!set.sessions || set.sessions.length === 0) &&
+                (!set.rotationSnapshots || set.rotationSnapshots.length === 0) &&
+                (!set.caliperDrafts || Object.keys(set.caliperDrafts).length === 0) &&
+                !hasWearSamples(set);
+        }
+
+        function hasWearSamples(set) {
+            const stats = set && set.wearStats ? set.wearStats : {};
+            return Object.values(stats).some((item) => {
+                return Number(item && item.samples) > 0 ||
+                    Number(item && item.totalLoss) > 0 ||
+                    Number(item && item.totalMinutes) > 0 ||
+                    Number(item && item.totalMiles) > 0;
+            });
+        }
+
+        function needsDefaultProfileRevision(set) {
+            return Number(set.defaultProfileRevision || 0) < DEFAULT_PROFILE_REVISION;
+        }
+
+        function applyDefaultUsedValues(set) {
+            const now = new Date().toISOString();
+            set.defaultProfileKey = DEFAULT_SETUP_ID;
+            set.defaultProfileRevision = DEFAULT_PROFILE_REVISION;
+            set.name = DEFAULT_USED_ENDLESS_90_ES.name;
+            set.frameKey = DEFAULT_USED_ENDLESS_90_ES.frameKey;
+            set.wheelModel = DEFAULT_USED_ENDLESS_90_ES.wheelModel;
+            set.wheelDurometer = DEFAULT_USED_ENDLESS_90_ES.wheelDurometer;
+            set.baseSize = DEFAULT_USED_ENDLESS_90_ES.baseSize;
+            set.wheelNames = {};
+                    set.sizes = {};
+                    set.baselineSizes = {};
+                    set.caliperDrafts = {};
+                    set.apexSides = {};
+                    set.trackingState = {};
+            set.wearStats = createEmptyWearStats(DEFAULT_USED_ENDLESS_90_ES.frameKey);
+            set.undoSnapshot = null;
+            set.lastSessionMeta = normalizeSessionMeta(set.lastSessionMeta);
+            set.sessions = [];
+            set.rotationSnapshots = [];
+
+            SLOT_ORDER.forEach((slot) => {
+                const slotState = DEFAULT_USED_ENDLESS_90_ES.trackingState[slot] || {};
+                const wheelKey = slotState.wheelKey || DEFAULT_SLOT_WHEEL_KEYS[slot];
+                set.wheelNames[wheelKey] = DEFAULT_USED_ENDLESS_90_ES.wheelNames[wheelKey];
+                set.sizes[wheelKey] = DEFAULT_USED_ENDLESS_90_ES.sizes[wheelKey];
+                set.baselineSizes[wheelKey] = DEFAULT_USED_ENDLESS_90_ES.sizes[wheelKey];
+                set.apexSides[wheelKey] = DEFAULT_USED_ENDLESS_90_ES.apexSides[wheelKey] || "logo";
+                set.trackingState[slot] = {
+                    wheelKey,
+                    sideFlipped: calculateMountSideFlipped(slot, set.apexSides[wheelKey]),
+                    rotations: 0
+                };
+            });
+
+            set.rotationCount = 0;
+            set.logs = [];
+            set.createdAt = set.createdAt || now;
+            set.updatedAt = now;
+        }
+
+        function saveStateDebounced() {
+            window.clearTimeout(saveTimer);
+            saveTimer = window.setTimeout(saveStateNow, 220);
+        }
+
+        function saveStateNow() {
+            try {
+                appState.lastSavedAt = new Date().toISOString();
+                const serialized = JSON.stringify(appState);
+                const previousSerialized = window.localStorage.getItem(STORAGE_KEY) || (lastLoadedStorageRecord && lastLoadedStorageRecord.raw);
+                archiveStoredState(previousSerialized, serialized);
+                STORAGE_WRITE_KEYS.forEach((key) => {
+                    window.localStorage.setItem(key, serialized);
+                });
+                window.localStorage.setItem(BACKUP_KEY, serialized);
+                lastLoadedStorageRecord = { key: STORAGE_KEY, raw: serialized, state: appState };
+                writeDurableState(serialized);
+                queueCloudSave();
+                renderSaveStats();
+                renderBackupStats();
+                renderDataLifeline();
+                renderCloudPanel();
+            } catch (error) {
+                showToast("Storage is full or blocked. Your current screen is still usable.");
+                console.warn("SkateTech save failed.", error);
+            }
+        }
+
+        function archiveStoredState(previousSerialized, nextSerialized) {
+            if (!previousSerialized || previousSerialized === nextSerialized) return;
+
+            try {
+                const archive = readLocalArchive();
+                if (archive[0] && archive[0].raw === previousSerialized) return;
+                archive.unshift({
+                    archivedAt: new Date().toISOString(),
+                    raw: previousSerialized
+                });
+                window.localStorage.setItem(ARCHIVE_KEY, JSON.stringify(archive.slice(0, 12)));
+            } catch (error) {
+                console.warn("SkateTech local archive could not be updated.", error);
+            }
+        }
+
+        function readLocalArchive() {
+            try {
+                const raw = window.localStorage.getItem(ARCHIVE_KEY);
+                const parsed = raw ? JSON.parse(raw) : [];
+                return Array.isArray(parsed) ? parsed : [];
+            } catch (error) {
+                console.warn("SkateTech local archive could not be read.", error);
+                return [];
+            }
+        }
+
+        function restoreArchivedState() {
+            const archive = readLocalArchive();
+            if (archive.length === 0) {
+                showToast("No local recovery save is available yet.");
+                return;
+            }
+
+            if (!window.confirm("Recover the most recent local save? This replaces the current screen with the previous saved app data.")) {
+                return;
+            }
+
+            try {
+                const latest = archive[0];
+                appState = normalizeState(JSON.parse(latest.raw));
+                renameMode = false;
+                pendingRotationPreview = null;
+                renderAll();
+                updateStatusBanner(calculateSpread(getActiveSet()));
+                saveStateNow();
+                showToast("Recovered the last local save.");
+            } catch (error) {
+                showToast("That local recovery save could not be restored.");
+                console.warn("SkateTech local recovery failed.", error);
+            }
+        }
+
+        function restoreBackupBackbone() {
+            const raw = (els.backboneRestoreInput && els.backboneRestoreInput.value || "").trim();
+            if (!raw) {
+                showToast("Paste a backup backbone string first.");
+                return;
+            }
+
+            try {
+                const restoredState = parseStoredState(raw);
+                const serialized = JSON.stringify(restoredState);
+                const previousSerialized = window.localStorage.getItem(STORAGE_KEY);
+                archiveStoredState(previousSerialized, serialized);
+                STORAGE_WRITE_KEYS.forEach((key) => {
+                    window.localStorage.setItem(key, serialized);
+                });
+                window.localStorage.setItem(BACKUP_KEY, serialized);
+                writeDurableState(serialized);
+                appState = restoredState;
+                lastLoadedStorageRecord = { key: STORAGE_KEY, raw: serialized, state: appState };
+                renameMode = false;
+                pendingRotationPreview = null;
+                renderAll();
+                updateStatusBanner(calculateSpread(getActiveSet()));
+                showToast("Backbone restored. Reloading.");
+                window.setTimeout(() => window.location.reload(), 250);
+            } catch (error) {
+                showToast("That backbone string is not valid SkateTech data.");
+                console.warn("SkateTech backbone restore failed.", error);
+            }
+        }
+
+        async function requestPersistentStorage() {
+            if (!navigator.storage || !navigator.storage.persist) return;
+            try {
+                await navigator.storage.persist();
+            } catch (error) {
+                console.warn("Persistent storage request was not granted.", error);
+            }
+        }
+
+        function registerServiceWorker() {
+            if (!("serviceWorker" in navigator)) return;
+            if (window.location.protocol === "file:") return;
+            window.addEventListener("load", () => {
+                navigator.serviceWorker.register("sw.js").catch((error) => {
+                    console.warn("SkateTech offline cache registration failed.", error);
+                });
+            });
+        }
+
+        function exportBackupFile() {
+            appState.lastBackupAt = new Date().toISOString();
+            saveStateNow();
+            const payload = {
+                exportedAt: new Date().toISOString(),
+                app: "SkateTech OS",
+                data: appState,
+                localArchive: readLocalArchive()
+            };
+            const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            const stamp = new Date().toISOString().slice(0, 10);
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = `skatetech-backup-${stamp}.json`;
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            URL.revokeObjectURL(url);
+            showToast("Backup exported.");
+        }
+
+        function importBackupFile(event) {
+            const file = event.target.files && event.target.files[0];
+            if (!file) return;
+            if (!window.confirm("Import this backup and replace the current saved app data?")) {
+                event.target.value = "";
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = () => {
+                try {
+                    const parsed = JSON.parse(String(reader.result || ""));
+                    const importedState = parsed.data || parsed;
+                    if (Array.isArray(parsed.localArchive)) {
+                        window.localStorage.setItem(ARCHIVE_KEY, JSON.stringify(parsed.localArchive.slice(0, 12)));
+                    }
+                    appState = normalizeState(importedState);
+                    renameMode = false;
+                    pendingRotationPreview = null;
+                    renderAll();
+                    updateStatusBanner(calculateSpread(getActiveSet()));
+                    saveStateNow();
+                    showToast("Backup imported.");
+                } catch (error) {
+                    showToast("That backup file could not be imported.");
+                    console.warn("SkateTech import failed.", error);
+                } finally {
+                    event.target.value = "";
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function renderAll() {
+            renderSetSelector();
+            renderInputs();
+            renderSessionFields();
+            renderRotationPreview();
+            renderOutputMap();
+            renderProfile();
+            renderUndoState();
+            renderBackupStats();
+            renderCloudPanel();
+            renderDataLifeline();
+            renderLoopDisplay();
+            renderHeatMap();
+            renderWearRanking();
+            renderSessionLogs();
+            renderLogs();
+        }
+
+        function renderSetSelector() {
+            const currentId = appState.activeSetId;
+            els.setSelector.innerHTML = appState.sets.map((set) => {
+                const selected = set.id === currentId ? " selected" : "";
+                return `<option value="${escapeHtml(set.id)}"${selected}>${escapeHtml(set.name)}</option>`;
+            }).join("");
+        }
+
+        function renderInputs() {
+            const set = getActiveSet();
+            document.getElementById("view-calibrate").classList.toggle("renaming", renameMode);
+            els.renameToggleBtn.classList.toggle("active", renameMode);
+            els.renameToggleBtn.textContent = renameMode ? "Done" : "Rename";
+            els.leftInputContainer.innerHTML = getLeftSlotsForFrame(set.frameKey).map((slot) => renderInputTile(getWheelViewForSlot(set, slot))).join("");
+            els.rightInputContainer.innerHTML = getRightSlotsForFrame(set.frameKey).map((slot) => renderInputTile(getWheelViewForSlot(set, slot))).join("");
+            els.caliperSummary.textContent = `${getFrame(set).name} - ${set.wheelModel} ${normalizeDurometer(set.wheelDurometer)} - limit ${formatMm(getFrame(set).safetyLimit)}`;
+        }
+
+        function renderSessionFields() {
+            const set = getActiveSet();
+            const session = normalizeSessionMeta(set.lastSessionMeta);
+            els.sessionMinutes.value = session.minutes ? String(session.minutes) : "";
+            els.sessionMiles.value = session.miles ? String(session.miles) : "";
+            els.sessionType.value = session.type;
+            els.sessionSummary.textContent = `Next saved session attaches to rotation ${set.rotationCount}.`;
+        }
+
+        function renderUndoState() {
+            const set = getActiveSet();
+            const hasUndo = Boolean(set.undoSnapshot);
+            els.undoRotationBtn.disabled = !hasUndo;
+            els.undoRotationBtn.textContent = hasUndo ? "Undo Last Rotation" : "Nothing To Undo";
+        }
+
+        function renderRotationPreview() {
+            const preview = pendingRotationPreview && pendingRotationPreview.setId === getActiveSet().id
+                ? pendingRotationPreview
+                : null;
+
+            els.rotationPreview.hidden = !preview;
+            if (!preview) {
+                els.previewSummary.textContent = "Review before saving.";
+                els.previewMoveList.innerHTML = "";
+                return;
+            }
+
+            const session = preview.sessionMeta;
+            const sessionText = formatSessionMeta(session);
+            const warningText = preview.warning
+                ? ` Safety warning: ${formatMm(preview.spread.gap)} spread exceeds the frame limit.`
+                : ` ${formatMm(preview.spread.gap)} spread is inside the frame limit.`;
+
+            els.previewSummary.textContent = `${sessionText}.${warningText}`;
+            els.previewMoveList.innerHTML = renderPreviewScript(preview);
+        }
+
+        function renderPreviewScript(preview) {
+            const set = getActiveSet();
+            return getRelayChainsForFrame(set.frameKey)
+                .map((chain) => renderRelayTrack(chain, preview.nextTrackingState))
+                .join("");
+        }
+
+        function getRelayChainsForFrame(frameKey) {
+            if (isArcFrame(frameKey)) {
+                return [
+                    {
+                        title: "TRACK A: THE 84mm FRONT CHAIN (CROSS-X)",
+                        route: ["L1", "R5", "L1"],
+                        summaryLabel: "Full Path Summary"
+                    },
+                    {
+                        title: "TRACK B: THE 84mm BACK CHAIN (CROSS-X)",
+                        route: ["L5", "R1", "L5"],
+                        summaryLabel: "Full Path Summary"
+                    },
+                    {
+                        title: "TRACK C: THE 76mm INNER STAGGER (3-SLOT CHAIN)",
+                        route: ["L2", "R3", "L4", "R2", "L3", "R4", "L2"],
+                        summaryLabel: "Full Path Summary"
+                    }
+                ];
+            }
+
+            return [
+                {
+                    title: "TRACK A: THE FOUR-WHEEL CHAIN",
+                    route: ["L4", "R1", "L2", "R3", "L4"],
+                    summaryLabel: "Full Path Summary"
+                },
+                {
+                    title: "TRACK B: THE FOUR-WHEEL CHAIN",
+                    route: ["L1", "R2", "L3", "R4", "L1"],
+                    summaryLabel: "Full Path Summary"
+                }
+            ];
+        }
+
+        function renderRelayTrack(chain, nextTrackingState) {
+            const title = chain.title;
+            const route = chain.route;
+            const firstSlot = route[0];
+            const arrow = String.fromCharCode(0x2794);
+            const summaryLabel = chain.summaryLabel || "Full Path Summary";
+            const summaryPath = route.join(` ${arrow} `);
+            const steps = [
+                `Remove wheel from ${firstSlot} and HOLD IT. (Slot ${firstSlot} is now empty)`
+            ];
+
+            for (let index = 1; index < route.length; index += 1) {
+                const targetSlot = route[index];
+                const orientation = getPreviewOrientationForSlot(nextTrackingState, targetSlot);
+                const action = index === route.length - 1
+                    ? `Move to ${targetSlot} -> Insert the final held wheel   ${orientation}`
+                    : `Move to ${targetSlot} -> Pull wheel, insert held wheel ${orientation}`;
+                steps.push(action);
+            }
+
+            return `
+                <div class="preview-script">
+                    <div class="preview-script-title">--- ${escapeHtml(title)} ---</div>
+                    <ol class="preview-steps">
+                        ${steps.map((step) => `<li>${escapeHtml(step)}</li>`).join("")}
+                    </ol>
+                    <div class="preview-path-summary">${escapeHtml(summaryLabel)}: ( ${escapeHtml(summaryPath)} )</div>
+                </div>
+            `;
+        }
+
+        function getPreviewOrientationForSlot(nextTrackingState, slot) {
+            const slotState = nextTrackingState && nextTrackingState[slot];
+            return getOrientationLabel(Boolean(slotState && slotState.sideFlipped));
+        }
+
+        function renderPreviewMoveCards(moves) {
+            return moves.map((move) => `
+                <div class="preview-move">
+                    <div class="preview-path">${escapeHtml(move.from)} -> ${escapeHtml(move.to)}</div>
+                    <div class="preview-wheel">${escapeHtml(move.name)}</div>
+                    <div class="preview-detail">${escapeHtml(move.size)} / ${escapeHtml(move.orientation)}</div>
+                </div>
+            `).join("");
+        }
+
+        function renderInputTile(wheel) {
+            const logoActive = wheel.apexSide === "logo" ? " active" : "";
+            const blankActive = wheel.apexSide === "blank" ? " active" : "";
+            const inputSize = Number.isFinite(Number(wheel.inputSize)) ? wheel.inputSize : wheel.size;
+            return `
+                <div class="input-tile">
+                    <label for="size-${wheel.slot}">${escapeHtml(wheel.slot)} / ${escapeHtml(wheel.name)}</label>
+                    <input id="size-${wheel.slot}" type="number" inputmode="decimal" min="40" max="130" step="0.1" value="${formatNumber(inputSize)}" data-size-slot="${escapeHtml(wheel.slot)}" aria-label="${escapeHtml(wheel.slot)} caliper measurement">
+                    <input class="name-edit-input" type="text" value="${escapeHtml(wheel.name)}" data-name-slot="${escapeHtml(wheel.slot)}" aria-label="${escapeHtml(wheel.slot)} wheel name" maxlength="18" autocomplete="off">
+                    <div class="apex-diagnostic" aria-label="Thickest shoulder side for ${escapeHtml(wheel.name)}">
+                        <div class="apex-label">Thickest Shoulder Side:</div>
+                        <div class="apex-options">
+                            <button type="button" class="apex-btn${logoActive}" data-apex-slot="${escapeHtml(wheel.slot)}" data-apex-side="logo">Logo Side</button>
+                            <button type="button" class="apex-btn${blankActive}" data-apex-slot="${escapeHtml(wheel.slot)}" data-apex-side="blank">Blank Side</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderTargets() {
+            renderOutputMap();
+        }
+
+        function renderOutputMap() {
+            const set = getActiveSet();
+            els.targetLeftContainer.innerHTML = getLeftSlotsForFrame(set.frameKey).map((slot) => renderMountSlot(set, slot)).join("");
+            els.targetRightContainer.innerHTML = getRightSlotsForFrame(set.frameKey).map((slot) => renderMountSlot(set, slot)).join("");
+            els.rotationCountLabel.textContent = `${set.rotationCount} ${set.rotationCount === 1 ? "rotation" : "rotations"}`;
+        }
+
+        function renderMountSlot(set, slot) {
+            const wheel = getWheelViewForSlot(set, slot);
+            const mountInstruction = calculateMountInstruction(slot, wheel.apexSide);
+            const flipClass = mountInstruction.sideFlipped ? " flipped" : "";
+            return `
+                <div id="target-${escapeHtml(slot)}" class="mount-slot">
+                    <div class="mount-lbl">${escapeHtml(slot)}</div>
+                    <div class="mount-name">${escapeHtml(wheel.name)}</div>
+                    <div class="mount-val">${formatMm(wheel.size)}</div>
+                    <div class="mount-flip${flipClass}">${escapeHtml(mountInstruction.label)}</div>
+                </div>
+            `;
+        }
+
+        function getOrientationLabel(sideFlipped) {
+            return Boolean(sideFlipped) ? "LOGO INWARD" : "LOGO OUTWARD";
+        }
+
+        function getWheelViewForSlot(set, slot, trackingState = set.trackingState) {
+            const state = trackingState && trackingState[slot] ? trackingState[slot] : {};
+            const wheelKey = state.wheelKey || getSlotWheelKeysForFrame(set.frameKey)[slot] || slot;
+            const apexSide = normalizeApexSide(set.apexSides && set.apexSides[wheelKey]);
+            const committedSize = toWheelSize(set.sizes && set.sizes[wheelKey], getDefaultSizeForSlot(set.frameKey, slot, set.baseSize));
+            const hasDraft = set.caliperDrafts && Object.prototype.hasOwnProperty.call(set.caliperDrafts, slot);
+            const inputSize = hasDraft ? toWheelSize(set.caliperDrafts[slot], committedSize) : committedSize;
+            return {
+                slot,
+                wheelKey,
+                name: cleanName(set.wheelNames && set.wheelNames[wheelKey], getDefaultWheelName(wheelKey)),
+                size: committedSize,
+                inputSize,
+                apexSide,
+                sideFlipped: calculateMountSideFlipped(slot, apexSide),
+                rotations: Number.isFinite(Number(state.rotations)) ? Number(state.rotations) : 0
+            };
+        }
+
+        function renderProfile() {
+            const set = getActiveSet();
+            const spread = calculateSpread(set);
+            els.activeSetName.value = set.name;
+            els.activeWheelModel.value = set.wheelModel || "";
+            els.activeWheelDurometer.value = normalizeDurometer(set.wheelDurometer);
+            els.activeFrameSelect.value = set.frameKey;
+            els.activeBaseSize.value = String(set.baseSize);
+            els.frameLimitStat.textContent = formatMm(getFrame(set).safetyLimit);
+            els.spreadStat.textContent = formatMm(spread.gap);
+            els.profileCountStat.textContent = String(appState.sets.length);
+            renderSaveStats();
+        }
+
+        function renderLoopDisplay() {
+            const set = getActiveSet();
+            const rows = getLoopRowsForFrame(set.frameKey);
+
+            els.loopDisplay.innerHTML = rows.map((row) => {
+                const label = isArcFrame(set.frameKey) ? `<span class="loop-label">${escapeHtml(row[0])}</span>` : "";
+                const slots = isArcFrame(set.frameKey) ? row.slice(1) : row;
+                const arrows = slots.map((slot) => `<span>${escapeHtml(slot)}</span>`).join("");
+                const cols = slots.length + (isArcFrame(set.frameKey) ? 1 : 0);
+                return `
+                    <div class="loop-line" style="--loop-cols:${cols}">
+                        ${label}${arrows}
+                    </div>
+                `;
+            }).join("");
+        }
+
+        function renderWearRanking() {
+            const set = getActiveSet();
+            const ranking = getWearRanking(set);
+            const sampled = ranking.filter((item) => item.samples > 0);
+            const worn = ranking.filter((item) => item.totalLoss > 0);
+
+            els.wearSummary.textContent = worn.length
+                ? `${worn[0].slot} is wearing fastest at ${formatWearRate(worn[0])}.`
+                : sampled.length
+                    ? "Samples recorded; no measurable loss yet."
+                    : "No wear samples yet.";
+
+            const maxAverage = Math.max(...ranking.map((item) => getWearMetric(item)), 0.1);
+            els.wearRankingList.innerHTML = ranking.map((item) => {
+                const width = item.samples > 0 ? Math.max(6, Math.round((getWearMetric(item) / maxAverage) * 100)) : 0;
+                const label = item.samples > 0
+                    ? formatWearRate(item)
+                    : "No samples";
+                const detail = item.samples > 0
+                    ? formatWearDetail(item)
+                    : "0.0 mm total";
+
+                return `
+                    <div class="wear-row">
+                        <div class="wear-slot">${escapeHtml(item.slot)}</div>
+                        <div>
+                            <div class="wear-bar"><div class="wear-fill" style="width:${width}%"></div></div>
+                            <div class="mini-copy">${escapeHtml(detail)}</div>
+                        </div>
+                        <div class="wear-value">${escapeHtml(label)}</div>
+                    </div>
+                `;
+            }).join("");
+        }
+
+        function renderHeatMap() {
+            const set = getActiveSet();
+            const ranking = getWearRanking(set);
+            const bySlot = Object.fromEntries(ranking.map((item) => [item.slot, item]));
+            const maxAverage = Math.max(...ranking.map((item) => getWearMetric(item)), 0);
+            const hottest = ranking.find((item) => item.samples > 0 && item.totalLoss > 0);
+
+            els.heatSummary.textContent = hottest
+                ? `${hottest.slot} is currently the hottest wear position.`
+                : "No wear samples yet.";
+
+            els.heatMap.innerHTML = [
+                renderHeatColumn("Left Frame", getLeftSlotsForFrame(set.frameKey), bySlot, maxAverage),
+                renderHeatColumn("Right Frame", getRightSlotsForFrame(set.frameKey), bySlot, maxAverage)
+            ].join("");
+        }
+
+        function renderHeatColumn(title, slots, bySlot, maxAverage) {
+            return `
+                <div class="heat-column">
+                    <h3>${escapeHtml(title)}</h3>
+                    ${slots.map((slot) => renderHeatTile(slot, bySlot[slot], maxAverage)).join("")}
+                </div>
+            `;
+        }
+
+        function renderHeatTile(slot, item, maxAverage) {
+            const hasData = item && item.samples > 0;
+            const intensity = hasData && maxAverage > 0 ? clamp(getWearMetric(item) / maxAverage, 0, 1) : 0;
+            const alpha = Number((0.08 + intensity * 0.48).toFixed(2));
+            const borderAlpha = Number((0.18 + intensity * 0.52).toFixed(2));
+            const background = hasData
+                ? `background:rgba(239,107,95,${alpha});border-color:rgba(239,107,95,${borderAlpha})`
+                : "";
+            const detail = hasData
+                ? `${formatWearRate(item)} / ${formatNumber(item.totalLoss)} mm total`
+                : "No samples yet";
+
+            return `
+                <div class="heat-tile" style="${background}">
+                    <div class="heat-slot">${escapeHtml(slot)}</div>
+                    <div class="heat-stat">${escapeHtml(detail)}</div>
+                </div>
+            `;
+        }
+
+        function renderBackupStats() {
+            if (!els.backupReminder || !appState) return;
+            const backupAgeDays = getAgeInDays(appState.lastBackupAt);
+            if (!appState.lastBackupAt) {
+                els.backupReminder.textContent = "External backup: never exported. Use Backup Now before making major changes.";
+            } else if (backupAgeDays >= 7) {
+                els.backupReminder.textContent = `External backup: ${relativeTime(appState.lastBackupAt)}. Backup recommended.`;
+            } else {
+                els.backupReminder.textContent = `External backup: ${relativeTime(appState.lastBackupAt)}.`;
+            }
+        }
+
+        function renderDataLifeline() {
+            if (!els.backboneString) return;
+            els.backboneString.value = getBackboneString();
+        }
+
+        function getBackboneString() {
+            return window.localStorage.getItem(STORAGE_KEY) || (appState ? JSON.stringify(appState) : "");
+        }
+
+        async function copyBackboneString() {
+            const text = getBackboneString();
+            if (!text) {
+                showToast("No backbone data is ready yet.");
+                return;
+            }
+
+            try {
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    await navigator.clipboard.writeText(text);
+                } else {
+                    els.backboneString.focus();
+                    els.backboneString.select();
+                    document.execCommand("copy");
+                }
+                showToast("Backbone copied.");
+            } catch (error) {
+                showToast("Copy failed. You can manually select the backbone string.");
+                console.warn("SkateTech backbone copy failed.", error);
+            }
+        }
+
+        function downloadBackboneString() {
+            const text = getBackboneString();
+            if (!text) {
+                showToast("No backbone data is ready yet.");
+                return;
+            }
+
+            const blob = new Blob([text], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            const stamp = new Date().toISOString().slice(0, 10);
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = `skatetech-backbone-${stamp}.json`;
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            URL.revokeObjectURL(url);
+            showToast("Backbone downloaded.");
+        }
+
+        function renderSaveStats() {
+            if (!els.savedStat || !appState) return;
+            els.savedStat.textContent = relativeTime(appState.lastSavedAt);
+        }
+
+        function renderSessionLogs() {
+            const set = getActiveSet();
+            const sessions = Array.isArray(set.sessions) ? set.sessions : [];
+            const totalMinutes = sessions.reduce((sum, session) => sum + Number(session.minutes || 0), 0);
+            const totalMiles = sessions.reduce((sum, session) => sum + Number(session.miles || 0), 0);
+
+            els.sessionLogSummary.textContent = sessions.length
+                ? `${sessions.length} ${sessions.length === 1 ? "session" : "sessions"} / ${totalMinutes} min / ${formatMiles(totalMiles)} mi`
+                : "No sessions yet.";
+
+            if (sessions.length === 0) {
+                els.sessionLogList.innerHTML = `<div class="empty-state">No saved sessions for this profile.</div>`;
+                return;
+            }
+
+            els.sessionLogList.innerHTML = sessions.slice(0, 80).map((session) => `
+                <article class="log-item">
+                    <div class="log-top">
+                        <span>Rotation ${escapeHtml(session.rotationNumber)}</span>
+                        <span>${escapeHtml(formatDate(session.createdAt))}</span>
+                    </div>
+                    <div class="log-meta">${escapeHtml(formatSessionMeta(session))}</div>
+                </article>
+            `).join("");
+        }
+
+        function renderLogs() {
+            const set = getActiveSet();
+            els.logSummary.textContent = set.logs.length
+                ? `${set.logs.length} saved ${set.logs.length === 1 ? "entry" : "entries"} for this profile.`
+                : "No rotations yet.";
+
+            if (set.logs.length === 0) {
+                els.logList.innerHTML = `<div class="empty-state">No logs for this profile.</div>`;
+                return;
+            }
+
+            els.logList.innerHTML = set.logs.slice(0, 60).map((log) => `
+                <article class="log-item">
+                    <div class="log-top">
+                        <span>${escapeHtml(log.title || "Rocket Loop")}</span>
+                        <span>${escapeHtml(formatDate(log.createdAt))}</span>
+                    </div>
+                    <div class="log-meta">${escapeHtml(log.detail || "")}</div>
+                    ${renderRotationSizeDetails(log.sizeSnapshot)}
+                </article>
+            `).join("");
+        }
+
+        function renderRotationSizeDetails(snapshot) {
+            if (!snapshot || !snapshot.measuredSlots) return "";
+            const slots = Object.keys(snapshot.measuredSlots);
+            if (slots.length === 0) return "";
+
+            return `
+                <details class="log-sizes">
+                    <summary>Show wheel sizes for this rotation</summary>
+                    <div class="size-grid">
+                        ${slots.map((slot) => {
+                            const measured = snapshot.measuredSlots[slot];
+                            const beforeSize = Number.isFinite(Number(measured.previousSize)) ? measured.previousSize : measured.size;
+                            return `
+                                <div class="size-chip">
+                                    <strong>${escapeHtml(slot)} / ${escapeHtml(measured.name || measured.wheelKey)}</strong>
+                                    ${formatMm(beforeSize)} -> ${formatMm(measured.size)}
+                                </div>
+                            `;
+                        }).join("")}
+                    </div>
+                </details>
+            `;
+        }
+
+        function showView(view) {
+            if (!["calibrate", "profiles", "logs"].includes(view) || view === activeView) return;
+            activeView = view;
+
+            document.querySelectorAll(".app-view").forEach((panel) => {
+                const isActive = panel.id === `view-${view}`;
+                panel.classList.toggle("active", isActive);
+                panel.setAttribute("aria-hidden", String(!isActive));
+            });
+
+            document.querySelectorAll(".nav-item").forEach((button) => {
+                const isActive = button.dataset.view === view;
+                button.classList.toggle("active", isActive);
+                if (isActive) button.setAttribute("aria-current", "page");
+                else button.removeAttribute("aria-current");
+            });
+
+            window.scrollTo({ top: 0, behavior: "smooth" });
+        }
+
+        function switchWheelSet() {
+            const nextId = els.setSelector.value;
+            if (!appState.sets.some((set) => set.id === nextId)) return;
+            appState.activeSetId = nextId;
+            pendingRotationPreview = null;
+            renameMode = false;
+            renderAll();
+            updateStatusBanner(calculateSpread(getActiveSet()));
+            saveStateNow();
+        }
+
+        function toggleRenameFields() {
+            renameMode = !renameMode;
+            renderInputs();
+        }
+
+        function handleWheelInput(event) {
+            const sizeSlot = event.target.dataset.sizeSlot;
+            const nameSlot = event.target.dataset.nameSlot;
+            const set = getActiveSet();
+
+            if (sizeSlot && set.trackingState[sizeSlot]) {
+                clearPendingRotationPreview();
+                const parsed = parseFloat(event.target.value);
+                if (Number.isFinite(parsed)) {
+                    set.caliperDrafts = set.caliperDrafts || {};
+                    set.caliperDrafts[sizeSlot] = clamp(parsed, 40, 130);
+                    set.updatedAt = new Date().toISOString();
+                    saveStateDebounced();
+                }
+            }
+
+            if (nameSlot && set.trackingState[nameSlot]) {
+                clearPendingRotationPreview();
+                const wheelKey = set.trackingState[nameSlot].wheelKey;
+                set.wheelNames[wheelKey] = cleanName(event.target.value, wheelKey);
+                set.updatedAt = new Date().toISOString();
+                renderInputs();
+                renderTargets();
+                saveStateDebounced();
+            }
+        }
+
+        function handleApexSelection(event) {
+            const button = event.target.closest("[data-apex-slot][data-apex-side]");
+            if (!button) return;
+
+            const set = getActiveSet();
+            const slot = button.dataset.apexSlot;
+            const apexSide = normalizeApexSide(button.dataset.apexSide);
+            const wheelKey = set.trackingState[slot] && set.trackingState[slot].wheelKey;
+            if (!wheelKey) return;
+
+            clearPendingRotationPreview();
+            set.apexSides[wheelKey] = apexSide;
+            set.trackingState[slot].sideFlipped = calculateMountSideFlipped(slot, apexSide);
+            set.updatedAt = new Date().toISOString();
+            renderInputs();
+            renderOutputMap();
+            saveStateNow();
+        }
+
+        function normalizeWheelField(event) {
+            const slot = event.target.dataset.sizeSlot;
+            if (!slot) return;
+            const set = getActiveSet();
+            const wheelKey = set.trackingState[slot] && set.trackingState[slot].wheelKey;
+            if (!wheelKey) return;
+            clearPendingRotationPreview();
+            const wheel = getWheelViewForSlot(set, slot);
+            const nextValue = toWheelSize(event.target.value, wheel.inputSize);
+            set.caliperDrafts = set.caliperDrafts || {};
+            set.caliperDrafts[slot] = nextValue;
+            event.target.value = formatNumber(nextValue);
+            set.updatedAt = new Date().toISOString();
+            saveStateDebounced();
+        }
+
+        function renderLiveStatsOnly() {
+            const set = getActiveSet();
+            const spread = calculateSpread(set);
+            els.spreadStat.textContent = formatMm(spread.gap);
+            updateStatusBanner(spread, true);
+            renderOutputMap();
+            renderHeatMap();
+            renderWearRanking();
+        }
+
+        function updateSessionMeta() {
+            const set = getActiveSet();
+            set.lastSessionMeta = normalizeSessionMeta({
+                minutes: els.sessionMinutes.value,
+                miles: els.sessionMiles.value,
+                type: els.sessionType.value
+            });
+            set.updatedAt = new Date().toISOString();
+            clearPendingRotationPreview();
+            saveStateDebounced();
+        }
+
+        function saveSessionEntry() {
+            const set = getActiveSet();
+            const sessionMeta = normalizeSessionMeta({
+                minutes: els.sessionMinutes.value,
+                miles: els.sessionMiles.value,
+                type: els.sessionType.value
+            });
+
+            if (sessionMeta.minutes <= 0 && sessionMeta.miles <= 0) {
+                showToast("Add minutes or miles before saving a session.");
+                return;
+            }
+
+            set.lastSessionMeta = sessionMeta;
+            set.sessions = normalizeSessionEntries(set.sessions);
+            set.sessions.unshift(createSessionEntry(set, sessionMeta));
+            set.sessions = set.sessions.slice(0, 300);
+            set.updatedAt = new Date().toISOString();
+
+            renderSessionFields();
+            renderSessionLogs();
+            saveStateNow();
+            showToast(`Session saved to rotation ${set.rotationCount}.`);
+        }
+
+        function createSessionEntry(set, sessionMeta) {
+            const session = normalizeSessionMeta(sessionMeta);
+            return {
+                id: createId(),
+                createdAt: new Date().toISOString(),
+                rotationNumber: Number(set.rotationCount || 0),
+                minutes: session.minutes,
+                miles: session.miles,
+                type: session.type,
+                frameKey: set.frameKey,
+                wheelModel: set.wheelModel || "",
+                wheelDurometer: normalizeDurometer(set.wheelDurometer),
+                slotMap: createSlotMapSnapshot(set)
+            };
+        }
+
+        function createSlotMapSnapshot(set) {
+            const snapshot = {};
+            getSlotOrderForFrame(set.frameKey).forEach((slot) => {
+                const wheel = getWheelViewForSlot(set, slot);
+                const mountInstruction = calculateMountInstruction(slot, wheel.apexSide);
+                snapshot[slot] = {
+                    wheelKey: wheel.wheelKey,
+                    name: wheel.name,
+                    size: wheel.size,
+                    orientation: mountInstruction.label,
+                    apexSide: wheel.apexSide
+                };
+            });
+            return snapshot;
+        }
+
+        function getWearSessionMetaForRotation(set) {
+            const savedSessions = getSessionsForRotation(set, set.rotationCount);
+            if (savedSessions.length === 0) {
+                return normalizeSessionMeta(set.lastSessionMeta);
+            }
+
+            const minutes = savedSessions.reduce((sum, session) => sum + Number(session.minutes || 0), 0);
+            const miles = savedSessions.reduce((sum, session) => sum + Number(session.miles || 0), 0);
+            const hasSlideHeavy = savedSessions.some((session) => session.type === "slide-heavy");
+            const allCruising = savedSessions.every((session) => session.type === "cruising");
+
+            return normalizeSessionMeta({
+                minutes,
+                miles,
+                type: hasSlideHeavy ? "slide-heavy" : allCruising ? "cruising" : "normal"
+            });
+        }
+
+        function getSessionsForRotation(set, rotationNumber) {
+            return normalizeSessionEntries(set.sessions).filter((session) => session.rotationNumber === Number(rotationNumber || 0));
+        }
+
+        function clearPendingRotationPreview() {
+            if (!pendingRotationPreview) return;
+            pendingRotationPreview = null;
+            renderRotationPreview();
+        }
+
+        function requestRotationPreview() {
+            const set = getActiveSet();
+            const freshMeasurements = collectFreshMeasurementsBuffer(set);
+            const previewSet = cloneProfileForPreview(set);
+            hydrateSizesFromMeasurements(previewSet, freshMeasurements);
+            const spread = calculateSpread(previewSet);
+            const warning = spread.gap > getFrame(set).safetyLimit;
+            const nextTrackingState = applyRocketLoop(set.trackingState, set);
+            const sessionMeta = getWearSessionMetaForRotation(set);
+
+            pendingRotationPreview = {
+                setId: set.id,
+                measurements: freshMeasurements,
+                spread,
+                warning,
+                nextTrackingState,
+                sessionMeta,
+                moves: buildRotationPreviewMoves(previewSet, nextTrackingState)
+            };
+
+            renderRotationPreview();
+            showToast("Review the rotation preview.");
+        }
+
+        function confirmRotationPreview() {
+            const set = getActiveSet();
+            if (!pendingRotationPreview || pendingRotationPreview.setId !== set.id) {
+                requestRotationPreview();
+                return;
+            }
+
+            const preview = pendingRotationPreview;
+            set.undoSnapshot = createUndoSnapshot(set);
+            const freshMeasurements = clonePlain(preview.measurements);
+            const spread = preview.spread;
+            const warning = preview.warning;
+            const nextTrackingState = preview.nextTrackingState;
+            const sizeSnapshot = createRotationSizeSnapshot(set, freshMeasurements, nextTrackingState, spread, warning, preview.sessionMeta);
+
+            // Strict Buffer-Then-Rotate pipeline: advance the wheel-ID matrix first.
+            set.trackingState = nextTrackingState;
+            set.rotationCount += 1;
+
+            // Only after the matrix advances do fresh measurements become committed sizes.
+            recordWearBySlot(set, freshMeasurements, preview.sessionMeta);
+            hydrateSizesFromMeasurements(set, freshMeasurements);
+            set.baselineSizes = { ...set.sizes };
+            set.caliperDrafts = {};
+            set.updatedAt = new Date().toISOString();
+            set.rotationSnapshots = normalizeRotationSnapshots(set.rotationSnapshots);
+            set.rotationSnapshots.unshift(sizeSnapshot);
+            set.rotationSnapshots = set.rotationSnapshots.slice(0, 100);
+            set.logs.unshift(createRotationLog(set, spread, warning, preview.sessionMeta, sizeSnapshot));
+            set.logs = set.logs.slice(0, 100);
+            pendingRotationPreview = null;
+
+            saveStateNow();
+            renderAll();
+            updateStatusBanner(spread, false);
+            showToast(warning ? "Rocket Loop saved. Safety warning logged." : "Rocket Loop saved.");
+        }
+
+        function cancelRotationPreview() {
+            clearPendingRotationPreview();
+            showToast("Rotation canceled.");
+        }
+
+        function executeRotation() {
+            requestRotationPreview();
+        }
+
+        function cloneProfileForPreview(set) {
+            return {
+                ...set,
+                sizes: { ...set.sizes },
+                baselineSizes: { ...set.baselineSizes },
+                caliperDrafts: { ...set.caliperDrafts },
+                apexSides: { ...set.apexSides },
+                trackingState: clonePlain(set.trackingState),
+                wearStats: clonePlain(set.wearStats),
+                sessions: Array.isArray(set.sessions) ? clonePlain(set.sessions) : [],
+                rotationSnapshots: Array.isArray(set.rotationSnapshots) ? clonePlain(set.rotationSnapshots) : [],
+                logs: Array.isArray(set.logs) ? set.logs.slice() : []
+            };
+        }
+
+        function buildRotationPreviewMoves(set, nextTrackingState) {
+            return getSlotOrderForFrame(set.frameKey).map((targetSlot) => {
+                const slotState = nextTrackingState[targetSlot];
+                const wheel = getWheelViewForSlot(set, targetSlot, nextTrackingState);
+                return {
+                    from: slotState.previousSlot || targetSlot,
+                    to: targetSlot,
+                    name: wheel.name,
+                    size: formatMm(wheel.size),
+                    orientation: getPreviewOrientationForSlot(nextTrackingState, targetSlot)
+                };
+            });
+        }
+
+        function createRotationSizeSnapshot(set, measurements, nextTrackingState, spread, warning, sessionMeta) {
+            const measuredSizes = { ...set.sizes };
+            Object.values(measurements).forEach((measurement) => {
+                measuredSizes[measurement.wheelKey] = measurement.size;
+            });
+
+            const measuredSet = {
+                ...set,
+                sizes: measuredSizes,
+                caliperDrafts: {}
+            };
+
+            const beforeSlots = {};
+            const measuredSlots = {};
+            const targetSlots = {};
+
+            getSlotOrderForFrame(set.frameKey).forEach((slot) => {
+                const beforeWheel = getWheelViewForSlot(set, slot);
+                const measurement = measurements[slot] || { wheelKey: beforeWheel.wheelKey, size: beforeWheel.size };
+                beforeSlots[slot] = createWheelSizeRecord(beforeWheel);
+                measuredSlots[slot] = {
+                    ...createWheelSizeRecord({
+                        ...beforeWheel,
+                        size: measurement.size
+                    }),
+                    previousSize: beforeWheel.size,
+                    loss: Number(Math.max(0, beforeWheel.size - measurement.size).toFixed(2))
+                };
+
+                const targetWheel = getWheelViewForSlot(measuredSet, slot, nextTrackingState);
+                targetSlots[slot] = createWheelSizeRecord(targetWheel);
+            });
+
+            return {
+                id: createId(),
+                createdAt: new Date().toISOString(),
+                rotationNumber: Number(set.rotationCount || 0) + 1,
+                previousRotationNumber: Number(set.rotationCount || 0),
+                frameKey: set.frameKey,
+                spread: spread.gap,
+                warning,
+                session: normalizeSessionMeta(sessionMeta),
+                beforeSlots,
+                measuredSlots,
+                targetSlots
+            };
+        }
+
+        function createWheelSizeRecord(wheel) {
+            const mountInstruction = calculateMountInstruction(wheel.slot, wheel.apexSide);
+            return {
+                wheelKey: wheel.wheelKey,
+                name: wheel.name,
+                size: wheel.size,
+                orientation: mountInstruction.label,
+                apexSide: wheel.apexSide
+            };
+        }
+
+        function createUndoSnapshot(set) {
+            return {
+                createdAt: new Date().toISOString(),
+                label: `Rotation ${set.rotationCount + 1}`,
+                profile: clonePlain({
+                    frameKey: set.frameKey,
+                    wheelModel: set.wheelModel,
+                    wheelDurometer: set.wheelDurometer,
+                    baseSize: set.baseSize,
+                    wheelNames: set.wheelNames,
+                    sizes: set.sizes,
+                    baselineSizes: set.baselineSizes,
+                    caliperDrafts: set.caliperDrafts,
+                    apexSides: set.apexSides,
+                    trackingState: set.trackingState,
+                    wearStats: set.wearStats,
+                    sessions: set.sessions,
+                    rotationSnapshots: set.rotationSnapshots,
+                    logs: set.logs,
+                    rotationCount: set.rotationCount,
+                    lastSessionMeta: set.lastSessionMeta,
+                    updatedAt: set.updatedAt
+                })
+            };
+        }
+
+        function undoLastRotation() {
+            const set = getActiveSet();
+            const snapshot = normalizeUndoSnapshot(set.undoSnapshot);
+            if (!snapshot) {
+                showToast("Nothing to undo.");
+                return;
+            }
+            if (!window.confirm("Undo the last saved rotation and restore the previous wheel map?")) return;
+
+            restoreUndoSnapshot(set, snapshot);
+            pendingRotationPreview = null;
+            renderAll();
+            updateStatusBanner(calculateSpread(set));
+            saveStateNow();
+            showToast("Last rotation undone.");
+        }
+
+        function restoreUndoSnapshot(set, snapshot) {
+            const profile = snapshot.profile;
+            const frameKey = getFrameKeyForValue(profile.frameKey);
+            set.frameKey = frameKey;
+            set.wheelModel = cleanName(profile.wheelModel, "Endless");
+            set.wheelDurometer = normalizeDurometer(profile.wheelDurometer);
+            set.baseSize = toWheelSize(profile.baseSize, FRAME_PRESETS[frameKey].defaultSize);
+            set.wheelNames = clonePlain(profile.wheelNames || {});
+            set.sizes = clonePlain(profile.sizes || {});
+            set.baselineSizes = clonePlain(profile.baselineSizes || {});
+            set.caliperDrafts = normalizeCaliperDrafts(profile.caliperDrafts, frameKey, set.sizes, profile.trackingState || {});
+            set.apexSides = clonePlain(profile.apexSides || {});
+            set.trackingState = clonePlain(profile.trackingState || {});
+            set.wearStats = normalizeWearStats(profile.wearStats, frameKey);
+            set.sessions = normalizeSessionEntries(profile.sessions);
+            set.rotationSnapshots = normalizeRotationSnapshots(profile.rotationSnapshots);
+            set.logs = Array.isArray(profile.logs) ? clonePlain(profile.logs).slice(0, 100) : [];
+            set.rotationCount = Number.isFinite(Number(profile.rotationCount)) ? Number(profile.rotationCount) : 0;
+            set.lastSessionMeta = normalizeSessionMeta(profile.lastSessionMeta);
+            set.undoSnapshot = null;
+            set.updatedAt = new Date().toISOString();
+        }
+
+        function executeAdaptivePipeline() {
+            executeRotation();
+        }
+
+        function commitVisibleCaliperInputs(set) {
+            const measurements = collectFreshMeasurementsBuffer(set);
+            set.caliperDrafts = set.caliperDrafts || {};
+            Object.entries(measurements).forEach(([slot, measurement]) => {
+                set.caliperDrafts[slot] = measurement.size;
+            });
+        }
+
+        function collectFreshMeasurementsBuffer(set) {
+            const freshMeasurements = {};
+            document.querySelectorAll("[data-size-slot]").forEach((input) => {
+                const slot = input.dataset.sizeSlot;
+                const wheelKey = set.trackingState[slot] && set.trackingState[slot].wheelKey;
+                if (wheelKey) {
+                    freshMeasurements[slot] = {
+                        wheelKey,
+                        size: toWheelSize(input.value, set.sizes[wheelKey])
+                    };
+                }
+            });
+            return freshMeasurements;
+        }
+
+        function readVisibleMeasurements(set) {
+            return collectFreshMeasurementsBuffer(set);
+        }
+
+        function hydrateSizesFromMeasurements(set, measurements) {
+            Object.values(measurements).forEach((measurement) => {
+                set.sizes[measurement.wheelKey] = measurement.size;
+            });
+        }
+
+        function recordWearBySlot(set, measurements, sessionMeta) {
+            const session = normalizeSessionMeta(sessionMeta);
+            set.wearStats = normalizeWearStats(set.wearStats, set.frameKey);
+            Object.entries(measurements).forEach(([slot, measurement]) => {
+                const previousSize = toWheelSize(set.baselineSizes && set.baselineSizes[measurement.wheelKey], measurement.size);
+                const loss = Math.max(0, Number((previousSize - measurement.size).toFixed(2)));
+                const slotStats = set.wearStats[slot] || { totalLoss: 0, samples: 0, lastLoss: 0, maxLoss: 0, totalMinutes: 0, totalMiles: 0, slideSamples: 0 };
+
+                slotStats.totalLoss = Number((Number(slotStats.totalLoss || 0) + loss).toFixed(2));
+                slotStats.samples = Number(slotStats.samples || 0) + 1;
+                slotStats.lastLoss = loss;
+                slotStats.maxLoss = Math.max(Number(slotStats.maxLoss || 0), loss);
+                slotStats.totalMinutes = Number((Number(slotStats.totalMinutes || 0) + session.minutes).toFixed(1));
+                slotStats.totalMiles = Number((Number(slotStats.totalMiles || 0) + session.miles).toFixed(2));
+                slotStats.slideSamples = Number(slotStats.slideSamples || 0) + (session.type === "slide-heavy" ? 1 : 0);
+                set.wearStats[slot] = slotStats;
+            });
+        }
+
+        function applyRocketLoop(currentTrackingState, set) {
+            const nextTrackingState = {};
+            const steps = getConveyorStepsForFrame(set.frameKey);
+            const slotOrder = getSlotOrderForFrame(set.frameKey);
+
+            steps.forEach((step) => {
+                const slotState = currentTrackingState[step.from];
+                if (!slotState || !slotState.wheelKey) {
+                    throw new Error(`Missing wheel tracking state in source slot ${step.from}`);
+                }
+
+                const apexSide = normalizeApexSide(set && set.apexSides && set.apexSides[slotState.wheelKey]);
+                nextTrackingState[step.to] = {
+                    wheelKey: slotState.wheelKey,
+                    previousSlot: step.from,
+                    lastMoveLine: step.line,
+                    lastMove: `${step.from}->${step.to}`,
+                    apexSide,
+                    sideFlipped: calculateMountSideFlipped(step.to, apexSide),
+                    mountSideFlipped: calculateMountSideFlipped(step.to, apexSide),
+                    rotations: Number(slotState.rotations || 0) + 1
+                };
+            });
+
+            slotOrder.forEach((slot) => {
+                if (!nextTrackingState[slot]) {
+                    throw new Error(`Rocket Loop did not fill target slot ${slot}`);
+                }
+            });
+
+            return nextTrackingState;
+        }
+
+        function createRotationLog(set, spread, warning, sessionMeta, sizeSnapshot) {
+            const frame = getFrame(set);
+            const title = warning ? "Safety override warning" : "Rocket Loop rotation";
+            const session = normalizeSessionMeta(sessionMeta);
+            const sessionText = ` Session: ${formatSessionMeta(session)}.`;
+            const detail = warning
+                ? `${frame.name}: ${formatMm(spread.gap)} spread exceeds ${formatMm(frame.safetyLimit)}. Override the loop and move the largest suitable wheel toward the highest-wear rear slot before skating.${sessionText}`
+                : `${frame.name}: ${formatMm(spread.gap)} spread is within the ${formatMm(frame.safetyLimit)} frame limit. Apex diagnostics set each target orientation.${sessionText}`;
+
+            return {
+                id: createId(),
+                createdAt: new Date().toISOString(),
+                title,
+                detail,
+                spread: spread.gap,
+                safetyLimit: frame.safetyLimit,
+                session,
+                sizeSnapshot: sizeSnapshot ? clonePlain(sizeSnapshot) : null,
+                warning
+            };
+        }
+
+        function createNewWheelSet() {
+            const name = cleanName(els.newSetName.value, "New Skate Setup");
+            const frameKey = getFrameKeyForValue(els.newSetFrame.value);
+            const baseSize = isArcFrame(frameKey)
+                ? FRAME_PRESETS[frameKey].defaultSize
+                : toWheelSize(els.newSetSize.value, FRAME_PRESETS[frameKey].defaultSize);
+            const wheelModel = cleanName(els.newWheelModel.value, "Endless");
+            const wheelDurometer = normalizeDurometer(els.newWheelDurometer.value);
+            const set = createWheelSet({ name, frameKey, baseSize, wheelModel, wheelDurometer });
+
+            appState.sets.push(set);
+            appState.activeSetId = set.id;
+            pendingRotationPreview = null;
+            els.newSetName.value = "";
+            els.newWheelModel.value = "Endless";
+            els.newWheelDurometer.value = "87A";
+            delete els.newSetSize.dataset.touched;
+            renameMode = false;
+            renderAll();
+            updateStatusBanner(calculateSpread(set));
+            saveStateNow();
+            showView("calibrate");
+            showToast("Profile added.");
+        }
+
+        function autoFillFrameSpecs() {
+            const preset = FRAME_PRESETS[els.newSetFrame.value];
+            if (!preset) return;
+            if (isArcFrame(els.newSetFrame.value)) {
+                els.newSetSize.value = String(preset.defaultSize);
+                return;
+            }
+            if (els.newSetSize.dataset.touched !== "true") {
+                els.newSetSize.value = String(preset.defaultSize);
+            }
+        }
+
+        function updateActiveSetName() {
+            const set = getActiveSet();
+            set.name = cleanName(els.activeSetName.value, set.name);
+            set.updatedAt = new Date().toISOString();
+            renderSetSelector();
+            saveStateDebounced();
+        }
+
+        function updateActiveWheelMeta() {
+            const set = getActiveSet();
+            set.wheelModel = cleanName(els.activeWheelModel.value, "Endless");
+            set.wheelDurometer = normalizeDurometer(els.activeWheelDurometer.value);
+            set.updatedAt = new Date().toISOString();
+            renderInputs();
+            saveStateDebounced();
+        }
+
+        function updateActiveFrame() {
+            const set = getActiveSet();
+            const nextFrameKey = getFrameKeyForValue(els.activeFrameSelect.value);
+            if (nextFrameKey === set.frameKey) return;
+
+            clearPendingRotationPreview();
+            if (getSlotOrderForFrame(nextFrameKey).length !== getSlotOrderForFrame(set.frameKey).length) {
+                if (!window.confirm("Changing between 4-wheel and 5-wheel frames rebuilds this profile's wheel slots and clears its rotation logs. Continue?")) {
+                    els.activeFrameSelect.value = set.frameKey;
+                    return;
+                }
+                rebuildSetForFrame(set, nextFrameKey);
+                renameMode = false;
+                renderAll();
+                updateStatusBanner(calculateSpread(set));
+                saveStateNow();
+                showToast("Frame structure rebuilt.");
+                return;
+            }
+
+            set.frameKey = nextFrameKey;
+            set.baseSize = toWheelSize(set.baseSize, FRAME_PRESETS[nextFrameKey].defaultSize);
+            set.wearStats = normalizeWearStats(set.wearStats, nextFrameKey);
+            set.updatedAt = new Date().toISOString();
+            renderAll();
+            updateStatusBanner(calculateSpread(set));
+            saveStateNow();
+        }
+
+        function rebuildSetForFrame(set, frameKey) {
+            const rebuilt = createWheelSet({
+                id: set.id,
+                name: set.name,
+                frameKey,
+                baseSize: FRAME_PRESETS[frameKey].defaultSize,
+                wheelModel: set.wheelModel,
+                wheelDurometer: set.wheelDurometer
+            });
+
+            set.defaultProfileKey = "";
+            set.defaultProfileRevision = 0;
+            set.frameKey = rebuilt.frameKey;
+            set.baseSize = rebuilt.baseSize;
+            set.wheelNames = rebuilt.wheelNames;
+            set.sizes = rebuilt.sizes;
+            set.baselineSizes = rebuilt.baselineSizes;
+            set.caliperDrafts = {};
+            set.apexSides = rebuilt.apexSides;
+            set.trackingState = rebuilt.trackingState;
+            set.wearStats = rebuilt.wearStats;
+            set.undoSnapshot = null;
+            set.sessions = [];
+            set.logs = [];
+            set.rotationCount = 0;
+            set.lastSessionMeta = normalizeSessionMeta(set.lastSessionMeta);
+            set.updatedAt = new Date().toISOString();
+        }
+
+        function updateActiveBaseSize() {
+            const set = getActiveSet();
+            clearPendingRotationPreview();
+            if (isArcFrame(set.frameKey)) {
+                set.baseSize = FRAME_PRESETS.endless_arc_es.defaultSize;
+                els.activeBaseSize.value = String(set.baseSize);
+                set.updatedAt = new Date().toISOString();
+                renderProfile();
+                saveStateNow();
+                showToast("Arc ES keeps fixed 84/76 defaults.");
+                return;
+            }
+            set.baseSize = toWheelSize(els.activeBaseSize.value, set.baseSize);
+            set.updatedAt = new Date().toISOString();
+            renderProfile();
+            saveStateNow();
+        }
+
+        function resetActiveWheelsToBaseSize() {
+            const set = getActiveSet();
+            if (!window.confirm("Reset every wheel in this profile to its frame default size?")) return;
+            clearPendingRotationPreview();
+            getSlotOrderForFrame(set.frameKey).forEach((slot) => {
+                const slotState = set.trackingState[slot];
+                if (!slotState || !slotState.wheelKey) return;
+                set.sizes[slotState.wheelKey] = getDefaultSizeForSlot(set.frameKey, slot, set.baseSize);
+            });
+            set.baselineSizes = { ...set.sizes };
+            set.caliperDrafts = {};
+            set.wearStats = createEmptyWearStats(set.frameKey);
+            set.updatedAt = new Date().toISOString();
+            renderAll();
+            updateStatusBanner(calculateSpread(set));
+            saveStateNow();
+            showToast("Wheel sizes reset.");
+        }
+
+        function deleteActiveProfile() {
+            if (appState.sets.length <= 1) {
+                showToast("Keep at least one profile available.");
+                return;
+            }
+            const set = getActiveSet();
+            if (!window.confirm(`Are you sure you want to delete the profile "${set.name}"? This cannot be undone.`)) return;
+            appState.sets = appState.sets.filter((item) => item.id !== set.id);
+            appState.activeSetId = appState.sets[0].id;
+            pendingRotationPreview = null;
+            renameMode = false;
+            renderAll();
+            updateStatusBanner(calculateSpread(getActiveSet()));
+            saveStateNow();
+            showToast("Profile deleted.");
+        }
+
+        function clearLogs() {
+            const set = getActiveSet();
+            if (set.logs.length === 0) return;
+            if (!window.confirm("Clear the logs for this profile?")) return;
+            set.logs = [];
+            set.updatedAt = new Date().toISOString();
+            renderLogs();
+            saveStateNow();
+            showToast("Logs cleared.");
+        }
+
+        function clearSessionLogs() {
+            const set = getActiveSet();
+            if (!set.sessions || set.sessions.length === 0) return;
+            if (!window.confirm("Clear the saved sessions for this profile?")) return;
+            set.sessions = [];
+            set.updatedAt = new Date().toISOString();
+            renderSessionLogs();
+            saveStateNow();
+            showToast("Sessions cleared.");
+        }
+
+        function factoryResetApp() {
+            if (!window.confirm("Factory reset SkateTech OS and remove all saved profiles?")) return;
+            appState = createDefaultState();
+            renameMode = false;
+            renderAll();
+            updateStatusBanner(calculateSpread(getActiveSet()));
+            saveStateNow();
+            showView("calibrate");
+            showToast("Factory reset complete.");
+        }
+
+        function updateStatusBanner(spread, quiet) {
+            const set = getActiveSet();
+            const frame = getFrame(set);
+            const isWarning = spread.gap > frame.safetyLimit;
+            els.statusBanner.classList.add("show");
+            els.statusBanner.classList.toggle("warn", isWarning);
+            els.statusBanner.classList.toggle("ok", !isWarning);
+            els.statusBanner.classList.remove("error");
+
+            if (isWarning) {
+                els.statusBanner.textContent = `${formatMm(spread.gap)} spread exceeds the ${frame.name} ${formatMm(frame.safetyLimit)} limit. Override the Rocket Loop and put the largest suitable wheel toward the highest-wear rear slot before skating.`;
+            } else {
+                els.statusBanner.textContent = quiet
+                    ? `${formatMm(spread.gap)} spread is inside the ${frame.name} safety limit.`
+                    : `${frame.name} is inside its ${formatMm(frame.safetyLimit)} safety limit. Rocket Loop is ready.`;
+            }
+        }
+
+        function calculateSpread(set) {
+            if (isArcFrame(set.frameKey)) {
+                const outerSpread = calculateSlotSpread(set, ARC_OUTER_SLOTS);
+                const innerSpread = calculateSlotSpread(set, ARC_INNER_SLOTS);
+                return {
+                    max: Math.max(outerSpread.max, innerSpread.max),
+                    min: Math.min(outerSpread.min, innerSpread.min),
+                    gap: Math.max(outerSpread.gap, innerSpread.gap),
+                    groups: {
+                        outer84: outerSpread,
+                        inner76: innerSpread
+                    }
+                };
+            }
+
+            return calculateSlotSpread(set, getSlotOrderForFrame(set.frameKey));
+        }
+
+        function calculateSlotSpread(set, slots) {
+            const sizes = getSlotOrderForFrame(set.frameKey).map((slot) => getWheelViewForSlot(set, slot).size);
+            const scopedSizes = slots.map((slot) => getWheelViewForSlot(set, slot).size);
+            const useSizes = scopedSizes.length ? scopedSizes : sizes;
+            const max = Math.max(...useSizes);
+            const min = Math.min(...useSizes);
+            return {
+                max,
+                min,
+                gap: Number((max - min).toFixed(2))
+            };
+        }
+
+        function getWearRanking(set) {
+            const slotOrder = getSlotOrderForFrame(set.frameKey);
+            const stats = normalizeWearStats(set.wearStats, set.frameKey);
+            return slotOrder.map((slot) => {
+                const item = stats[slot];
+                const samples = item.samples || 0;
+                const totalLoss = Number(item.totalLoss || 0);
+                return {
+                    slot,
+                    samples,
+                    totalLoss,
+                    lastLoss: Number(item.lastLoss || 0),
+                    maxLoss: Number(item.maxLoss || 0),
+                    totalMinutes: Number(item.totalMinutes || 0),
+                    totalMiles: Number(item.totalMiles || 0),
+                    slideSamples: Number(item.slideSamples || 0),
+                    averageLoss: samples > 0 ? totalLoss / samples : 0,
+                    mmPerHour: Number(item.totalMinutes || 0) > 0 ? totalLoss / (Number(item.totalMinutes || 0) / 60) : 0,
+                    mmPerMile: Number(item.totalMiles || 0) > 0 ? totalLoss / Number(item.totalMiles || 0) : 0
+                };
+            }).sort((a, b) => {
+                const aRate = a.mmPerHour || a.mmPerMile || a.averageLoss;
+                const bRate = b.mmPerHour || b.mmPerMile || b.averageLoss;
+                if (bRate !== aRate) return bRate - aRate;
+                return slotOrder.indexOf(a.slot) - slotOrder.indexOf(b.slot);
+            });
+        }
+
+        function getActiveSet() {
+            const set = appState.sets.find((item) => item.id === appState.activeSetId);
+            if (set) return set;
+            appState.activeSetId = appState.sets[0].id;
+            return appState.sets[0];
+        }
+
+        function getFrame(set) {
+            return FRAME_PRESETS[set.frameKey] || FRAME_PRESETS.endless_90es;
+        }
+
+        function getWearMetric(item) {
+            if (item && item.mmPerHour > 0) return item.mmPerHour;
+            if (item && item.mmPerMile > 0) return item.mmPerMile;
+            return item && item.averageLoss ? item.averageLoss : 0;
+        }
+
+        function formatWearRate(item) {
+            if (item.mmPerHour > 0) {
+                return `${formatNumber(item.mmPerHour)} mm/hr`;
+            }
+            if (item.mmPerMile > 0) {
+                return `${formatNumber(item.mmPerMile)} mm/mi`;
+            }
+            return `${formatNumber(item.averageLoss)} mm/sample`;
+        }
+
+        function formatWearDetail(item) {
+            const parts = [
+                `${formatNumber(item.totalLoss)} mm total`,
+                `${item.samples} ${item.samples === 1 ? "sample" : "samples"}`
+            ];
+            if (item.totalMinutes > 0) parts.push(`${Math.round(item.totalMinutes)} min`);
+            if (item.totalMiles > 0) parts.push(`${formatMiles(item.totalMiles)} mi`);
+            return parts.join(" / ");
+        }
+
+        function formatSessionMeta(sessionLike) {
+            const session = normalizeSessionMeta(sessionLike);
+            const parts = [];
+            if (session.minutes > 0) parts.push(`${session.minutes} min`);
+            if (session.miles > 0) parts.push(`${formatMiles(session.miles)} mi`);
+            parts.push(getSessionTypeLabel(session.type));
+            return parts.join(" / ");
+        }
+
+        function cleanName(value, fallback) {
+            const text = String(value || "").replace(/\s+/g, " ").trim();
+            return text || fallback;
+        }
+
+        function toWheelSize(value, fallback) {
+            const parsed = parseFloat(value);
+            if (!Number.isFinite(parsed)) return Number(fallback);
+            return Number(clamp(parsed, 40, 130).toFixed(1));
+        }
+
+        function clamp(value, min, max) {
+            return Math.min(max, Math.max(min, value));
+        }
+
+        function formatMm(value) {
+            return `${formatNumber(value)} mm`;
+        }
+
+        function formatNumber(value) {
+            return Number(value).toFixed(1);
+        }
+
+        function formatMiles(value) {
+            return Number(value || 0).toFixed(1);
+        }
+
+        function clonePlain(value) {
+            return JSON.parse(JSON.stringify(value || {}));
+        }
+
+        function createId() {
+            if (window.crypto && window.crypto.randomUUID) {
+                return window.crypto.randomUUID();
+            }
+            return `id-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+        }
+
+        function formatDate(value) {
+            const date = new Date(value);
+            if (Number.isNaN(date.getTime())) return "Unknown";
+            return date.toLocaleString([], {
+                month: "short",
+                day: "numeric",
+                hour: "numeric",
+                minute: "2-digit"
+            });
+        }
+
+        function relativeTime(value) {
+            const date = new Date(value);
+            if (Number.isNaN(date.getTime())) return "Now";
+            const seconds = Math.max(0, Math.round((Date.now() - date.getTime()) / 1000));
+            if (seconds < 8) return "Now";
+            if (seconds < 60) return `${seconds}s ago`;
+            const minutes = Math.round(seconds / 60);
+            if (minutes < 60) return `${minutes}m ago`;
+            return formatDate(value);
+        }
+
+        function getAgeInDays(value) {
+            const date = new Date(value);
+            if (Number.isNaN(date.getTime())) return Infinity;
+            return Math.floor(Math.max(0, Date.now() - date.getTime()) / 86400000);
+        }
+
+        function escapeHtml(value) {
+            return String(value)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#39;");
+        }
+
+        function showToast(message) {
+            els.toast.textContent = message;
+            els.toast.classList.add("show");
+            window.clearTimeout(toastTimer);
+            toastTimer = window.setTimeout(() => {
+                els.toast.classList.remove("show");
+            }, 2300);
+        }
+
+        window.switchWheelSet = switchWheelSet;
+        window.toggleRenameFields = toggleRenameFields;
+        window.executeAdaptivePipeline = executeAdaptivePipeline;
+        window.executeRotation = executeRotation;
+        window.requestRotationPreview = requestRotationPreview;
+        window.confirmRotationPreview = confirmRotationPreview;
+        window.undoLastRotation = undoLastRotation;
+        window.saveSessionEntry = saveSessionEntry;
+        window.createNewWheelSet = createNewWheelSet;
+        window.autoFillFrameSpecs = autoFillFrameSpecs;
+        window.factoryResetApp = factoryResetApp;
+    </script>
+</body>
+</html>
