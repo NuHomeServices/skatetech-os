@@ -2568,6 +2568,14 @@
                         token_hash: params.tokenHash,
                         type: params.type || "magiclink"
                     });
+                } else if (params.token) {
+                    const email = String(els.cloudEmailInput.value || "").trim();
+                    if (!email) throw new Error("Enter your email before finishing login from this link.");
+                    result = await client.auth.verifyOtp({
+                        email,
+                        token: params.token,
+                        type: params.type || "magiclink"
+                    });
                 } else {
                     throw new Error("That link does not contain a Supabase login token.");
                 }
@@ -2592,14 +2600,32 @@
         }
 
         function parseCloudLoginLink(rawLink) {
-            const url = new URL(rawLink);
-            const hashParams = new URLSearchParams(url.hash.replace(/^#/, ""));
-            const searchParams = url.searchParams;
+            const cleaned = String(rawLink || "").trim().replace(/\s+/g, "");
+            let hashParams = new URLSearchParams();
+            let searchParams = new URLSearchParams();
+
+            try {
+                const url = new URL(cleaned);
+                hashParams = new URLSearchParams(url.hash.replace(/^#/, ""));
+                searchParams = url.searchParams;
+            } catch (_error) {
+                const queryIndex = cleaned.indexOf("?");
+                const hashIndex = cleaned.indexOf("#");
+                if (queryIndex >= 0) {
+                    const end = hashIndex > queryIndex ? hashIndex : cleaned.length;
+                    searchParams = new URLSearchParams(cleaned.slice(queryIndex + 1, end));
+                } else {
+                    searchParams = new URLSearchParams(cleaned.replace(/^#/, ""));
+                }
+                if (hashIndex >= 0) hashParams = new URLSearchParams(cleaned.slice(hashIndex + 1));
+            }
+
             return {
                 accessToken: hashParams.get("access_token") || searchParams.get("access_token"),
                 refreshToken: hashParams.get("refresh_token") || searchParams.get("refresh_token"),
                 code: searchParams.get("code") || hashParams.get("code"),
                 tokenHash: searchParams.get("token_hash") || hashParams.get("token_hash"),
+                token: searchParams.get("token") || hashParams.get("token"),
                 type: normalizeOtpType(searchParams.get("type") || hashParams.get("type"))
             };
         }
@@ -2625,6 +2651,14 @@
                 } else if (params.tokenHash) {
                     result = await client.auth.verifyOtp({
                         token_hash: params.tokenHash,
+                        type: params.type || "magiclink"
+                    });
+                } else if (params.token) {
+                    const email = cloudConfig && cloudConfig.email ? cloudConfig.email : "";
+                    if (!email) throw new Error("Enter your email before finishing login from this link.");
+                    result = await client.auth.verifyOtp({
+                        email,
+                        token: params.token,
                         type: params.type || "magiclink"
                     });
                 }
