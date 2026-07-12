@@ -1357,6 +1357,7 @@
                         <div>
                             <div class="section-title">Cloud Sync</div>
                             <div class="mini-copy" id="cloudSyncStatus">Not connected.</div>
+                            <div class="mini-copy" id="cloudDebugStatus">No cloud check yet.</div>
                         </div>
                     </div>
                     <div class="cloud-grid">
@@ -1649,8 +1650,12 @@
         let cloudSaveTimer = 0;
         let cloudAutoSyncTimer = 0;
         let cloudBusy = false;
+        let cloudReadyForPush = false;
         let pendingCloudPush = false;
+        let lastCloudPullAttemptAt = 0;
         let lastCloudPullAt = 0;
+        let lastCloudPushAt = 0;
+        let lastCloudRemoteSummary = "";
         let magicLinkCooldownUntil = 0;
         let supabaseLibraryPromise = null;
 
@@ -1668,7 +1673,9 @@
             renderAll();
             updateStatusBanner(calculateSpread(getActiveSet()));
             initCloudSync();
-            hydrateFromDurableCache().finally(saveStateDebounced);
+            hydrateFromDurableCache().then(() => {
+                renderCloudDebugStatus();
+            });
         }
 
         function cacheElements() {
@@ -1686,7 +1693,7 @@
                 "sessionLogSummary", "clearSessionLogsBtn", "toast",
                 "exportDataBtn", "importDataBtn", "importDataFile", "restoreArchiveBtn", "backupReminder",
                 "backboneString", "copyBackboneBtn", "downloadBackboneBtn", "backboneRestoreInput", "restoreBackboneBtn",
-                "supabaseUrlInput", "supabaseAnonInput", "cloudEmailInput", "cloudPasswordInput", "cloudLoginLinkInput", "cloudSyncStatus",
+                "supabaseUrlInput", "supabaseAnonInput", "cloudEmailInput", "cloudPasswordInput", "cloudLoginLinkInput", "cloudSyncStatus", "cloudDebugStatus",
                 "saveCloudSettingsBtn", "sendMagicLinkBtn", "completeLoginLinkBtn", "signInPasswordBtn", "createPasswordAccountBtn",
                 "syncCloudNowBtn", "pullCloudBtn", "cloudSignOutBtn",
                 "wearSummary", "wearRankingList", "heatSummary", "heatMap",
@@ -2368,13 +2375,21 @@
                     if (cloudSession) startCloudAutoSync();
                     else stopCloudAutoSync();
                     renderCloudPanel();
-                    if (cloudSession) pullCloudState({ showToastOnSuccess: false, auto: true }).then(() => queueCloudSave(250));
+                    if (cloudSession) {
+                        cloudReadyForPush = false;
+                        pullCloudState({ showToastOnSuccess: false, auto: true }).then((checkedCloud) => {
+                            cloudReadyForPush = Boolean(checkedCloud);
+                            if (cloudReadyForPush) queueCloudSave(250);
+                        });
+                    }
                 });
                 renderCloudPanel();
                 if (cloudSession) {
+                    cloudReadyForPush = false;
                     startCloudAutoSync();
-                    await pullCloudState({ showToastOnSuccess: false, auto: true });
-                    queueCloudSave(250);
+                    const checkedCloud = await pullCloudState({ showToastOnSuccess: false, auto: true });
+                    cloudReadyForPush = Boolean(checkedCloud);
+                    if (cloudReadyForPush) queueCloudSave(250);
                 } else if (hasAuthParamsInCurrentUrl()) {
                     await completeCloudLoginFromCurrentUrl(client);
                 }
@@ -2386,7 +2401,11 @@
 
         function hasAuthParamsInCurrentUrl() {
             const raw = window.location.href;
-            return raw.includes("access_token=") || raw.includes("refresh_token=") || raw.includes("token_hash=") || raw.includes("?code=");
+            return raw.includes("access_token=") ||
+                raw.includes("refresh_token=") ||
+                raw.includes("token_hash=") ||
+                raw.includes("token=") ||
+                raw.includes("?code=");
         }
 
         function saveCloudSettings(event) {
@@ -2481,11 +2500,13 @@
                 if (error) throw error;
                 cloudSession = data && data.session ? data.session : null;
                 if (!cloudSession) throw new Error("Supabase did not return a session.");
+                cloudReadyForPush = false;
                 startCloudAutoSync();
                 renderCloudPanel();
                 showToast("Cloud signed in.");
-                await pullCloudState({ showToastOnSuccess: false, auto: true });
-                queueCloudSave(250);
+                const checkedCloud = await pullCloudState({ showToastOnSuccess: false, auto: true });
+                cloudReadyForPush = Boolean(checkedCloud);
+                if (cloudReadyForPush) queueCloudSave(250);
             } catch (error) {
                 showToast("Password sign-in failed.");
                 renderCloudStatus(`Password sign-in failed: ${error.message || error}`);
@@ -2520,11 +2541,13 @@
                 if (error) throw error;
                 cloudSession = data && data.session ? data.session : null;
                 if (cloudSession) {
+                    cloudReadyForPush = false;
                     startCloudAutoSync();
                     renderCloudPanel();
                     showToast("Password login created and signed in.");
-                    await pullCloudState({ showToastOnSuccess: false, auto: true });
-                    queueCloudSave(250);
+                    const checkedCloud = await pullCloudState({ showToastOnSuccess: false, auto: true });
+                    cloudReadyForPush = Boolean(checkedCloud);
+                    if (cloudReadyForPush) queueCloudSave(250);
                 } else {
                     renderCloudStatus("Password login created. If Supabase asks for confirmation, check your email once.");
                     showToast("Password login created. Check email if needed.");
@@ -2569,13 +2592,7 @@
                         type: params.type || "magiclink"
                     });
                 } else if (params.token) {
-                    const email = String(els.cloudEmailInput.value || "").trim();
-                    if (!email) throw new Error("Enter your email before finishing login from this link.");
-                    result = await client.auth.verifyOtp({
-                        email,
-                        token: params.token,
-                        type: params.type || "magiclink"
-                    });
+                    result = await verifyTokenLink(client, params, String(els.cloudEmailInput.value || "").trim());
                 } else {
                     throw new Error("That link does not contain a Supabase login token.");
                 }
@@ -2587,16 +2604,44 @@
                 if (!cloudSession) throw new Error("Supabase did not return a signed-in session.");
 
                 els.cloudLoginLinkInput.value = "";
+                cloudReadyForPush = false;
                 startCloudAutoSync();
                 renderCloudPanel();
                 showToast("Cloud login finished.");
-                await pullCloudState({ showToastOnSuccess: false, auto: true });
-                queueCloudSave(250);
+                const checkedCloud = await pullCloudState({ showToastOnSuccess: false, auto: true });
+                cloudReadyForPush = Boolean(checkedCloud);
+                if (cloudReadyForPush) queueCloudSave(250);
             } catch (error) {
-                showToast("Could not finish cloud login from that link.");
-                renderCloudStatus(`Link login failed: ${error.message || error}`);
+                const message = formatCloudError(error);
+                showToast(`Login link failed: ${message}`);
+                renderCloudStatus(`Link login failed: ${message}`);
                 console.warn("SkateTech link login failed.", error);
             }
+        }
+
+        async function verifyTokenLink(client, params, email) {
+            const type = params.type || "magiclink";
+            const tokenHashResult = await client.auth.verifyOtp({
+                token_hash: params.token,
+                type
+            });
+            if (!tokenHashResult.error) return tokenHashResult;
+
+            if (!email) return tokenHashResult;
+            const tokenResult = await client.auth.verifyOtp({
+                email,
+                token: params.token,
+                type
+            });
+            return tokenResult.error ? tokenHashResult : tokenResult;
+        }
+
+        function formatCloudError(error) {
+            const message = String(error && error.message ? error.message : error || "Unknown error");
+            if (message.toLowerCase().includes("expired")) return "link expired or already used";
+            if (message.toLowerCase().includes("invalid")) return "link invalid, expired, or already used";
+            if (message.length > 90) return `${message.slice(0, 87)}...`;
+            return message;
         }
 
         function parseCloudLoginLink(rawLink) {
@@ -2655,12 +2700,7 @@
                     });
                 } else if (params.token) {
                     const email = cloudConfig && cloudConfig.email ? cloudConfig.email : "";
-                    if (!email) throw new Error("Enter your email before finishing login from this link.");
-                    result = await client.auth.verifyOtp({
-                        email,
-                        token: params.token,
-                        type: params.type || "magiclink"
-                    });
+                    result = await verifyTokenLink(client, params, email);
                 }
 
                 if (result && result.error) throw result.error;
@@ -2669,11 +2709,13 @@
                 cloudSession = sessionResult.data && sessionResult.data.session ? sessionResult.data.session : null;
                 if (cloudSession) {
                     window.history.replaceState({}, document.title, getCleanAppUrl());
+                    cloudReadyForPush = false;
                     startCloudAutoSync();
                     renderCloudPanel();
                     showToast("Cloud login finished.");
-                    await pullCloudState({ showToastOnSuccess: false, auto: true });
-                    queueCloudSave(250);
+                    const checkedCloud = await pullCloudState({ showToastOnSuccess: false, auto: true });
+                    cloudReadyForPush = Boolean(checkedCloud);
+                    if (cloudReadyForPush) queueCloudSave(250);
                 }
             } catch (error) {
                 renderCloudStatus(`Automatic login failed: ${error.message || error}`);
@@ -2695,6 +2737,7 @@
             try {
                 await client.auth.signOut();
                 cloudSession = null;
+                cloudReadyForPush = false;
                 pendingCloudPush = false;
                 stopCloudAutoSync();
                 renderCloudPanel();
@@ -2708,6 +2751,7 @@
         function queueCloudSave(delayMs = 700) {
             if (!cloudSession) return;
             pendingCloudPush = true;
+            if (!cloudReadyForPush) return;
             window.clearTimeout(cloudSaveTimer);
             cloudSaveTimer = window.setTimeout(() => {
                 flushCloudSaveQueue();
@@ -2716,6 +2760,7 @@
 
         async function flushCloudSaveQueue() {
             if (!pendingCloudPush || !cloudSession) return;
+            if (!cloudReadyForPush) return;
             if (cloudBusy) {
                 queueCloudSave(1200);
                 return;
@@ -2736,7 +2781,6 @@
                 autoPullCloudState("interval");
                 flushCloudSaveQueue();
             }, 15000);
-            autoPullCloudState("start");
         }
 
         function stopCloudAutoSync() {
@@ -2747,8 +2791,8 @@
         function autoPullCloudState(_reason) {
             if (!cloudSession || cloudBusy) return;
             const now = Date.now();
-            if (now - lastCloudPullAt < 2500) return;
-            lastCloudPullAt = now;
+            if (now - lastCloudPullAttemptAt < 2500) return;
+            lastCloudPullAttemptAt = now;
             pullCloudState({ showToastOnSuccess: false, auto: true });
         }
 
@@ -2758,6 +2802,10 @@
             if (!client || !user) {
                 if (options.showToastOnSuccess) showToast("Sign in to cloud first.");
                 renderCloudPanel();
+                return false;
+            }
+            if (!cloudReadyForPush && !options.allowBeforeInitialPull) {
+                renderCloudStatus("Cloud is checking the latest save before uploading.");
                 return false;
             }
 
@@ -2774,6 +2822,8 @@
                         updated_at: new Date().toISOString()
                     }, { onConflict: "user_id" });
                 if (error) throw error;
+                lastCloudPushAt = Date.now();
+                lastCloudRemoteSummary = getStateCloudSummary(payload);
                 renderCloudStatus(`Cloud saved as ${user.email || "signed-in user"}.`);
                 if (options.showToastOnSuccess) showToast("Cloud sync saved.");
                 return true;
@@ -2807,12 +2857,20 @@
                     .maybeSingle();
                 if (error) throw error;
                 if (!data || !data.payload) {
-                    await pushCloudState({ showToastOnSuccess: false });
+                    lastCloudPullAt = Date.now();
+                    lastCloudRemoteSummary = "empty";
+                    const created = await pushCloudState({
+                        showToastOnSuccess: false,
+                        allowBeforeInitialPull: true
+                    });
+                    if (!created) return false;
                     if (options.showToastOnSuccess) showToast("No cloud save existed, so local data was uploaded.");
                     return true;
                 }
 
                 const remoteState = normalizeState(data.payload);
+                lastCloudPullAt = Date.now();
+                lastCloudRemoteSummary = getStateCloudSummary(remoteState);
                 const shouldAdopt = options.force || shouldAdoptStoredState(remoteState, appState);
                 if (shouldAdopt) {
                     if (options.force && !window.confirm("Replace this device with the Supabase cloud save?")) return false;
@@ -2827,8 +2885,9 @@
                 }
 
                 renderCloudStatus(options.auto ? "Cloud is watching for updates." : "Local save is current. Cloud pull skipped.");
+                renderCloudDebugStatus();
                 if (options.showToastOnSuccess) showToast("Local save is already current.");
-                return false;
+                return true;
             } catch (error) {
                 renderCloudStatus(`Cloud pull failed: ${error.message || error}`);
                 if (options.showToastOnSuccess) showToast("Cloud pull failed.");
@@ -2858,10 +2917,28 @@
             } else {
                 renderCloudStatus("Cloud configured. Send a login link to start syncing.");
             }
+            renderCloudDebugStatus();
         }
 
         function renderCloudStatus(message) {
             if (els.cloudSyncStatus) els.cloudSyncStatus.textContent = message;
+        }
+
+        function renderCloudDebugStatus() {
+            if (!els.cloudDebugStatus) return;
+            const localSummary = getStateCloudSummary(appState);
+            const cloudSummary = lastCloudRemoteSummary ? ` / cloud ${lastCloudRemoteSummary}` : "";
+            const pulled = lastCloudPullAt ? ` / pulled ${relativeTime(new Date(lastCloudPullAt).toISOString())}` : "";
+            const pushed = lastCloudPushAt ? ` / pushed ${relativeTime(new Date(lastCloudPushAt).toISOString())}` : "";
+            els.cloudDebugStatus.textContent = `Local ${localSummary}${cloudSummary}${pulled}${pushed}`;
+        }
+
+        function getStateCloudSummary(state) {
+            const sets = state && Array.isArray(state.sets) ? state.sets : [];
+            const sessions = sets.reduce((total, set) => total + (Array.isArray(set.sessions) ? set.sessions.length : 0), 0);
+            const logs = sets.reduce((total, set) => total + (Array.isArray(set.logs) ? set.logs.length : 0), 0);
+            const rotations = sets.reduce((total, set) => total + Number(set.rotationCount || 0), 0);
+            return `${sets.length} profiles / ${sessions} sessions / ${logs} logs / ${rotations} rotations`;
         }
 
         function normalizeState(value) {
