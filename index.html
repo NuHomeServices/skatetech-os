@@ -1644,7 +1644,10 @@
         let cloudClient = null;
         let cloudSession = null;
         let cloudSaveTimer = 0;
+        let cloudAutoSyncTimer = 0;
         let cloudBusy = false;
+        let pendingCloudPush = false;
+        let lastCloudPullAt = 0;
         let supabaseLibraryPromise = null;
 
         const els = {};
@@ -1734,8 +1737,15 @@
             els.clearSessionLogsBtn.addEventListener("click", clearSessionLogs);
             window.addEventListener("beforeunload", saveStateNow);
             window.addEventListener("pagehide", saveStateNow);
+            window.addEventListener("pageshow", () => autoPullCloudState("page shown"));
+            window.addEventListener("focus", () => autoPullCloudState("focus"));
+            window.addEventListener("online", () => {
+                autoPullCloudState("online");
+                flushCloudSaveQueue();
+            });
             document.addEventListener("visibilitychange", () => {
                 if (document.visibilityState === "hidden") saveStateNow();
+                else autoPullCloudState("visible");
             });
 
             els.leftInputContainer.addEventListener("input", handleWheelInput);
@@ -2348,13 +2358,16 @@
                 cloudSession = data && data.session ? data.session : null;
                 client.auth.onAuthStateChange((_event, session) => {
                     cloudSession = session || null;
+                    if (cloudSession) startCloudAutoSync();
+                    else stopCloudAutoSync();
                     renderCloudPanel();
-                    if (cloudSession) pullCloudState({ showToastOnSuccess: false }).then(() => pushCloudState({ showToastOnSuccess: false }));
+                    if (cloudSession) pullCloudState({ showToastOnSuccess: false, auto: true }).then(() => queueCloudSave(250));
                 });
                 renderCloudPanel();
                 if (cloudSession) {
-                    await pullCloudState({ showToastOnSuccess: false });
-                    await pushCloudState({ showToastOnSuccess: false });
+                    startCloudAutoSync();
+                    await pullCloudState({ showToastOnSuccess: false, auto: true });
+                    queueCloudSave(250);
                 } else if (hasAuthParamsInCurrentUrl()) {
                     await completeCloudLoginFromCurrentUrl(client);
                 }
@@ -2471,10 +2484,11 @@
                 if (!cloudSession) throw new Error("Supabase did not return a signed-in session.");
 
                 els.cloudLoginLinkInput.value = "";
+                startCloudAutoSync();
                 renderCloudPanel();
                 showToast("Cloud login finished.");
-                await pullCloudState({ showToastOnSuccess: false });
-                await pushCloudState({ showToastOnSuccess: false });
+                await pullCloudState({ showToastOnSuccess: false, auto: true });
+                queueCloudSave(250);
             } catch (error) {
                 showToast("Could not finish cloud login from that link.");
                 renderCloudStatus(`Link login failed: ${error.message || error}`);
@@ -2526,10 +2540,11 @@
                 cloudSession = sessionResult.data && sessionResult.data.session ? sessionResult.data.session : null;
                 if (cloudSession) {
                     window.history.replaceState({}, document.title, getCleanAppUrl());
+                    startCloudAutoSync();
                     renderCloudPanel();
                     showToast("Cloud login finished.");
-                    await pullCloudState({ showToastOnSuccess: false });
-                    await pushCloudState({ showToastOnSuccess: false });
+                    await pullCloudState({ showToastOnSuccess: false, auto: true });
+                    queueCloudSave(250);
                 }
             } catch (error) {
                 renderCloudStatus(`Automatic login failed: ${error.message || error}`);
@@ -2551,6 +2566,8 @@
             try {
                 await client.auth.signOut();
                 cloudSession = null;
+                pendingCloudPush = false;
+                stopCloudAutoSync();
                 renderCloudPanel();
                 showToast("Cloud signed out.");
             } catch (error) {
@@ -2559,12 +2576,51 @@
             }
         }
 
-        function queueCloudSave() {
-            if (!cloudSession || cloudBusy) return;
+        function queueCloudSave(delayMs = 700) {
+            if (!cloudSession) return;
+            pendingCloudPush = true;
             window.clearTimeout(cloudSaveTimer);
             cloudSaveTimer = window.setTimeout(() => {
-                pushCloudState({ showToastOnSuccess: false });
-            }, 900);
+                flushCloudSaveQueue();
+            }, delayMs);
+        }
+
+        async function flushCloudSaveQueue() {
+            if (!pendingCloudPush || !cloudSession) return;
+            if (cloudBusy) {
+                queueCloudSave(1200);
+                return;
+            }
+
+            pendingCloudPush = false;
+            const ok = await pushCloudState({ showToastOnSuccess: false, auto: true });
+            if (!ok && cloudSession) {
+                pendingCloudPush = true;
+                queueCloudSave(8000);
+            }
+        }
+
+        function startCloudAutoSync() {
+            if (!cloudSession) return;
+            stopCloudAutoSync();
+            cloudAutoSyncTimer = window.setInterval(() => {
+                autoPullCloudState("interval");
+                flushCloudSaveQueue();
+            }, 15000);
+            autoPullCloudState("start");
+        }
+
+        function stopCloudAutoSync() {
+            window.clearInterval(cloudAutoSyncTimer);
+            cloudAutoSyncTimer = 0;
+        }
+
+        function autoPullCloudState(_reason) {
+            if (!cloudSession || cloudBusy) return;
+            const now = Date.now();
+            if (now - lastCloudPullAt < 2500) return;
+            lastCloudPullAt = now;
+            pullCloudState({ showToastOnSuccess: false, auto: true });
         }
 
         async function pushCloudState(options = {}) {
@@ -2641,7 +2697,7 @@
                     return true;
                 }
 
-                renderCloudStatus("Local save is current. Cloud pull skipped.");
+                renderCloudStatus(options.auto ? "Cloud is watching for updates." : "Local save is current. Cloud pull skipped.");
                 if (options.showToastOnSuccess) showToast("Local save is already current.");
                 return false;
             } catch (error) {
@@ -3695,6 +3751,7 @@
             renderSessionFields();
             renderSessionLogs();
             saveStateNow();
+            queueCloudSave(100);
             showToast(`Session saved to rotation ${set.rotationCount}.`);
         }
 
