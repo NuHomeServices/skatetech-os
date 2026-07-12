@@ -1372,7 +1372,7 @@
                         <button class="ghost-btn" id="sendMagicLinkBtn" type="button">Send Login Link</button>
                         <button class="ghost-btn" id="completeLoginLinkBtn" type="button">Finish Login From Link</button>
                         <button class="ghost-btn" id="signInPasswordBtn" type="button">Sign In Password</button>
-                        <button class="ghost-btn" id="createPasswordAccountBtn" type="button">Create Password Login</button>
+                        <button class="ghost-btn" id="createPasswordAccountBtn" type="button">Set/Update Password</button>
                         <button class="ghost-btn" id="syncCloudNowBtn" type="button">Sync Now</button>
                         <button class="ghost-btn" id="pullCloudBtn" type="button">Pull Cloud Save</button>
                         <button class="danger-btn" id="cloudSignOutBtn" type="button">Sign Out Cloud</button>
@@ -2530,6 +2530,20 @@
             }
 
             try {
+                const sessionResult = await client.auth.getSession();
+                if (!sessionResult.error && sessionResult.data && sessionResult.data.session) {
+                    cloudSession = sessionResult.data.session;
+                }
+
+                if (cloudSession && cloudSession.user) {
+                    renderCloudStatus("Updating password for this signed-in cloud account...");
+                    const { error } = await client.auth.updateUser({ password });
+                    if (error) throw error;
+                    showToast("Cloud password updated.");
+                    renderCloudStatus(`Password ready for ${cloudSession.user.email || email}. Use it on the phone.`);
+                    return;
+                }
+
                 renderCloudStatus("Creating password login...");
                 const { data, error } = await client.auth.signUp({
                     email,
@@ -2553,8 +2567,9 @@
                     showToast("Password login created. Check email if needed.");
                 }
             } catch (error) {
-                showToast("Could not create password login.");
-                renderCloudStatus(`Create password failed: ${error.message || error}`);
+                const message = String(error.message || error || "");
+                showToast("Could not set cloud password.");
+                renderCloudStatus(`Set password failed: ${message}`);
                 console.warn("SkateTech password account create failed.", error);
             }
         }
