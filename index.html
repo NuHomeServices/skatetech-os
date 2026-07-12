@@ -1363,10 +1363,12 @@
                         <input type="url" id="supabaseUrlInput" placeholder="Supabase project URL" autocomplete="off" spellcheck="false" aria-label="Supabase project URL">
                         <input type="password" id="supabaseAnonInput" placeholder="Supabase anon public key" autocomplete="off" spellcheck="false" aria-label="Supabase anon public key">
                         <input type="email" id="cloudEmailInput" placeholder="Your email for magic-link login" autocomplete="email" aria-label="Cloud sync email">
+                        <textarea id="cloudLoginLinkInput" class="backbone-field restore-field" placeholder="Paste login link here if email opens in browser instead of the home-screen app" spellcheck="false" aria-label="Paste Supabase login link"></textarea>
                     </div>
                     <div class="cloud-actions">
                         <button class="ghost-btn" id="saveCloudSettingsBtn" type="button">Save Cloud Settings</button>
                         <button class="ghost-btn" id="sendMagicLinkBtn" type="button">Send Login Link</button>
+                        <button class="ghost-btn" id="completeLoginLinkBtn" type="button">Finish Login From Link</button>
                         <button class="ghost-btn" id="syncCloudNowBtn" type="button">Sync Now</button>
                         <button class="ghost-btn" id="pullCloudBtn" type="button">Pull Cloud Save</button>
                         <button class="danger-btn" id="cloudSignOutBtn" type="button">Sign Out Cloud</button>
@@ -1677,8 +1679,8 @@
                 "sessionLogSummary", "clearSessionLogsBtn", "toast",
                 "exportDataBtn", "importDataBtn", "importDataFile", "restoreArchiveBtn", "backupReminder",
                 "backboneString", "copyBackboneBtn", "downloadBackboneBtn", "backboneRestoreInput", "restoreBackboneBtn",
-                "supabaseUrlInput", "supabaseAnonInput", "cloudEmailInput", "cloudSyncStatus",
-                "saveCloudSettingsBtn", "sendMagicLinkBtn", "syncCloudNowBtn", "pullCloudBtn", "cloudSignOutBtn",
+                "supabaseUrlInput", "supabaseAnonInput", "cloudEmailInput", "cloudLoginLinkInput", "cloudSyncStatus",
+                "saveCloudSettingsBtn", "sendMagicLinkBtn", "completeLoginLinkBtn", "syncCloudNowBtn", "pullCloudBtn", "cloudSignOutBtn",
                 "wearSummary", "wearRankingList", "heatSummary", "heatMap",
                 "targetLeftContainer", "targetRightContainer", "loopDisplay"
             ].forEach((id) => {
@@ -1724,6 +1726,7 @@
             els.restoreBackboneBtn.addEventListener("click", restoreBackupBackbone);
             els.saveCloudSettingsBtn.addEventListener("click", saveCloudSettings);
             els.sendMagicLinkBtn.addEventListener("click", sendCloudMagicLink);
+            els.completeLoginLinkBtn.addEventListener("click", completeCloudLoginFromLink);
             els.syncCloudNowBtn.addEventListener("click", () => pushCloudState({ showToastOnSuccess: true }));
             els.pullCloudBtn.addEventListener("click", () => pullCloudState({ force: true, showToastOnSuccess: true }));
             els.cloudSignOutBtn.addEventListener("click", signOutCloud);
@@ -2352,11 +2355,18 @@
                 if (cloudSession) {
                     await pullCloudState({ showToastOnSuccess: false });
                     await pushCloudState({ showToastOnSuccess: false });
+                } else if (hasAuthParamsInCurrentUrl()) {
+                    await completeCloudLoginFromCurrentUrl(client);
                 }
             } catch (error) {
                 renderCloudStatus(`Cloud auth error: ${error.message || error}`);
                 console.warn("SkateTech cloud init failed.", error);
             }
+        }
+
+        function hasAuthParamsInCurrentUrl() {
+            const raw = window.location.href;
+            return raw.includes("access_token=") || raw.includes("refresh_token=") || raw.includes("token_hash=") || raw.includes("?code=");
         }
 
         function saveCloudSettings(event) {
@@ -2418,8 +2428,121 @@
             }
         }
 
+        async function completeCloudLoginFromLink() {
+            if (!persistCloudSettingsFromInputs(false)) return;
+            const rawLink = String(els.cloudLoginLinkInput.value || "").trim();
+            if (!rawLink) {
+                showToast("Paste the Supabase email login link first.");
+                return;
+            }
+
+            const client = await getCloudClientAsync();
+            if (!client) {
+                showToast("Supabase could not load. Refresh the app and try again.");
+                renderCloudStatus("Supabase could not load. Check internet, then refresh.");
+                return;
+            }
+
+            try {
+                renderCloudStatus("Finishing cloud login...");
+                const params = parseCloudLoginLink(rawLink);
+                let result = null;
+
+                if (params.accessToken && params.refreshToken) {
+                    result = await client.auth.setSession({
+                        access_token: params.accessToken,
+                        refresh_token: params.refreshToken
+                    });
+                } else if (params.code) {
+                    result = await client.auth.exchangeCodeForSession(params.code);
+                } else if (params.tokenHash) {
+                    result = await client.auth.verifyOtp({
+                        token_hash: params.tokenHash,
+                        type: params.type || "magiclink"
+                    });
+                } else {
+                    throw new Error("That link does not contain a Supabase login token.");
+                }
+
+                if (result && result.error) throw result.error;
+                const sessionResult = await client.auth.getSession();
+                if (sessionResult.error) throw sessionResult.error;
+                cloudSession = sessionResult.data && sessionResult.data.session ? sessionResult.data.session : null;
+                if (!cloudSession) throw new Error("Supabase did not return a signed-in session.");
+
+                els.cloudLoginLinkInput.value = "";
+                renderCloudPanel();
+                showToast("Cloud login finished.");
+                await pullCloudState({ showToastOnSuccess: false });
+                await pushCloudState({ showToastOnSuccess: false });
+            } catch (error) {
+                showToast("Could not finish cloud login from that link.");
+                renderCloudStatus(`Link login failed: ${error.message || error}`);
+                console.warn("SkateTech link login failed.", error);
+            }
+        }
+
+        function parseCloudLoginLink(rawLink) {
+            const url = new URL(rawLink);
+            const hashParams = new URLSearchParams(url.hash.replace(/^#/, ""));
+            const searchParams = url.searchParams;
+            return {
+                accessToken: hashParams.get("access_token") || searchParams.get("access_token"),
+                refreshToken: hashParams.get("refresh_token") || searchParams.get("refresh_token"),
+                code: searchParams.get("code") || hashParams.get("code"),
+                tokenHash: searchParams.get("token_hash") || hashParams.get("token_hash"),
+                type: normalizeOtpType(searchParams.get("type") || hashParams.get("type"))
+            };
+        }
+
+        function normalizeOtpType(type) {
+            const normalized = String(type || "").toLowerCase();
+            return ["signup", "invite", "magiclink", "recovery", "email_change", "email"].includes(normalized)
+                ? normalized
+                : "magiclink";
+        }
+
+        async function completeCloudLoginFromCurrentUrl(client) {
+            try {
+                const params = parseCloudLoginLink(window.location.href);
+                let result = null;
+                if (params.accessToken && params.refreshToken) {
+                    result = await client.auth.setSession({
+                        access_token: params.accessToken,
+                        refresh_token: params.refreshToken
+                    });
+                } else if (params.code) {
+                    result = await client.auth.exchangeCodeForSession(params.code);
+                } else if (params.tokenHash) {
+                    result = await client.auth.verifyOtp({
+                        token_hash: params.tokenHash,
+                        type: params.type || "magiclink"
+                    });
+                }
+
+                if (result && result.error) throw result.error;
+                const sessionResult = await client.auth.getSession();
+                if (sessionResult.error) throw sessionResult.error;
+                cloudSession = sessionResult.data && sessionResult.data.session ? sessionResult.data.session : null;
+                if (cloudSession) {
+                    window.history.replaceState({}, document.title, getCleanAppUrl());
+                    renderCloudPanel();
+                    showToast("Cloud login finished.");
+                    await pullCloudState({ showToastOnSuccess: false });
+                    await pushCloudState({ showToastOnSuccess: false });
+                }
+            } catch (error) {
+                renderCloudStatus(`Automatic login failed: ${error.message || error}`);
+                console.warn("SkateTech automatic cloud login failed.", error);
+            }
+        }
+
         function getAppRedirectUrl() {
             return window.location.href.split("#")[0].split("?")[0];
+        }
+
+        function getCleanAppUrl() {
+            return window.location.origin + window.location.pathname;
         }
 
         async function signOutCloud() {
