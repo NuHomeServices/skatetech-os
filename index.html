@@ -1458,6 +1458,10 @@
         const DURABLE_STATE_KEY = "latest";
         const CLOUD_CONFIG_KEY = "skatetech.supabase.config.v1";
         const CLOUD_TABLE_NAME = "skatetech_app_state";
+        const SUPABASE_SCRIPT_URLS = Object.freeze([
+            "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2",
+            "https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"
+        ]);
         const DEFAULT_PROFILE_REVISION = 4;
         const FOUR_WHEEL_LEFT_SLOTS = Object.freeze(["L1", "L2", "L3", "L4"]);
         const FOUR_WHEEL_RIGHT_SLOTS = Object.freeze(["R1", "R2", "R3", "R4"]);
@@ -1639,6 +1643,7 @@
         let cloudSession = null;
         let cloudSaveTimer = 0;
         let cloudBusy = false;
+        let supabaseLibraryPromise = null;
 
         const els = {};
 
@@ -2275,13 +2280,62 @@
             return cloudClient;
         }
 
+        async function getCloudClientAsync() {
+            if (!hasCloudConfig()) return null;
+            await ensureSupabaseLibrary();
+            return getCloudClient();
+        }
+
+        async function ensureSupabaseLibrary() {
+            if (window.supabase && window.supabase.createClient) return true;
+            if (supabaseLibraryPromise) return supabaseLibraryPromise;
+
+            supabaseLibraryPromise = (async () => {
+                for (const src of SUPABASE_SCRIPT_URLS) {
+                    try {
+                        await loadExternalScript(src);
+                        if (window.supabase && window.supabase.createClient) return true;
+                    } catch (error) {
+                        console.warn(`SkateTech could not load Supabase from ${src}.`, error);
+                    }
+                }
+                throw new Error("Supabase library could not be loaded. Check your internet connection or refresh the app.");
+            })();
+
+            try {
+                return await supabaseLibraryPromise;
+            } finally {
+                if (!(window.supabase && window.supabase.createClient)) supabaseLibraryPromise = null;
+            }
+        }
+
+        function loadExternalScript(src) {
+            return new Promise((resolve, reject) => {
+                const existing = document.querySelector(`script[src="${src}"]`);
+                if (existing && existing.dataset.loaded === "true") {
+                    resolve();
+                    return;
+                }
+
+                const script = existing || document.createElement("script");
+                script.src = src;
+                script.async = true;
+                script.onload = () => {
+                    script.dataset.loaded = "true";
+                    resolve();
+                };
+                script.onerror = () => reject(new Error(`Could not load ${src}`));
+                if (!existing) document.head.appendChild(script);
+            });
+        }
+
         async function initCloudSync() {
             renderCloudPanel();
             if (!hasCloudConfig()) return;
 
-            const client = getCloudClient();
+            const client = await getCloudClientAsync();
             if (!client) {
-                renderCloudStatus("Supabase client is not loaded yet.");
+                renderCloudStatus("Supabase client is not ready. Check URL/key, internet, then refresh.");
                 return;
             }
 
@@ -2305,7 +2359,12 @@
             }
         }
 
-        function saveCloudSettings() {
+        function saveCloudSettings(event) {
+            if (event && event.preventDefault) event.preventDefault();
+            return persistCloudSettingsFromInputs(true);
+        }
+
+        function persistCloudSettingsFromInputs(showToastOnSuccess) {
             const nextConfig = {
                 url: els.supabaseUrlInput.value,
                 anonKey: els.supabaseAnonInput.value,
@@ -2313,7 +2372,7 @@
             };
             if (!cleanUrl(nextConfig.url) || !nextConfig.anonKey.trim()) {
                 showToast("Enter your Supabase URL and anon public key.");
-                return;
+                return false;
             }
 
             saveCloudConfig(nextConfig);
@@ -2321,20 +2380,23 @@
             cloudSession = null;
             renderCloudPanel();
             initCloudSync();
-            showToast("Cloud settings saved.");
+            if (showToastOnSuccess) showToast("Cloud settings saved.");
+            return true;
         }
 
         async function sendCloudMagicLink() {
-            saveCloudSettings();
+            if (!persistCloudSettingsFromInputs(false)) return;
             const email = String(els.cloudEmailInput.value || "").trim();
             if (!email) {
                 showToast("Enter your email first.");
                 return;
             }
 
-            const client = getCloudClient();
+            renderCloudStatus("Loading Supabase...");
+            const client = await getCloudClientAsync();
             if (!client) {
-                showToast("Supabase is not ready yet.");
+                showToast("Supabase could not load. Refresh the app and try again.");
+                renderCloudStatus("Supabase could not load. Check internet, then refresh.");
                 return;
             }
 
@@ -2361,7 +2423,7 @@
         }
 
         async function signOutCloud() {
-            const client = getCloudClient();
+            const client = await getCloudClientAsync();
             if (!client) return;
             try {
                 await client.auth.signOut();
@@ -2383,7 +2445,7 @@
         }
 
         async function pushCloudState(options = {}) {
-            const client = getCloudClient();
+            const client = await getCloudClientAsync();
             const user = cloudSession && cloudSession.user;
             if (!client || !user) {
                 if (options.showToastOnSuccess) showToast("Sign in to cloud first.");
@@ -2419,7 +2481,7 @@
         }
 
         async function pullCloudState(options = {}) {
-            const client = getCloudClient();
+            const client = await getCloudClientAsync();
             const user = cloudSession && cloudSession.user;
             if (!client || !user) {
                 if (options.showToastOnSuccess) showToast("Sign in to cloud first.");
@@ -2480,7 +2542,7 @@
             if (!hasCloudConfig()) {
                 renderCloudStatus("Not connected. Add your Supabase URL and anon key.");
             } else if (!window.supabase || !window.supabase.createClient) {
-                renderCloudStatus("Supabase library is loading. Refresh if this stays here.");
+                renderCloudStatus("Cloud settings saved. Tap Send Login Link to load Supabase.");
             } else if (cloudBusy) {
                 renderCloudStatus("Cloud sync in progress...");
             } else if (cloudSession && cloudSession.user) {
