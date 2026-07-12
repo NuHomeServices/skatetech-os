@@ -1363,12 +1363,15 @@
                         <input type="url" id="supabaseUrlInput" placeholder="Supabase project URL" autocomplete="off" spellcheck="false" aria-label="Supabase project URL">
                         <input type="password" id="supabaseAnonInput" placeholder="Supabase anon public key" autocomplete="off" spellcheck="false" aria-label="Supabase anon public key">
                         <input type="email" id="cloudEmailInput" placeholder="Your email for magic-link login" autocomplete="email" aria-label="Cloud sync email">
+                        <input type="password" id="cloudPasswordInput" placeholder="Optional cloud password" autocomplete="current-password" aria-label="Cloud sync password">
                         <textarea id="cloudLoginLinkInput" class="backbone-field restore-field" placeholder="Paste login link here if email opens in browser instead of the home-screen app" spellcheck="false" aria-label="Paste Supabase login link"></textarea>
                     </div>
                     <div class="cloud-actions">
                         <button class="ghost-btn" id="saveCloudSettingsBtn" type="button">Save Cloud Settings</button>
                         <button class="ghost-btn" id="sendMagicLinkBtn" type="button">Send Login Link</button>
                         <button class="ghost-btn" id="completeLoginLinkBtn" type="button">Finish Login From Link</button>
+                        <button class="ghost-btn" id="signInPasswordBtn" type="button">Sign In Password</button>
+                        <button class="ghost-btn" id="createPasswordAccountBtn" type="button">Create Password Login</button>
                         <button class="ghost-btn" id="syncCloudNowBtn" type="button">Sync Now</button>
                         <button class="ghost-btn" id="pullCloudBtn" type="button">Pull Cloud Save</button>
                         <button class="danger-btn" id="cloudSignOutBtn" type="button">Sign Out Cloud</button>
@@ -1648,6 +1651,7 @@
         let cloudBusy = false;
         let pendingCloudPush = false;
         let lastCloudPullAt = 0;
+        let magicLinkCooldownUntil = 0;
         let supabaseLibraryPromise = null;
 
         const els = {};
@@ -1682,8 +1686,9 @@
                 "sessionLogSummary", "clearSessionLogsBtn", "toast",
                 "exportDataBtn", "importDataBtn", "importDataFile", "restoreArchiveBtn", "backupReminder",
                 "backboneString", "copyBackboneBtn", "downloadBackboneBtn", "backboneRestoreInput", "restoreBackboneBtn",
-                "supabaseUrlInput", "supabaseAnonInput", "cloudEmailInput", "cloudLoginLinkInput", "cloudSyncStatus",
-                "saveCloudSettingsBtn", "sendMagicLinkBtn", "completeLoginLinkBtn", "syncCloudNowBtn", "pullCloudBtn", "cloudSignOutBtn",
+                "supabaseUrlInput", "supabaseAnonInput", "cloudEmailInput", "cloudPasswordInput", "cloudLoginLinkInput", "cloudSyncStatus",
+                "saveCloudSettingsBtn", "sendMagicLinkBtn", "completeLoginLinkBtn", "signInPasswordBtn", "createPasswordAccountBtn",
+                "syncCloudNowBtn", "pullCloudBtn", "cloudSignOutBtn",
                 "wearSummary", "wearRankingList", "heatSummary", "heatMap",
                 "targetLeftContainer", "targetRightContainer", "loopDisplay"
             ].forEach((id) => {
@@ -1730,6 +1735,8 @@
             els.saveCloudSettingsBtn.addEventListener("click", saveCloudSettings);
             els.sendMagicLinkBtn.addEventListener("click", sendCloudMagicLink);
             els.completeLoginLinkBtn.addEventListener("click", completeCloudLoginFromLink);
+            els.signInPasswordBtn.addEventListener("click", signInCloudWithPassword);
+            els.createPasswordAccountBtn.addEventListener("click", createCloudPasswordAccount);
             els.syncCloudNowBtn.addEventListener("click", () => pushCloudState({ showToastOnSuccess: true }));
             els.pullCloudBtn.addEventListener("click", () => pullCloudState({ force: true, showToastOnSuccess: true }));
             els.cloudSignOutBtn.addEventListener("click", signOutCloud);
@@ -2409,6 +2416,11 @@
 
         async function sendCloudMagicLink() {
             if (!persistCloudSettingsFromInputs(false)) return;
+            if (Date.now() < magicLinkCooldownUntil) {
+                showToast("Login email cooldown is active. Use an existing link or password login.");
+                renderCloudStatus("Email login is cooling down. Paste an existing link or use password login.");
+                return;
+            }
             const email = String(els.cloudEmailInput.value || "").trim();
             if (!email) {
                 showToast("Enter your email first.");
@@ -2432,12 +2444,95 @@
                     }
                 });
                 if (error) throw error;
+                magicLinkCooldownUntil = Date.now() + 60000;
                 showToast("Login link sent. Open it on this device.");
                 renderCloudStatus("Login link sent. Check your email.");
             } catch (error) {
+                if (String(error.message || error).toLowerCase().includes("rate limit")) {
+                    magicLinkCooldownUntil = Date.now() + 10 * 60000;
+                    renderCloudStatus("Email rate limit hit. Wait, paste an existing link, or use password login.");
+                }
                 showToast("Could not send login link.");
-                renderCloudStatus(`Login link failed: ${error.message || error}`);
+                if (!String(error.message || error).toLowerCase().includes("rate limit")) {
+                    renderCloudStatus(`Login link failed: ${error.message || error}`);
+                }
                 console.warn("SkateTech magic link failed.", error);
+            }
+        }
+
+        async function signInCloudWithPassword() {
+            if (!persistCloudSettingsFromInputs(false)) return;
+            const email = String(els.cloudEmailInput.value || "").trim();
+            const password = String(els.cloudPasswordInput.value || "");
+            if (!email || !password) {
+                showToast("Enter email and password.");
+                return;
+            }
+
+            const client = await getCloudClientAsync();
+            if (!client) {
+                showToast("Supabase could not load. Refresh the app and try again.");
+                return;
+            }
+
+            try {
+                renderCloudStatus("Signing in with password...");
+                const { data, error } = await client.auth.signInWithPassword({ email, password });
+                if (error) throw error;
+                cloudSession = data && data.session ? data.session : null;
+                if (!cloudSession) throw new Error("Supabase did not return a session.");
+                startCloudAutoSync();
+                renderCloudPanel();
+                showToast("Cloud signed in.");
+                await pullCloudState({ showToastOnSuccess: false, auto: true });
+                queueCloudSave(250);
+            } catch (error) {
+                showToast("Password sign-in failed.");
+                renderCloudStatus(`Password sign-in failed: ${error.message || error}`);
+                console.warn("SkateTech password sign-in failed.", error);
+            }
+        }
+
+        async function createCloudPasswordAccount() {
+            if (!persistCloudSettingsFromInputs(false)) return;
+            const email = String(els.cloudEmailInput.value || "").trim();
+            const password = String(els.cloudPasswordInput.value || "");
+            if (!email || password.length < 6) {
+                showToast("Enter email and a password with at least 6 characters.");
+                return;
+            }
+
+            const client = await getCloudClientAsync();
+            if (!client) {
+                showToast("Supabase could not load. Refresh the app and try again.");
+                return;
+            }
+
+            try {
+                renderCloudStatus("Creating password login...");
+                const { data, error } = await client.auth.signUp({
+                    email,
+                    password,
+                    options: {
+                        emailRedirectTo: getAppRedirectUrl()
+                    }
+                });
+                if (error) throw error;
+                cloudSession = data && data.session ? data.session : null;
+                if (cloudSession) {
+                    startCloudAutoSync();
+                    renderCloudPanel();
+                    showToast("Password login created and signed in.");
+                    await pullCloudState({ showToastOnSuccess: false, auto: true });
+                    queueCloudSave(250);
+                } else {
+                    renderCloudStatus("Password login created. If Supabase asks for confirmation, check your email once.");
+                    showToast("Password login created. Check email if needed.");
+                }
+            } catch (error) {
+                showToast("Could not create password login.");
+                renderCloudStatus(`Create password failed: ${error.message || error}`);
+                console.warn("SkateTech password account create failed.", error);
             }
         }
 
