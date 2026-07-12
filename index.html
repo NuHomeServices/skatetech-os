@@ -2413,7 +2413,8 @@
             return persistCloudSettingsFromInputs(true);
         }
 
-        function persistCloudSettingsFromInputs(showToastOnSuccess) {
+        function persistCloudSettingsFromInputs(showToastOnSuccess, options = {}) {
+            const previousConfig = cloudConfig || { url: "", anonKey: "", email: "" };
             const nextConfig = {
                 url: els.supabaseUrlInput.value,
                 anonKey: els.supabaseAnonInput.value,
@@ -2424,11 +2425,20 @@
                 return false;
             }
 
+            const sameProject =
+                cleanUrl(previousConfig.url || "") === cleanUrl(nextConfig.url || "") &&
+                String(previousConfig.anonKey || "") === String(nextConfig.anonKey || "");
+
             saveCloudConfig(nextConfig);
-            cloudClient = null;
-            cloudSession = null;
-            renderCloudPanel();
-            initCloudSync();
+            if (!sameProject || !options.preserveSession) {
+                cloudClient = null;
+                cloudSession = null;
+                cloudReadyForPush = false;
+                renderCloudPanel();
+                initCloudSync();
+            } else {
+                renderCloudPanel();
+            }
             if (showToastOnSuccess) showToast("Cloud settings saved.");
             return true;
         }
@@ -2515,7 +2525,7 @@
         }
 
         async function createCloudPasswordAccount() {
-            if (!persistCloudSettingsFromInputs(false)) return;
+            if (!persistCloudSettingsFromInputs(false, { preserveSession: true })) return;
             const email = String(els.cloudEmailInput.value || "").trim();
             const password = String(els.cloudPasswordInput.value || "");
             if (!email || password.length < 6) {
@@ -2567,8 +2577,8 @@
                     showToast("Password login created. Check email if needed.");
                 }
             } catch (error) {
-                const message = String(error.message || error || "");
-                showToast("Could not set cloud password.");
+                const message = formatCloudError(error);
+                showToast(`Password failed: ${message}`);
                 renderCloudStatus(`Set password failed: ${message}`);
                 console.warn("SkateTech password account create failed.", error);
             }
