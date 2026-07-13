@@ -1,4 +1,4 @@
-const CACHE_NAME = "skatetech-os-v19";
+const CACHE_NAME = "skatetech-os-v20";
 const ASSETS = [
   "./",
   "./index.html",
