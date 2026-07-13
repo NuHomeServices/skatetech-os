@@ -1988,6 +1988,1223 @@
                 grid-template-columns: 1fr;
             }
         }
+        /* SkateTech reimagined interface */
+        :root {
+            --canvas: #07080a;
+            --surface: #111317;
+            --surface-raised: #171a1f;
+            --surface-soft: #0d0f12;
+            --line: rgba(255, 255, 255, 0.09);
+            --line-bright: rgba(255, 255, 255, 0.16);
+            --ink: #f7f8fa;
+            --ink-soft: #c8cbd1;
+            --ink-muted: #777c86;
+            --aqua: #75eadc;
+            --aqua-deep: #163d3b;
+            --ice: #8fc7ff;
+            --lime: #b8f06b;
+            --coral: #ff8e7a;
+            --gold: #f3cb72;
+            --nav-height: 76px;
+        }
+
+        html {
+            background: var(--canvas);
+        }
+
+        body {
+            padding: calc(env(safe-area-inset-top) + 18px) 22px calc(var(--nav-height) + env(safe-area-inset-bottom) + 34px);
+            background: var(--canvas);
+            color: var(--ink);
+        }
+
+        body::before {
+            display: none;
+        }
+
+        .app {
+            width: min(100%, 1180px);
+        }
+
+        .app-header {
+            min-height: 64px;
+            grid-template-columns: minmax(0, 1fr) minmax(250px, 390px);
+            margin-bottom: 22px;
+            padding: 0;
+        }
+
+        .brand-zone {
+            gap: 12px;
+        }
+
+        .brand-logo {
+            width: 42px;
+            height: 42px;
+            border-radius: 8px;
+            border: 1px solid var(--line-bright);
+            box-shadow: none;
+        }
+
+        h1 {
+            font-size: 21px;
+            font-weight: 720;
+        }
+
+        .subtitle {
+            margin-top: 4px;
+            color: var(--ink-muted);
+            font-size: 11px;
+            font-weight: 560;
+        }
+
+        .app-header .select-wrap select {
+            min-height: 46px;
+            border-radius: 8px;
+            border-color: var(--line);
+            background: var(--surface);
+            box-shadow: none;
+            font-size: 13px;
+        }
+
+        .app-view {
+            transform: translate3d(0, 8px, 0);
+        }
+
+        .card {
+            margin-bottom: 22px;
+            padding: 22px;
+            border-radius: 8px;
+            border: 1px solid var(--line);
+            background: var(--surface);
+            box-shadow: none;
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+        }
+
+        .section-kicker {
+            margin-bottom: 7px;
+            color: var(--aqua);
+            font-size: 9px;
+            font-weight: 760;
+            letter-spacing: 0.12em;
+        }
+
+        .section-title {
+            color: var(--ink);
+            font-size: 18px;
+            font-weight: 690;
+        }
+
+        .mini-copy {
+            color: var(--ink-muted);
+            font-size: 11px;
+            line-height: 1.5;
+        }
+
+        .cockpit-hero {
+            position: relative;
+            min-height: 286px;
+            display: grid;
+            grid-template-columns: minmax(250px, 0.9fr) minmax(300px, 1.1fr);
+            grid-template-rows: 1fr auto;
+            overflow: hidden;
+            margin-bottom: 24px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: #0e1114;
+            isolation: isolate;
+        }
+
+        .cockpit-hero::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            z-index: -1;
+            background: linear-gradient(90deg, #0e1114 0%, rgba(14, 17, 20, 0.96) 36%, rgba(14, 17, 20, 0.24) 68%, rgba(14, 17, 20, 0.12) 100%);
+            pointer-events: none;
+        }
+
+        .cockpit-copy {
+            align-self: center;
+            padding: 32px 12px 24px 32px;
+            z-index: 2;
+        }
+
+        .cockpit-rotation {
+            display: flex;
+            align-items: baseline;
+            gap: 10px;
+            margin: 2px 0 5px;
+        }
+
+        .cockpit-rotation span {
+            font-size: clamp(58px, 8vw, 88px);
+            line-height: 0.9;
+            font-weight: 650;
+            color: var(--ink);
+            font-variant-numeric: tabular-nums;
+        }
+
+        .cockpit-rotation small {
+            color: var(--ink-muted);
+            font-size: 14px;
+            font-weight: 620;
+        }
+
+        .cockpit-profile {
+            color: var(--ink-soft);
+            font-size: 15px;
+            font-weight: 620;
+        }
+
+        .cockpit-condition {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 18px;
+            color: #badfcf;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .condition-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--lime);
+            box-shadow: 0 0 16px rgba(184, 240, 107, 0.46);
+        }
+
+        .cockpit-hero[data-condition="warning"] .condition-dot {
+            background: var(--coral);
+            box-shadow: 0 0 16px rgba(255, 142, 122, 0.42);
+        }
+
+        .cockpit-hero[data-condition="warning"] .cockpit-condition {
+            color: #ffc2b8;
+        }
+
+        .cockpit-visual {
+            position: absolute;
+            inset: 0 0 0 39%;
+            z-index: -2;
+            overflow: hidden;
+        }
+
+        .cockpit-wheel-art {
+            position: absolute;
+            width: min(560px, 64vw);
+            aspect-ratio: 1;
+            right: -42px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: url("logo.png") center / cover no-repeat;
+            filter: saturate(0.9) contrast(1.05);
+            opacity: 0.86;
+        }
+
+        .orbit {
+            position: absolute;
+            border: 1px solid rgba(117, 234, 220, 0.18);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .orbit-one {
+            width: 390px;
+            height: 390px;
+            right: 40px;
+            top: -52px;
+        }
+
+        .orbit-two {
+            width: 480px;
+            height: 480px;
+            right: -6px;
+            top: -98px;
+            border-color: rgba(143, 199, 255, 0.12);
+        }
+
+        .cockpit-metrics {
+            grid-column: 1 / -1;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            z-index: 3;
+            border-top: 1px solid var(--line);
+            background: rgba(7, 9, 11, 0.82);
+        }
+
+        .cockpit-metric {
+            min-height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 0 22px;
+            border-right: 1px solid var(--line);
+        }
+
+        .cockpit-metric:last-child {
+            border-right: 0;
+        }
+
+        .cockpit-metric span {
+            color: var(--ink-muted);
+            font-size: 10px;
+            font-weight: 620;
+        }
+
+        .cockpit-metric strong {
+            color: var(--ink);
+            font-size: 15px;
+            font-weight: 660;
+            white-space: nowrap;
+        }
+
+        .calibration-card {
+            padding: 0;
+            border: 0;
+            background: transparent;
+        }
+
+        .calibration-card > .section-header {
+            padding: 0 2px;
+            margin-bottom: 16px;
+        }
+
+        .measurement-rail {
+            margin-bottom: 12px;
+            padding: 16px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: var(--surface);
+        }
+
+        .rail-heading,
+        .frame-label {
+            display: grid;
+            grid-template-columns: auto auto 1fr auto;
+            align-items: center;
+            gap: 9px;
+            margin-bottom: 12px;
+        }
+
+        .rail-heading span,
+        .frame-label span {
+            color: var(--ink-soft);
+            font-size: 11px;
+            font-weight: 680;
+        }
+
+        .rail-heading small,
+        .frame-label small {
+            color: var(--ink-muted);
+            font-size: 8px;
+            font-weight: 620;
+            text-transform: uppercase;
+        }
+
+        .rail-heading i,
+        .frame-label i {
+            height: 1px;
+            background: var(--line);
+        }
+
+        .caliper-grid {
+            grid-template-columns: repeat(auto-fit, minmax(142px, 1fr));
+            gap: 8px;
+            margin: 0;
+        }
+
+        .input-tile {
+            position: relative;
+            min-height: 172px;
+            padding: 13px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            text-align: left;
+            background: var(--surface-soft);
+            box-shadow: none;
+            overflow: hidden;
+        }
+
+        .input-tile::before {
+            content: "";
+            position: absolute;
+            inset: 0 0 auto;
+            height: 2px;
+            background: var(--ice);
+            opacity: 0;
+            transition: opacity 180ms ease;
+        }
+
+        .input-tile:focus-within {
+            border-color: rgba(143, 199, 255, 0.46);
+            background: #10151a;
+            transform: none;
+        }
+
+        .input-tile:focus-within::before {
+            opacity: 1;
+        }
+
+        .wheel-tile-heading {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 0;
+        }
+
+        .slot-chip {
+            min-width: 27px;
+            height: 22px;
+            display: grid;
+            place-items: center;
+            border-radius: 6px;
+            color: #07100f;
+            background: var(--aqua);
+            font-size: 9px;
+            font-weight: 820;
+        }
+
+        .input-tile label {
+            min-width: 0;
+            margin: 0;
+            color: var(--ink-muted);
+            font-size: 10px;
+            font-weight: 620;
+        }
+
+        .measurement-value {
+            display: flex;
+            align-items: baseline;
+            margin: 13px 0 10px;
+        }
+
+        .input-tile .measurement-value input[type="number"] {
+            width: auto;
+            min-width: 0;
+            min-height: 40px;
+            padding: 0;
+            text-align: left;
+            color: var(--ink);
+            font-size: 29px;
+            font-weight: 640;
+            background: transparent;
+            box-shadow: none;
+        }
+
+        .measurement-value span {
+            color: var(--ink-muted);
+            font-size: 10px;
+            font-weight: 620;
+        }
+
+        .apex-diagnostic {
+            margin-top: 0;
+            padding-top: 9px;
+            border-top: 1px solid var(--line);
+        }
+
+        .apex-label {
+            margin-bottom: 6px;
+            color: var(--ink-muted);
+            font-size: 8px;
+            font-weight: 620;
+            text-transform: uppercase;
+        }
+
+        .apex-options {
+            gap: 3px;
+            padding: 3px;
+            border-radius: 8px;
+            background: #090b0e;
+        }
+
+        .apex-btn {
+            min-height: 29px;
+            border: 0;
+            border-radius: 6px;
+            color: var(--ink-muted);
+            background: transparent;
+            font-size: 8px;
+            font-weight: 680;
+        }
+
+        .apex-btn.active {
+            color: var(--ink);
+            background: #24302f;
+            box-shadow: none;
+        }
+
+        .embedded-tool {
+            margin: 18px 0 0;
+            padding: 18px 0 0;
+            border: 0;
+            border-top: 1px solid var(--line);
+            border-radius: 0;
+            background: transparent;
+            box-shadow: none;
+        }
+
+        .session-grid {
+            grid-template-columns: 1fr 1fr 1fr auto;
+            gap: 8px;
+        }
+
+        .session-grid #saveSessionBtn {
+            min-width: 142px;
+        }
+
+        select,
+        input[type="text"],
+        input[type="number"],
+        input[type="email"],
+        input[type="password"],
+        input[type="url"],
+        textarea {
+            min-height: 48px;
+            border-radius: 8px;
+            border-color: var(--line);
+            background: var(--surface-soft);
+            box-shadow: none;
+        }
+
+        select:focus,
+        input:focus,
+        textarea:focus {
+            border-color: rgba(117, 234, 220, 0.5);
+            background: #101519;
+            box-shadow: 0 0 0 3px rgba(117, 234, 220, 0.08);
+        }
+
+        .rotation-actions {
+            grid-template-columns: minmax(0, 1fr) auto;
+            margin-top: 16px;
+        }
+
+        .action-btn {
+            min-height: 52px;
+            border-radius: 8px;
+            background: var(--aqua);
+            color: #07100f;
+            box-shadow: none;
+            font-size: 13px;
+            font-weight: 760;
+        }
+
+        .ghost-btn,
+        .pill-btn,
+        .danger-btn {
+            min-height: 42px;
+            border-radius: 8px;
+            border-color: var(--line);
+            background: transparent;
+            box-shadow: none;
+            color: var(--ink-soft);
+            font-size: 11px;
+            font-weight: 650;
+        }
+
+        .ghost-btn:hover,
+        .pill-btn:hover {
+            border-color: var(--line-bright);
+            background: rgba(255, 255, 255, 0.035);
+        }
+
+        .danger-btn {
+            color: #ffaaa0;
+            border-color: rgba(255, 142, 122, 0.3);
+        }
+
+        .status-banner {
+            margin: -6px 0 22px;
+            padding: 12px 15px;
+            border-radius: 8px;
+            box-shadow: none;
+            backdrop-filter: none;
+        }
+
+        .mapping-card {
+            padding: 22px;
+            background: #0d0f12;
+        }
+
+        .rotation-badge {
+            padding: 7px 10px;
+            border-radius: 999px;
+            color: var(--aqua);
+            background: var(--aqua-deep);
+            border: 0;
+        }
+
+        .skate-viewport {
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .frame-column {
+            padding: 14px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: #090b0e;
+            box-shadow: none;
+        }
+
+        .frame-label {
+            margin-bottom: 10px;
+        }
+
+        .target-stack {
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 7px;
+        }
+
+        .mount-slot {
+            min-height: 128px;
+            display: grid;
+            grid-template-rows: 1fr auto;
+            place-items: center;
+            padding: 10px 8px 9px;
+            border: 0;
+            border-radius: 8px;
+            background: var(--surface);
+            box-shadow: none;
+        }
+
+        .mount-wheel {
+            width: 86px;
+            height: 86px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border: 6px solid #293139;
+            border-radius: 50%;
+            background: #0b0d10;
+            box-shadow: inset 0 0 0 1px rgba(143, 199, 255, 0.22);
+        }
+
+        .mount-lbl {
+            color: var(--aqua);
+            font-size: 8px;
+        }
+
+        .mount-name {
+            width: 68px;
+            margin: 4px 0 2px;
+            color: var(--ink);
+            font-size: 10px;
+            font-weight: 680;
+        }
+
+        .mount-val {
+            color: var(--lime);
+            font-size: 10px;
+        }
+
+        .mount-flip {
+            margin-top: 6px;
+            padding: 3px 6px;
+            border: 0;
+            border-radius: 5px;
+            color: var(--ink-muted);
+            background: transparent;
+            font-size: 7px;
+            font-weight: 720;
+        }
+
+        .mount-flip.flipped {
+            color: var(--aqua);
+            border: 0;
+            background: transparent;
+        }
+
+        .rotation-preview {
+            margin-top: 14px;
+            padding: 18px;
+            border-radius: 8px;
+            background: #101719;
+            border-color: rgba(117, 234, 220, 0.22);
+        }
+
+        .preview-list {
+            grid-template-columns: 1fr;
+        }
+
+        .preview-script {
+            padding: 16px;
+            border-radius: 8px;
+            border-color: var(--line);
+            background: #0b0e11;
+            box-shadow: none;
+        }
+
+        .preview-script-title,
+        .preview-path-summary {
+            color: var(--aqua);
+        }
+
+        .profile-page-heading {
+            grid-column: 1 / -1;
+            padding: 16px 2px 8px;
+        }
+
+        .profile-page-heading h2,
+        .logs-overview h2 {
+            margin: 0;
+            color: var(--ink);
+            font-size: 30px;
+            line-height: 1.08;
+            font-weight: 650;
+        }
+
+        .profile-page-heading p,
+        .logs-overview p {
+            max-width: 520px;
+            margin-top: 8px;
+            color: var(--ink-muted);
+            font-size: 12px;
+            line-height: 1.55;
+        }
+
+        #view-profiles.active {
+            display: grid;
+            grid-template-columns: minmax(0, 1.12fr) minmax(310px, 0.88fr);
+            gap: 18px;
+            align-items: start;
+        }
+
+        #view-profiles .card {
+            margin-bottom: 0;
+        }
+
+        .active-profile-card {
+            grid-column: 1;
+            grid-row: 2 / span 2;
+            position: relative;
+            overflow: hidden;
+            padding-top: 170px;
+        }
+
+        .profile-art {
+            position: absolute;
+            inset: 0 0 auto;
+            height: 150px;
+            background: url("logo.png") 70% 48% / cover no-repeat;
+            border-bottom: 1px solid var(--line);
+            filter: saturate(0.8) contrast(1.08);
+        }
+
+        .profile-art::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, rgba(17, 19, 23, 0.92), rgba(17, 19, 23, 0.2));
+        }
+
+        .active-profile-card .form-grid {
+            gap: 9px;
+        }
+
+        .stats-grid {
+            gap: 7px;
+        }
+
+        .stat {
+            min-height: 76px;
+            padding: 13px;
+            border-radius: 8px;
+            border-color: var(--line);
+            background: var(--surface-soft);
+            box-shadow: none;
+        }
+
+        .stat span {
+            color: var(--ink-muted);
+            font-size: 8px;
+            font-weight: 650;
+        }
+
+        .stat strong {
+            font-size: 18px;
+            font-weight: 650;
+        }
+
+        .profile-create-card {
+            grid-column: 2;
+            grid-row: 2;
+            background: #101316;
+        }
+
+        .loop-card {
+            grid-column: 2;
+            grid-row: 3;
+        }
+
+        .loop-line span {
+            min-height: 42px;
+            border-radius: 8px;
+            border-color: var(--line);
+            background: var(--surface-soft);
+            box-shadow: none;
+        }
+
+        .loop-line .loop-label {
+            color: var(--aqua);
+            border-color: rgba(117, 234, 220, 0.2);
+            background: #132321;
+        }
+
+        .heat-card {
+            grid-column: 1;
+            grid-row: 4;
+        }
+
+        .wear-card {
+            grid-column: 2;
+            grid-row: 4;
+        }
+
+        .cloud-sync-card {
+            grid-column: 1 / -1;
+            grid-row: 5;
+            padding: 0;
+            overflow: hidden;
+            background: #0d1012;
+        }
+
+        .cloud-overview {
+            min-height: 76px;
+            padding: 14px 17px;
+        }
+
+        .cloud-mark {
+            width: 38px;
+            height: 38px;
+            border: 0;
+            border-radius: 8px;
+            background: #162321;
+        }
+
+        .cloud-mark svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .cloud-copy .section-title {
+            font-size: 14px;
+        }
+
+        .cloud-disclosure summary {
+            min-height: 42px;
+            padding: 0 17px;
+        }
+
+        .heat-tile,
+        .wear-row {
+            border-radius: 8px;
+            border-color: var(--line);
+            background: var(--surface-soft);
+            box-shadow: none;
+        }
+
+        .wear-row {
+            min-height: 62px;
+            padding: 12px;
+        }
+
+        .wear-bar {
+            height: 5px;
+        }
+
+        .wear-fill {
+            background: var(--gold);
+        }
+
+        .logs-overview {
+            min-height: 210px;
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            align-items: end;
+            gap: 32px;
+            margin-bottom: 26px;
+            padding: 34px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: #0e1114;
+        }
+
+        .history-stats {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(88px, 1fr));
+            gap: 1px;
+            background: var(--line);
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .history-stats div {
+            min-height: 86px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 14px;
+            background: var(--surface);
+        }
+
+        .history-stats strong {
+            color: var(--ink);
+            font-size: 25px;
+            font-weight: 640;
+        }
+
+        .history-stats span {
+            margin-top: 5px;
+            color: var(--ink-muted);
+            font-size: 9px;
+            font-weight: 650;
+            text-transform: uppercase;
+        }
+
+        #view-logs.active {
+            display: grid;
+            grid-template-columns: 0.92fr 1.08fr;
+            gap: 18px;
+            align-items: start;
+        }
+
+        .logs-overview {
+            grid-column: 1 / -1;
+        }
+
+        .logs-card {
+            margin: 0;
+            padding: 0;
+            border: 0;
+            background: transparent;
+        }
+
+        .logs-card > .section-header {
+            padding: 0 2px 8px;
+        }
+
+        .log-list {
+            gap: 8px;
+        }
+
+        .log-item {
+            position: relative;
+            padding: 15px 16px 15px 20px;
+            border-radius: 8px;
+            border: 1px solid var(--line);
+            background: var(--surface);
+            box-shadow: none;
+        }
+
+        .log-item::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 12px;
+            bottom: 12px;
+            width: 2px;
+            background: var(--aqua);
+        }
+
+        .log-top {
+            font-size: 12px;
+        }
+
+        .log-meta {
+            font-size: 11px;
+            line-height: 1.5;
+        }
+
+        .nav-dock {
+            width: min(390px, calc(100% - 32px));
+            height: 62px;
+            bottom: calc(13px + env(safe-area-inset-bottom));
+            padding: 5px;
+            border-radius: 8px;
+            border-color: var(--line-bright);
+            background: rgba(18, 20, 24, 0.94);
+            box-shadow: 0 20px 48px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+
+        .nav-item {
+            min-height: 50px;
+            border-radius: 6px;
+            color: var(--ink-muted);
+            font-size: 8px;
+        }
+
+        .nav-item.active {
+            color: var(--ink);
+            border-color: transparent;
+            background: #272b31;
+            box-shadow: none;
+        }
+
+        .toast {
+            border-radius: 8px;
+        }
+
+        @media (max-width: 820px) {
+            body {
+                padding: calc(env(safe-area-inset-top) + 12px) 12px calc(var(--nav-height) + env(safe-area-inset-bottom) + 30px);
+            }
+
+            .app-header {
+                grid-template-columns: 1fr;
+                gap: 12px;
+                margin-bottom: 16px;
+            }
+
+            .brand-logo {
+                width: 38px;
+                height: 38px;
+            }
+
+            h1 {
+                font-size: 19px;
+            }
+
+            .app-header .select-wrap select {
+                min-height: 44px;
+            }
+
+            .cockpit-hero {
+                min-height: 318px;
+                grid-template-columns: 1fr;
+                grid-template-rows: 1fr auto;
+            }
+
+            .cockpit-copy {
+                align-self: start;
+                padding: 24px 20px;
+            }
+
+            .cockpit-rotation span {
+                font-size: 66px;
+            }
+
+            .cockpit-visual {
+                inset: 0 0 64px 22%;
+                opacity: 0.72;
+            }
+
+            .cockpit-wheel-art {
+                width: 350px;
+                right: -95px;
+            }
+
+            .orbit-one,
+            .orbit-two {
+                display: none;
+            }
+
+            .cockpit-hero::after {
+                background: linear-gradient(90deg, #0e1114 0%, rgba(14, 17, 20, 0.85) 48%, rgba(14, 17, 20, 0.08) 100%);
+            }
+
+            .cockpit-metric {
+                min-height: 62px;
+                display: block;
+                padding: 13px 12px;
+            }
+
+            .cockpit-metric span,
+            .cockpit-metric strong {
+                display: block;
+            }
+
+            .cockpit-metric strong {
+                margin-top: 6px;
+                font-size: 13px;
+            }
+
+            .measurement-rail {
+                padding: 14px 12px 12px;
+            }
+
+            .caliper-grid {
+                display: flex;
+                gap: 8px;
+                overflow-x: auto;
+                padding-bottom: 4px;
+                scroll-snap-type: x mandatory;
+                scrollbar-width: none;
+            }
+
+            .caliper-grid::-webkit-scrollbar {
+                display: none;
+            }
+
+            .input-tile {
+                flex: 0 0 148px;
+                scroll-snap-align: start;
+            }
+
+            .session-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .session-grid .select-wrap,
+            .session-grid #saveSessionBtn {
+                min-width: 0;
+            }
+
+            .rotation-actions {
+                grid-template-columns: 1fr;
+            }
+
+            .mapping-card {
+                padding: 17px 12px;
+            }
+
+            .target-stack {
+                display: flex;
+                gap: 7px;
+                overflow-x: auto;
+                padding-bottom: 4px;
+                scrollbar-width: none;
+            }
+
+            .target-stack::-webkit-scrollbar {
+                display: none;
+            }
+
+            .mount-slot {
+                flex: 1 0 112px;
+            }
+
+            #view-profiles.active {
+                display: flex;
+                flex-direction: column;
+            }
+
+            #view-logs.active {
+                display: block;
+            }
+
+            #view-profiles .profile-page-heading { order: 0; }
+            #view-profiles .active-profile-card { order: 1; }
+            #view-profiles .loop-card { order: 2; }
+            #view-profiles .heat-card { order: 3; }
+            #view-profiles .wear-card { order: 4; }
+            #view-profiles .cloud-sync-card { order: 5; }
+            #view-profiles .profile-create-card { order: 6; }
+
+            #view-profiles .card,
+            #view-logs .card {
+                margin-bottom: 14px;
+            }
+
+            .profile-page-heading {
+                padding: 12px 2px 18px;
+            }
+
+            .profile-page-heading h2,
+            .logs-overview h2 {
+                font-size: 26px;
+            }
+
+            .active-profile-card {
+                padding: 152px 16px 18px;
+            }
+
+            .profile-art {
+                height: 134px;
+            }
+
+            .profile-create-card,
+            .loop-card,
+            .heat-card,
+            .wear-card,
+            .cloud-sync-card {
+                grid-column: auto;
+                grid-row: auto;
+            }
+
+            .logs-overview {
+                min-height: 0;
+                display: block;
+                margin-bottom: 20px;
+                padding: 24px 18px 18px;
+            }
+
+            .history-stats {
+                margin-top: 24px;
+            }
+
+            .history-stats div {
+                min-height: 76px;
+                padding: 10px;
+            }
+
+            .history-stats strong {
+                font-size: 21px;
+            }
+
+            .cloud-overview {
+                grid-template-columns: 38px minmax(0, 1fr);
+            }
+
+            .sync-pill {
+                grid-column: 1 / -1;
+                justify-self: start;
+                margin-left: 52px;
+                margin-top: -9px;
+            }
+
+            .cloud-grid,
+            .cloud-actions {
+                grid-template-columns: 1fr;
+            }
+
+            .cloud-actions button,
+            #cloudLoginLinkInput {
+                grid-column: 1;
+            }
+        }
+
+        @media (max-width: 420px) {
+            .section-header {
+                align-items: flex-start;
+            }
+
+            .cockpit-condition {
+                max-width: 180px;
+            }
+
+            .session-grid,
+            .creator-row,
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .profile-actions,
+            .backup-actions {
+                grid-template-columns: 1fr;
+            }
+
+            .heat-map {
+                grid-template-columns: 1fr;
+            }
+
+            .wear-row {
+                grid-template-columns: 34px minmax(0, 1fr);
+            }
+
+            .wear-value {
+                grid-column: 2;
+                text-align: left;
+            }
+        }
     </style>
 </head>
 <body>
@@ -2007,24 +3224,58 @@
 
         <main class="view-shell">
             <section id="view-calibrate" class="app-view active" aria-labelledby="tab-calibrate">
+                <section class="cockpit-hero" aria-label="Current wheel setup overview">
+                    <div class="cockpit-copy">
+                        <div class="section-kicker">Ready to skate</div>
+                        <div class="cockpit-rotation"><span id="cockpitRotation">0</span><small>rotation</small></div>
+                        <div class="cockpit-profile" id="cockpitProfile">Endless 90 ES</div>
+                        <div class="cockpit-condition"><span class="condition-dot"></span><span id="cockpitCondition">Rocker geometry protected</span></div>
+                    </div>
+                    <div class="cockpit-visual" aria-hidden="true">
+                        <div class="cockpit-wheel-art"></div>
+                        <div class="orbit orbit-one"></div>
+                        <div class="orbit orbit-two"></div>
+                    </div>
+                    <div class="cockpit-metrics">
+                        <div class="cockpit-metric">
+                            <span>Wheel spread</span>
+                            <strong id="cockpitSpread">0.0 mm</strong>
+                        </div>
+                        <div class="cockpit-metric">
+                            <span>Frame limit</span>
+                            <strong id="cockpitLimit">2.0 mm</strong>
+                        </div>
+                        <div class="cockpit-metric">
+                            <span>Time tracked</span>
+                            <strong id="cockpitTime">0 min</strong>
+                        </div>
+                    </div>
+                </section>
+
                 <div class="card calibration-card">
                     <div class="section-header">
                         <div>
-                            <div class="section-kicker">Live measurement</div>
-                            <div class="section-title">Caliper Inputs</div>
+                            <div class="section-kicker">Wheel scan</div>
+                            <div class="section-title">Fresh measurements</div>
                             <div class="mini-copy" id="caliperSummary">Endless 90 ES / 2.0 mm limit</div>
                         </div>
                         <button id="renameToggleBtn" class="pill-btn" type="button">Rename</button>
                     </div>
 
-                    <div class="caliper-grid" id="leftInputContainer"></div>
-                    <div class="caliper-grid" id="rightInputContainer"></div>
+                    <div class="measurement-rail">
+                        <div class="rail-heading"><span>Left skate</span><small>Front</small><i></i><small>Back</small></div>
+                        <div class="caliper-grid" id="leftInputContainer"></div>
+                    </div>
+                    <div class="measurement-rail">
+                        <div class="rail-heading"><span>Right skate</span><small>Front</small><i></i><small>Back</small></div>
+                        <div class="caliper-grid" id="rightInputContainer"></div>
+                    </div>
 
                     <div class="session-panel embedded-tool">
                         <div class="section-header">
                             <div>
-                                <div class="section-kicker">Activity</div>
-                                <div class="section-title">Log this skate</div>
+                                <div class="section-kicker">Ride journal</div>
+                                <div class="section-title">Capture this session</div>
                                 <div class="mini-copy" id="sessionSummary">Saved against the current rotation.</div>
                             </div>
                         </div>
@@ -2067,18 +3318,19 @@
                 <div class="card mapping-card">
                     <div class="section-header">
                         <div>
-                            <div class="section-kicker">Current mounting plan</div>
-                            <div class="section-title">Target Mapping</div>
+                            <div class="section-kicker">Installation view</div>
+                            <div class="section-title">Mounting plan</div>
+                            <div class="mini-copy">Front to back, exactly as the wheels sit under each boot.</div>
                         </div>
                         <div class="section-value rotation-badge" id="rotationCountLabel">0 rotations</div>
                     </div>
                     <div class="skate-viewport">
                         <div class="frame-column">
-                            <h3>Left Frame</h3>
+                            <div class="frame-label"><span>Left frame</span><small>Front</small><i></i><small>Back</small></div>
                             <div id="targetLeftContainer" class="target-stack"></div>
                         </div>
                         <div class="frame-column">
-                            <h3>Right Frame</h3>
+                            <div class="frame-label"><span>Right frame</span><small>Front</small><i></i><small>Back</small></div>
                             <div id="targetRightContainer" class="target-stack"></div>
                         </div>
                     </div>
@@ -2086,9 +3338,15 @@
             </section>
 
             <section id="view-profiles" class="app-view" aria-labelledby="tab-profiles" aria-hidden="true">
+                <div class="profile-page-heading">
+                    <div class="section-kicker">Equipment lab</div>
+                    <h2>Your skate system</h2>
+                    <p>Everything that defines this setup, from frame geometry to real-world wear.</p>
+                </div>
+
                 <div class="card profile-create-card">
                     <div class="section-kicker">New equipment</div>
-                    <div class="section-title">Create Profile</div>
+                    <div class="section-title">Build another setup</div>
                     <div class="creator-grid" style="margin-top: 10px;">
                         <input type="text" id="newSetName" placeholder="My street setup" autocomplete="off">
                         <div class="creator-row">
@@ -2130,10 +3388,11 @@
                 </div>
 
                 <div class="card active-profile-card">
+                    <div class="profile-art" aria-hidden="true"></div>
                     <div class="section-header">
                         <div>
-                            <div class="section-kicker">Equipment</div>
-                            <div class="section-title">Active Profile</div>
+                            <div class="section-kicker">Active equipment</div>
+                            <div class="section-title">Setup identity</div>
                         </div>
                         <button class="ghost-btn" id="deleteProfileBtn" type="button">Delete</button>
                     </div>
@@ -2205,13 +3464,13 @@
                     </div>
                 </div>
 
-                <div class="card loop-card">
+                <div class="card loop-card profile-lab-card">
                     <div class="section-kicker">Locked physics</div>
                     <div class="section-title" style="margin-bottom: 10px;">Rocket Loop</div>
                     <div id="loopDisplay" class="loop-grid" aria-label="Forced rocket loop"></div>
                 </div>
 
-                <div class="card">
+                <div class="card heat-card profile-lab-card">
                     <div class="section-header">
                         <div>
                             <div class="section-kicker">Frame analysis</div>
@@ -2222,7 +3481,7 @@
                     <div id="heatMap" class="heat-map"></div>
                 </div>
 
-                <div class="card">
+                <div class="card wear-card profile-lab-card">
                     <div class="section-header">
                         <div>
                             <div class="section-kicker">Wear intelligence</div>
@@ -2299,6 +3558,18 @@
             </section>
 
             <section id="view-logs" class="app-view" aria-labelledby="tab-logs" aria-hidden="true">
+                <section class="logs-overview" aria-label="Skating history overview">
+                    <div>
+                        <div class="section-kicker">Your skating record</div>
+                        <h2>Wheel life, remembered.</h2>
+                        <p>Sessions and rotations stay connected, so every millimeter has a story.</p>
+                    </div>
+                    <div class="history-stats">
+                        <div><strong id="historySessions">0</strong><span>Sessions</span></div>
+                        <div><strong id="historyDistance">0.0</strong><span>Miles</span></div>
+                        <div><strong id="historyRotations">0</strong><span>Rotations</span></div>
+                    </div>
+                </section>
                 <div class="card logs-card">
                     <div class="section-header">
                         <div>
@@ -2597,7 +3868,9 @@
                 "saveCloudSettingsBtn", "sendMagicLinkBtn", "completeLoginLinkBtn", "signInPasswordBtn", "createPasswordAccountBtn",
                 "syncCloudNowBtn", "pullCloudBtn", "cloudSignOutBtn",
                 "wearSummary", "wearRankingList", "heatSummary", "heatMap",
-                "targetLeftContainer", "targetRightContainer", "loopDisplay"
+                "targetLeftContainer", "targetRightContainer", "loopDisplay",
+                "cockpitRotation", "cockpitProfile", "cockpitCondition", "cockpitSpread", "cockpitLimit", "cockpitTime",
+                "historySessions", "historyDistance", "historyRotations"
             ].forEach((id) => {
                 els[id] = document.getElementById(id);
             });
@@ -4279,6 +5552,32 @@
             renderWearRanking();
             renderSessionLogs();
             renderLogs();
+            renderExperienceSummary();
+        }
+
+        function renderExperienceSummary() {
+            const set = getActiveSet();
+            const frame = getFrame(set);
+            const spread = calculateSpread(set);
+            const sessions = Array.isArray(set.sessions) ? set.sessions : [];
+            const totalMinutes = sessions.reduce((sum, session) => sum + Number(session.minutes || 0), 0);
+            const totalMiles = sessions.reduce((sum, session) => sum + Number(session.miles || 0), 0);
+            const safe = spread.gap <= frame.safetyLimit;
+
+            els.cockpitRotation.textContent = String(set.rotationCount || 0);
+            els.cockpitRotation.parentElement.querySelector("small").textContent = Number(set.rotationCount || 0) === 1 ? "rotation" : "rotations";
+            els.cockpitProfile.textContent = `${frame.name} / ${set.wheelModel} ${normalizeDurometer(set.wheelDurometer)}`;
+            els.cockpitCondition.textContent = safe ? "Rocker geometry protected" : "Wheel spread needs attention";
+            els.cockpitSpread.textContent = formatMm(spread.gap);
+            els.cockpitLimit.textContent = formatMm(frame.safetyLimit);
+            els.cockpitTime.textContent = `${totalMinutes} min`;
+
+            els.historySessions.textContent = String(sessions.length);
+            els.historyDistance.textContent = formatMiles(totalMiles);
+            els.historyRotations.textContent = String(set.rotationCount || 0);
+
+            const cockpit = document.querySelector(".cockpit-hero");
+            if (cockpit) cockpit.dataset.condition = safe ? "safe" : "warning";
         }
 
         function renderSetSelector() {
@@ -4430,9 +5729,15 @@
             const blankActive = wheel.apexSide === "blank" ? " active" : "";
             const inputSize = Number.isFinite(Number(wheel.inputSize)) ? wheel.inputSize : wheel.size;
             return `
-                <div class="input-tile">
-                    <label for="size-${wheel.slot}">${escapeHtml(wheel.slot)} / ${escapeHtml(wheel.name)}</label>
-                    <input id="size-${wheel.slot}" type="number" inputmode="decimal" min="40" max="130" step="0.1" value="${formatNumber(inputSize)}" data-size-slot="${escapeHtml(wheel.slot)}" aria-label="${escapeHtml(wheel.slot)} caliper measurement">
+                <div class="input-tile" data-wheel-slot="${escapeHtml(wheel.slot)}">
+                    <div class="wheel-tile-heading">
+                        <span class="slot-chip">${escapeHtml(wheel.slot)}</span>
+                        <label for="size-${wheel.slot}">${escapeHtml(wheel.name)}</label>
+                    </div>
+                    <div class="measurement-value">
+                        <input id="size-${wheel.slot}" type="number" inputmode="decimal" min="40" max="130" step="0.1" value="${formatNumber(inputSize)}" data-size-slot="${escapeHtml(wheel.slot)}" aria-label="${escapeHtml(wheel.slot)} caliper measurement">
+                        <span>mm</span>
+                    </div>
                     <input class="name-edit-input" type="text" value="${escapeHtml(wheel.name)}" data-name-slot="${escapeHtml(wheel.slot)}" aria-label="${escapeHtml(wheel.slot)} wheel name" maxlength="18" autocomplete="off">
                     <div class="apex-diagnostic" aria-label="Thickest shoulder side for ${escapeHtml(wheel.name)}">
                         <div class="apex-label">Thickest Shoulder Side:</div>
@@ -4462,9 +5767,11 @@
             const flipClass = mountInstruction.sideFlipped ? " flipped" : "";
             return `
                 <div id="target-${escapeHtml(slot)}" class="mount-slot">
-                    <div class="mount-lbl">${escapeHtml(slot)}</div>
-                    <div class="mount-name">${escapeHtml(wheel.name)}</div>
-                    <div class="mount-val">${formatMm(wheel.size)}</div>
+                    <div class="mount-wheel">
+                        <div class="mount-lbl">${escapeHtml(slot)}</div>
+                        <div class="mount-name">${escapeHtml(wheel.name)}</div>
+                        <div class="mount-val">${formatMm(wheel.size)}</div>
+                    </div>
                     <div class="mount-flip${flipClass}">${escapeHtml(mountInstruction.label)}</div>
                 </div>
             `;
@@ -4887,6 +6194,7 @@
 
             renderSessionFields();
             renderSessionLogs();
+            renderExperienceSummary();
             saveStateNow();
             queueCloudSave(100);
             showToast(`Session saved to rotation ${set.rotationCount}.`);
