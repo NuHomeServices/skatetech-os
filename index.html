@@ -7441,7 +7441,7 @@
             els.forecastConfidence.dataset.level = confidence.level;
             els.forecastWearRate.textContent = model.typicalMmPerHour > 0 ? `${formatNumber(model.typicalMmPerHour)} mm/hr` : "--";
             els.forecastConservativeRate.textContent = model.rateRange.high > 0
-                ? `${formatNumber(model.rateRange.low)} to ${formatNumber(model.rateRange.high)}`
+                ? `${formatNumber(model.rateRange.low)} to ${formatNumber(model.rateRange.high)} mm/hr`
                 : "--";
 
             if (!model.limitingWheel || model.timedSampleCount === 0 || model.typicalMmPerHour <= 0) {
@@ -7691,9 +7691,17 @@
             const wheelItems = calculateWheelEffects(model);
             const allItems = [...positionItems, ...typeItems, ...surfaceItems, ...wheelItems].filter((item) => Number.isFinite(item.multiplier));
             const highest = allItems.slice().sort((a, b) => b.multiplier - a.multiplier)[0];
-            els.causeSummary.textContent = highest && average > 0
-                ? `${highest.label} is the strongest observed wear multiplier at ${formatMultiplier(highest.multiplier)}.`
-                : "Timed measurements across more conditions will separate the causes.";
+            if (highest && average > 0) {
+                const difference = Math.round(Math.abs(highest.multiplier - 1) * 100);
+                const comparison = difference === 0
+                    ? "at the profile average"
+                    : highest.multiplier > 1
+                        ? `${difference}% faster than the profile average`
+                        : `${difference}% slower than the profile average`;
+                els.causeSummary.textContent = `${highest.label} is ${comparison} (${formatMultiplier(highest.multiplier)}).`;
+            } else {
+                els.causeSummary.textContent = "Timed measurements across more conditions will separate the causes.";
+            }
             els.causeAnalysis.innerHTML = [
                 renderCauseGroup("Position", positionItems),
                 renderCauseGroup("Session style", typeItems),
