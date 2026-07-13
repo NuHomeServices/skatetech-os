@@ -1988,6 +1988,2552 @@
                 grid-template-columns: 1fr;
             }
         }
+        /* SkateTech reimagined interface */
+        :root {
+            --canvas: #07080a;
+            --surface: #111317;
+            --surface-raised: #171a1f;
+            --surface-soft: #0d0f12;
+            --line: rgba(255, 255, 255, 0.09);
+            --line-bright: rgba(255, 255, 255, 0.16);
+            --ink: #f7f8fa;
+            --ink-soft: #c8cbd1;
+            --ink-muted: #777c86;
+            --aqua: #75eadc;
+            --aqua-deep: #163d3b;
+            --ice: #8fc7ff;
+            --lime: #b8f06b;
+            --coral: #ff8e7a;
+            --gold: #f3cb72;
+            --nav-height: 76px;
+        }
+
+        html {
+            background: var(--canvas);
+        }
+
+        body {
+            padding: calc(env(safe-area-inset-top) + 18px) 22px calc(var(--nav-height) + env(safe-area-inset-bottom) + 34px);
+            background: var(--canvas);
+            color: var(--ink);
+        }
+
+        body::before {
+            display: none;
+        }
+
+        .app {
+            width: min(100%, 1180px);
+        }
+
+        .app-header {
+            min-height: 64px;
+            grid-template-columns: minmax(0, 1fr) minmax(250px, 390px);
+            margin-bottom: 22px;
+            padding: 0;
+        }
+
+        .brand-zone {
+            gap: 12px;
+        }
+
+        .brand-logo {
+            width: 42px;
+            height: 42px;
+            border-radius: 8px;
+            border: 1px solid var(--line-bright);
+            box-shadow: none;
+        }
+
+        h1 {
+            font-size: 21px;
+            font-weight: 720;
+        }
+
+        .subtitle {
+            margin-top: 4px;
+            color: var(--ink-muted);
+            font-size: 11px;
+            font-weight: 560;
+        }
+
+        .app-header .select-wrap select {
+            min-height: 46px;
+            border-radius: 8px;
+            border-color: var(--line);
+            background: var(--surface);
+            box-shadow: none;
+            font-size: 13px;
+        }
+
+        .app-view {
+            transform: translate3d(0, 8px, 0);
+        }
+
+        .card {
+            margin-bottom: 22px;
+            padding: 22px;
+            border-radius: 8px;
+            border: 1px solid var(--line);
+            background: var(--surface);
+            box-shadow: none;
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+        }
+
+        .section-kicker {
+            margin-bottom: 7px;
+            color: var(--aqua);
+            font-size: 9px;
+            font-weight: 760;
+            letter-spacing: 0.12em;
+        }
+
+        .section-title {
+            color: var(--ink);
+            font-size: 18px;
+            font-weight: 690;
+        }
+
+        .mini-copy {
+            color: var(--ink-muted);
+            font-size: 11px;
+            line-height: 1.5;
+        }
+
+        .cockpit-hero {
+            position: relative;
+            min-height: 286px;
+            display: grid;
+            grid-template-columns: minmax(250px, 0.9fr) minmax(300px, 1.1fr);
+            grid-template-rows: 1fr auto;
+            overflow: hidden;
+            margin-bottom: 24px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: #0e1114;
+            isolation: isolate;
+        }
+
+        .cockpit-hero::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            z-index: -1;
+            background: linear-gradient(90deg, #0e1114 0%, rgba(14, 17, 20, 0.96) 36%, rgba(14, 17, 20, 0.24) 68%, rgba(14, 17, 20, 0.12) 100%);
+            pointer-events: none;
+        }
+
+        .cockpit-copy {
+            align-self: center;
+            padding: 32px 12px 24px 32px;
+            z-index: 2;
+        }
+
+        .cockpit-rotation {
+            display: flex;
+            align-items: baseline;
+            gap: 10px;
+            margin: 2px 0 5px;
+        }
+
+        .cockpit-rotation span {
+            font-size: clamp(58px, 8vw, 88px);
+            line-height: 0.9;
+            font-weight: 650;
+            color: var(--ink);
+            font-variant-numeric: tabular-nums;
+        }
+
+        .cockpit-rotation small {
+            color: var(--ink-muted);
+            font-size: 14px;
+            font-weight: 620;
+        }
+
+        .cockpit-profile {
+            color: var(--ink-soft);
+            font-size: 15px;
+            font-weight: 620;
+        }
+
+        .cockpit-condition {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 18px;
+            color: #badfcf;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .condition-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--lime);
+            box-shadow: 0 0 16px rgba(184, 240, 107, 0.46);
+        }
+
+        .cockpit-hero[data-condition="warning"] .condition-dot {
+            background: var(--coral);
+            box-shadow: 0 0 16px rgba(255, 142, 122, 0.42);
+        }
+
+        .cockpit-hero[data-condition="warning"] .cockpit-condition {
+            color: #ffc2b8;
+        }
+
+        .cockpit-visual {
+            position: absolute;
+            inset: 0 0 0 39%;
+            z-index: -2;
+            overflow: hidden;
+        }
+
+        .cockpit-wheel-art {
+            position: absolute;
+            width: min(560px, 64vw);
+            aspect-ratio: 1;
+            right: -42px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: url("logo.png") center / cover no-repeat;
+            filter: saturate(0.9) contrast(1.05);
+            opacity: 0.86;
+        }
+
+        .orbit {
+            position: absolute;
+            border: 1px solid rgba(117, 234, 220, 0.18);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .orbit-one {
+            width: 390px;
+            height: 390px;
+            right: 40px;
+            top: -52px;
+        }
+
+        .orbit-two {
+            width: 480px;
+            height: 480px;
+            right: -6px;
+            top: -98px;
+            border-color: rgba(143, 199, 255, 0.12);
+        }
+
+        .cockpit-metrics {
+            grid-column: 1 / -1;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            z-index: 3;
+            border-top: 1px solid var(--line);
+            background: rgba(7, 9, 11, 0.82);
+        }
+
+        .cockpit-metric {
+            min-height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 0 22px;
+            border-right: 1px solid var(--line);
+        }
+
+        .cockpit-metric:last-child {
+            border-right: 0;
+        }
+
+        .cockpit-metric span {
+            color: var(--ink-muted);
+            font-size: 10px;
+            font-weight: 620;
+        }
+
+        .cockpit-metric strong {
+            color: var(--ink);
+            font-size: 15px;
+            font-weight: 660;
+            white-space: nowrap;
+        }
+
+        .calibration-card {
+            padding: 0;
+            border: 0;
+            background: transparent;
+        }
+
+        .calibration-card > .section-header {
+            padding: 0 2px;
+            margin-bottom: 16px;
+        }
+
+        .measurement-rail {
+            margin-bottom: 12px;
+            padding: 16px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: var(--surface);
+        }
+
+        .rail-heading,
+        .frame-label {
+            display: grid;
+            grid-template-columns: auto auto 1fr auto;
+            align-items: center;
+            gap: 9px;
+            margin-bottom: 12px;
+        }
+
+        .rail-heading span,
+        .frame-label span {
+            color: var(--ink-soft);
+            font-size: 11px;
+            font-weight: 680;
+        }
+
+        .rail-heading small,
+        .frame-label small {
+            color: var(--ink-muted);
+            font-size: 8px;
+            font-weight: 620;
+            text-transform: uppercase;
+        }
+
+        .rail-heading i,
+        .frame-label i {
+            height: 1px;
+            background: var(--line);
+        }
+
+        .caliper-grid {
+            grid-template-columns: repeat(auto-fit, minmax(142px, 1fr));
+            gap: 8px;
+            margin: 0;
+        }
+
+        .input-tile {
+            position: relative;
+            min-height: 172px;
+            padding: 13px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            text-align: left;
+            background: var(--surface-soft);
+            box-shadow: none;
+            overflow: hidden;
+        }
+
+        .input-tile::before {
+            content: "";
+            position: absolute;
+            inset: 0 0 auto;
+            height: 2px;
+            background: var(--ice);
+            opacity: 0;
+            transition: opacity 180ms ease;
+        }
+
+        .input-tile:focus-within {
+            border-color: rgba(143, 199, 255, 0.46);
+            background: #10151a;
+            transform: none;
+        }
+
+        .input-tile:focus-within::before {
+            opacity: 1;
+        }
+
+        .wheel-tile-heading {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 0;
+        }
+
+        .slot-chip {
+            min-width: 27px;
+            height: 22px;
+            display: grid;
+            place-items: center;
+            border-radius: 6px;
+            color: #07100f;
+            background: var(--aqua);
+            font-size: 9px;
+            font-weight: 820;
+        }
+
+        .input-tile label {
+            min-width: 0;
+            margin: 0;
+            color: var(--ink-muted);
+            font-size: 10px;
+            font-weight: 620;
+        }
+
+        .measurement-value {
+            display: flex;
+            align-items: baseline;
+            margin: 13px 0 10px;
+        }
+
+        .input-tile .measurement-value input[type="number"] {
+            width: auto;
+            min-width: 0;
+            min-height: 40px;
+            padding: 0;
+            text-align: left;
+            color: var(--ink);
+            font-size: 29px;
+            font-weight: 640;
+            background: transparent;
+            box-shadow: none;
+        }
+
+        .measurement-value span {
+            color: var(--ink-muted);
+            font-size: 10px;
+            font-weight: 620;
+        }
+
+        .apex-diagnostic {
+            margin-top: 0;
+            padding-top: 9px;
+            border-top: 1px solid var(--line);
+        }
+
+        .apex-label {
+            margin-bottom: 6px;
+            color: var(--ink-muted);
+            font-size: 8px;
+            font-weight: 620;
+            text-transform: uppercase;
+        }
+
+        .apex-options {
+            gap: 3px;
+            padding: 3px;
+            border-radius: 8px;
+            background: #090b0e;
+        }
+
+        .apex-btn {
+            min-height: 29px;
+            border: 0;
+            border-radius: 6px;
+            color: var(--ink-muted);
+            background: transparent;
+            font-size: 8px;
+            font-weight: 680;
+        }
+
+        .apex-btn.active {
+            color: var(--ink);
+            background: #24302f;
+            box-shadow: none;
+        }
+
+        .embedded-tool {
+            margin: 18px 0 0;
+            padding: 18px 0 0;
+            border: 0;
+            border-top: 1px solid var(--line);
+            border-radius: 0;
+            background: transparent;
+            box-shadow: none;
+        }
+
+        .session-grid {
+            grid-template-columns: 1fr 1fr 1fr auto;
+            gap: 8px;
+        }
+
+        .session-grid #saveSessionBtn {
+            min-width: 142px;
+        }
+
+        select,
+        input[type="text"],
+        input[type="number"],
+        input[type="email"],
+        input[type="password"],
+        input[type="url"],
+        textarea {
+            min-height: 48px;
+            border-radius: 8px;
+            border-color: var(--line);
+            background: var(--surface-soft);
+            box-shadow: none;
+        }
+
+        select:focus,
+        input:focus,
+        textarea:focus {
+            border-color: rgba(117, 234, 220, 0.5);
+            background: #101519;
+            box-shadow: 0 0 0 3px rgba(117, 234, 220, 0.08);
+        }
+
+        .rotation-actions {
+            grid-template-columns: minmax(0, 1fr) auto;
+            margin-top: 16px;
+        }
+
+        .action-btn {
+            min-height: 52px;
+            border-radius: 8px;
+            background: var(--aqua);
+            color: #07100f;
+            box-shadow: none;
+            font-size: 13px;
+            font-weight: 760;
+        }
+
+        .ghost-btn,
+        .pill-btn,
+        .danger-btn {
+            min-height: 42px;
+            border-radius: 8px;
+            border-color: var(--line);
+            background: transparent;
+            box-shadow: none;
+            color: var(--ink-soft);
+            font-size: 11px;
+            font-weight: 650;
+        }
+
+        .ghost-btn:hover,
+        .pill-btn:hover {
+            border-color: var(--line-bright);
+            background: rgba(255, 255, 255, 0.035);
+        }
+
+        .danger-btn {
+            color: #ffaaa0;
+            border-color: rgba(255, 142, 122, 0.3);
+        }
+
+        .status-banner {
+            margin: -6px 0 22px;
+            padding: 12px 15px;
+            border-radius: 8px;
+            box-shadow: none;
+            backdrop-filter: none;
+        }
+
+        .mapping-card {
+            padding: 22px;
+            background: #0d0f12;
+        }
+
+        .rotation-badge {
+            padding: 7px 10px;
+            border-radius: 999px;
+            color: var(--aqua);
+            background: var(--aqua-deep);
+            border: 0;
+        }
+
+        .skate-viewport {
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .frame-column {
+            padding: 14px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: #090b0e;
+            box-shadow: none;
+        }
+
+        .frame-label {
+            margin-bottom: 10px;
+        }
+
+        .target-stack {
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 7px;
+        }
+
+        .mount-slot {
+            min-height: 128px;
+            display: grid;
+            grid-template-rows: 1fr auto;
+            place-items: center;
+            padding: 10px 8px 9px;
+            border: 0;
+            border-radius: 8px;
+            background: var(--surface);
+            box-shadow: none;
+        }
+
+        .mount-wheel {
+            width: 86px;
+            height: 86px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border: 6px solid #293139;
+            border-radius: 50%;
+            background: #0b0d10;
+            box-shadow: inset 0 0 0 1px rgba(143, 199, 255, 0.22);
+        }
+
+        .mount-lbl {
+            color: var(--aqua);
+            font-size: 8px;
+        }
+
+        .mount-name {
+            width: 68px;
+            margin: 4px 0 2px;
+            color: var(--ink);
+            font-size: 10px;
+            font-weight: 680;
+        }
+
+        .mount-val {
+            color: var(--lime);
+            font-size: 10px;
+        }
+
+        .mount-flip {
+            margin-top: 6px;
+            padding: 3px 6px;
+            border: 0;
+            border-radius: 5px;
+            color: var(--ink-muted);
+            background: transparent;
+            font-size: 7px;
+            font-weight: 720;
+        }
+
+        .mount-flip.flipped {
+            color: var(--aqua);
+            border: 0;
+            background: transparent;
+        }
+
+        .rotation-preview {
+            margin-top: 14px;
+            padding: 18px;
+            border-radius: 8px;
+            background: #101719;
+            border-color: rgba(117, 234, 220, 0.22);
+        }
+
+        .preview-list {
+            grid-template-columns: 1fr;
+        }
+
+        .preview-script {
+            padding: 16px;
+            border-radius: 8px;
+            border-color: var(--line);
+            background: #0b0e11;
+            box-shadow: none;
+        }
+
+        .preview-script-title,
+        .preview-path-summary {
+            color: var(--aqua);
+        }
+
+        .profile-page-heading {
+            grid-column: 1 / -1;
+            padding: 16px 2px 8px;
+        }
+
+        .profile-page-heading h2,
+        .logs-overview h2 {
+            margin: 0;
+            color: var(--ink);
+            font-size: 30px;
+            line-height: 1.08;
+            font-weight: 650;
+        }
+
+        .profile-page-heading p,
+        .logs-overview p {
+            max-width: 520px;
+            margin-top: 8px;
+            color: var(--ink-muted);
+            font-size: 12px;
+            line-height: 1.55;
+        }
+
+        #view-profiles.active {
+            display: grid;
+            grid-template-columns: minmax(0, 1.12fr) minmax(310px, 0.88fr);
+            gap: 18px;
+            align-items: start;
+        }
+
+        #view-profiles .card {
+            margin-bottom: 0;
+        }
+
+        .active-profile-card {
+            grid-column: 1;
+            grid-row: 2 / span 2;
+            position: relative;
+            overflow: hidden;
+            padding-top: 170px;
+        }
+
+        .profile-art {
+            position: absolute;
+            inset: 0 0 auto;
+            height: 150px;
+            background: url("logo.png") 70% 48% / cover no-repeat;
+            border-bottom: 1px solid var(--line);
+            filter: saturate(0.8) contrast(1.08);
+        }
+
+        .profile-art::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, rgba(17, 19, 23, 0.92), rgba(17, 19, 23, 0.2));
+        }
+
+        .active-profile-card .form-grid {
+            gap: 9px;
+        }
+
+        .stats-grid {
+            gap: 7px;
+        }
+
+        .stat {
+            min-height: 76px;
+            padding: 13px;
+            border-radius: 8px;
+            border-color: var(--line);
+            background: var(--surface-soft);
+            box-shadow: none;
+        }
+
+        .stat span {
+            color: var(--ink-muted);
+            font-size: 8px;
+            font-weight: 650;
+        }
+
+        .stat strong {
+            font-size: 18px;
+            font-weight: 650;
+        }
+
+        .profile-create-card {
+            grid-column: 2;
+            grid-row: 2;
+            background: #101316;
+        }
+
+        .loop-card {
+            grid-column: 2;
+            grid-row: 3;
+        }
+
+        .loop-line span {
+            min-height: 42px;
+            border-radius: 8px;
+            border-color: var(--line);
+            background: var(--surface-soft);
+            box-shadow: none;
+        }
+
+        .loop-line .loop-label {
+            color: var(--aqua);
+            border-color: rgba(117, 234, 220, 0.2);
+            background: #132321;
+        }
+
+        .heat-card {
+            grid-column: 1;
+            grid-row: 4;
+        }
+
+        .wear-card {
+            grid-column: 2;
+            grid-row: 4;
+        }
+
+        .cloud-sync-card {
+            grid-column: 1 / -1;
+            grid-row: 5;
+            padding: 0;
+            overflow: hidden;
+            background: #0d1012;
+        }
+
+        .cloud-overview {
+            min-height: 76px;
+            padding: 14px 17px;
+        }
+
+        .cloud-mark {
+            width: 38px;
+            height: 38px;
+            border: 0;
+            border-radius: 8px;
+            background: #162321;
+        }
+
+        .cloud-mark svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .cloud-copy .section-title {
+            font-size: 14px;
+        }
+
+        .cloud-disclosure summary {
+            min-height: 42px;
+            padding: 0 17px;
+        }
+
+        .heat-tile,
+        .wear-row {
+            border-radius: 8px;
+            border-color: var(--line);
+            background: var(--surface-soft);
+            box-shadow: none;
+        }
+
+        .wear-row {
+            min-height: 62px;
+            padding: 12px;
+        }
+
+        .wear-bar {
+            height: 5px;
+        }
+
+        .wear-fill {
+            background: var(--gold);
+        }
+
+        .logs-overview {
+            min-height: 210px;
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            align-items: end;
+            gap: 32px;
+            margin-bottom: 26px;
+            padding: 34px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: #0e1114;
+        }
+
+        .history-stats {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(88px, 1fr));
+            gap: 1px;
+            background: var(--line);
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .history-stats div {
+            min-height: 86px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 14px;
+            background: var(--surface);
+        }
+
+        .history-stats strong {
+            color: var(--ink);
+            font-size: 25px;
+            font-weight: 640;
+        }
+
+        .history-stats span {
+            margin-top: 5px;
+            color: var(--ink-muted);
+            font-size: 9px;
+            font-weight: 650;
+            text-transform: uppercase;
+        }
+
+        #view-logs.active {
+            display: grid;
+            grid-template-columns: 0.92fr 1.08fr;
+            gap: 18px;
+            align-items: start;
+        }
+
+        .logs-overview {
+            grid-column: 1 / -1;
+        }
+
+        .logs-card {
+            margin: 0;
+            padding: 0;
+            border: 0;
+            background: transparent;
+        }
+
+        .logs-card > .section-header {
+            padding: 0 2px 8px;
+        }
+
+        .log-list {
+            gap: 8px;
+        }
+
+        .log-item {
+            position: relative;
+            padding: 15px 16px 15px 20px;
+            border-radius: 8px;
+            border: 1px solid var(--line);
+            background: var(--surface);
+            box-shadow: none;
+        }
+
+        .log-item::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 12px;
+            bottom: 12px;
+            width: 2px;
+            background: var(--aqua);
+        }
+
+        .log-top {
+            font-size: 12px;
+        }
+
+        .log-meta {
+            font-size: 11px;
+            line-height: 1.5;
+        }
+
+        .nav-dock {
+            width: min(390px, calc(100% - 32px));
+            height: 62px;
+            bottom: calc(13px + env(safe-area-inset-bottom));
+            padding: 5px;
+            border-radius: 8px;
+            border-color: var(--line-bright);
+            background: rgba(18, 20, 24, 0.94);
+            box-shadow: 0 20px 48px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+
+        .nav-item {
+            min-height: 50px;
+            border-radius: 6px;
+            color: var(--ink-muted);
+            font-size: 8px;
+        }
+
+        .nav-item.active {
+            color: var(--ink);
+            border-color: transparent;
+            background: #272b31;
+            box-shadow: none;
+        }
+
+        .toast {
+            border-radius: 8px;
+        }
+
+        @media (max-width: 820px) {
+            body {
+                padding: calc(env(safe-area-inset-top) + 12px) 12px calc(var(--nav-height) + env(safe-area-inset-bottom) + 30px);
+            }
+
+            .app-header {
+                grid-template-columns: 1fr;
+                gap: 12px;
+                margin-bottom: 16px;
+            }
+
+            .brand-logo {
+                width: 38px;
+                height: 38px;
+            }
+
+            h1 {
+                font-size: 19px;
+            }
+
+            .app-header .select-wrap select {
+                min-height: 44px;
+            }
+
+            .cockpit-hero {
+                min-height: 318px;
+                grid-template-columns: 1fr;
+                grid-template-rows: 1fr auto;
+            }
+
+            .cockpit-copy {
+                align-self: start;
+                padding: 24px 20px;
+            }
+
+            .cockpit-rotation span {
+                font-size: 66px;
+            }
+
+            .cockpit-visual {
+                inset: 0 0 64px 22%;
+                opacity: 0.72;
+            }
+
+            .cockpit-wheel-art {
+                width: 350px;
+                right: -95px;
+            }
+
+            .orbit-one,
+            .orbit-two {
+                display: none;
+            }
+
+            .cockpit-hero::after {
+                background: linear-gradient(90deg, #0e1114 0%, rgba(14, 17, 20, 0.85) 48%, rgba(14, 17, 20, 0.08) 100%);
+            }
+
+            .cockpit-metric {
+                min-height: 62px;
+                display: block;
+                padding: 13px 12px;
+            }
+
+            .cockpit-metric span,
+            .cockpit-metric strong {
+                display: block;
+            }
+
+            .cockpit-metric strong {
+                margin-top: 6px;
+                font-size: 13px;
+            }
+
+            .measurement-rail {
+                padding: 14px 12px 12px;
+            }
+
+            .caliper-grid {
+                display: flex;
+                gap: 8px;
+                overflow-x: auto;
+                padding-bottom: 4px;
+                scroll-snap-type: x mandatory;
+                scrollbar-width: none;
+            }
+
+            .caliper-grid::-webkit-scrollbar {
+                display: none;
+            }
+
+            .input-tile {
+                flex: 0 0 148px;
+                scroll-snap-align: start;
+            }
+
+            .session-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .session-grid .select-wrap,
+            .session-grid #saveSessionBtn {
+                min-width: 0;
+            }
+
+            .rotation-actions {
+                grid-template-columns: 1fr;
+            }
+
+            .mapping-card {
+                padding: 17px 12px;
+            }
+
+            .target-stack {
+                display: flex;
+                gap: 7px;
+                overflow-x: auto;
+                padding-bottom: 4px;
+                scrollbar-width: none;
+            }
+
+            .target-stack::-webkit-scrollbar {
+                display: none;
+            }
+
+            .mount-slot {
+                flex: 1 0 112px;
+            }
+
+            #view-profiles.active {
+                display: flex;
+                flex-direction: column;
+            }
+
+            #view-logs.active {
+                display: block;
+            }
+
+            #view-profiles .profile-page-heading { order: 0; }
+            #view-profiles .active-profile-card { order: 1; }
+            #view-profiles .loop-card { order: 2; }
+            #view-profiles .heat-card { order: 3; }
+            #view-profiles .wear-card { order: 4; }
+            #view-profiles .cloud-sync-card { order: 5; }
+            #view-profiles .profile-create-card { order: 6; }
+
+            #view-profiles .card,
+            #view-logs .card {
+                margin-bottom: 14px;
+            }
+
+            .profile-page-heading {
+                padding: 12px 2px 18px;
+            }
+
+            .profile-page-heading h2,
+            .logs-overview h2 {
+                font-size: 26px;
+            }
+
+            .active-profile-card {
+                padding: 152px 16px 18px;
+            }
+
+            .profile-art {
+                height: 134px;
+            }
+
+            .profile-create-card,
+            .loop-card,
+            .heat-card,
+            .wear-card,
+            .cloud-sync-card {
+                grid-column: auto;
+                grid-row: auto;
+            }
+
+            .logs-overview {
+                min-height: 0;
+                display: block;
+                margin-bottom: 20px;
+                padding: 24px 18px 18px;
+            }
+
+            .history-stats {
+                margin-top: 24px;
+            }
+
+            .history-stats div {
+                min-height: 76px;
+                padding: 10px;
+            }
+
+            .history-stats strong {
+                font-size: 21px;
+            }
+
+            .cloud-overview {
+                grid-template-columns: 38px minmax(0, 1fr);
+            }
+
+            .sync-pill {
+                grid-column: 1 / -1;
+                justify-self: start;
+                margin-left: 52px;
+                margin-top: -9px;
+            }
+
+            .cloud-grid,
+            .cloud-actions {
+                grid-template-columns: 1fr;
+            }
+
+            .cloud-actions button,
+            #cloudLoginLinkInput {
+                grid-column: 1;
+            }
+        }
+
+        @media (max-width: 420px) {
+            .section-header {
+                align-items: flex-start;
+            }
+
+            .cockpit-condition {
+                max-width: 180px;
+            }
+
+            .session-grid,
+            .creator-row,
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .profile-actions,
+            .backup-actions {
+                grid-template-columns: 1fr;
+            }
+
+            .heat-map {
+                grid-template-columns: 1fr;
+            }
+
+            .wear-row {
+                grid-template-columns: 34px minmax(0, 1fr);
+            }
+
+            .wear-value {
+                grid-column: 2;
+                text-align: left;
+            }
+        }
+
+        /* Readability and profile-layout refinement */
+        * {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Segoe UI Variable Text", "Segoe UI", Arial, sans-serif;
+            font-synthesis: none;
+            text-shadow: none;
+        }
+
+        body {
+            -webkit-font-smoothing: auto;
+            -moz-osx-font-smoothing: auto;
+        }
+
+        .app-view,
+        .app-view.active {
+            transform: none;
+            transition: opacity 180ms ease, visibility 180ms;
+        }
+
+        h1,
+        h2,
+        .section-title,
+        .cockpit-rotation span,
+        .history-stats strong,
+        .stat strong {
+            font-weight: 700;
+        }
+
+        button,
+        select,
+        .mount-name,
+        .mount-val,
+        .log-top,
+        .slot-chip {
+            font-weight: 600;
+        }
+
+        #view-profiles.active {
+            display: block;
+        }
+
+        .profile-page-heading {
+            padding-bottom: 18px;
+        }
+
+        .profile-equipment-layout {
+            display: grid;
+            grid-template-columns: minmax(0, 1.12fr) minmax(330px, 0.88fr);
+            gap: 18px;
+            align-items: start;
+            margin-bottom: 18px;
+        }
+
+        .profile-side-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            min-width: 0;
+        }
+
+        .profile-analytics-layout {
+            display: grid;
+            grid-template-columns: minmax(0, 1.12fr) minmax(330px, 0.88fr);
+            gap: 18px;
+            align-items: stretch;
+            margin-bottom: 18px;
+        }
+
+        .profile-equipment-layout > .card,
+        .profile-side-stack > .card,
+        .profile-analytics-layout > .card {
+            grid-column: auto;
+            grid-row: auto;
+            width: 100%;
+            margin: 0;
+        }
+
+        .profile-analytics-layout > .card {
+            height: 100%;
+        }
+
+        .heat-card {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .heat-card .heat-map {
+            flex: 1;
+        }
+
+        .profile-maintenance {
+            margin-top: 7px;
+            border-top: 1px solid var(--line);
+        }
+
+        .profile-maintenance summary {
+            min-height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            color: var(--ink-soft);
+            cursor: pointer;
+            list-style: none;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .profile-maintenance summary::-webkit-details-marker {
+            display: none;
+        }
+
+        .profile-maintenance summary i {
+            width: 8px;
+            height: 8px;
+            border-right: 1.5px solid var(--ink-muted);
+            border-bottom: 1.5px solid var(--ink-muted);
+            transform: rotate(45deg) translateY(-2px);
+            transition: transform 180ms ease;
+        }
+
+        .profile-maintenance[open] summary i {
+            transform: rotate(225deg) translate(-2px, -2px);
+        }
+
+        .profile-maintenance .profile-actions {
+            margin: 0;
+            padding: 4px 0 0;
+        }
+
+        .mount-slot {
+            min-height: 154px;
+        }
+
+        .mount-wheel {
+            width: 106px;
+            height: 106px;
+            border-width: 7px;
+        }
+
+        .mount-lbl {
+            font-size: 9px;
+        }
+
+        .mount-name {
+            width: 82px;
+            font-size: 11px;
+        }
+
+        .mount-val {
+            font-size: 12px;
+        }
+
+        .mount-flip {
+            font-size: 8px;
+        }
+
+        @media (max-width: 1024px) and (min-width: 821px) {
+            .profile-equipment-layout,
+            .profile-analytics-layout {
+                grid-template-columns: minmax(0, 1fr) minmax(300px, 0.92fr);
+                gap: 14px;
+            }
+
+            .profile-side-stack {
+                gap: 14px;
+            }
+
+            .active-profile-card,
+            .profile-create-card,
+            .loop-card,
+            .heat-card,
+            .wear-card {
+                padding-left: 16px;
+                padding-right: 16px;
+            }
+        }
+
+        @media (max-width: 820px) {
+            .profile-equipment-layout,
+            .profile-analytics-layout {
+                display: flex;
+                flex-direction: column;
+                gap: 14px;
+                align-items: stretch;
+                margin-bottom: 14px;
+            }
+
+            .profile-equipment-layout > .active-profile-card {
+                order: 0;
+            }
+
+            .profile-side-stack {
+                order: 1;
+                gap: 14px;
+            }
+
+            .profile-side-stack > .loop-card {
+                order: 0;
+            }
+
+            .profile-side-stack > .profile-create-card {
+                order: 1;
+            }
+
+            .mount-slot {
+                flex-basis: 132px;
+                min-height: 150px;
+            }
+
+            .mount-wheel {
+                width: 102px;
+                height: 102px;
+            }
+        }
+
+        /* Predictive intelligence */
+        .header-tools {
+            display: grid;
+            grid-template-columns: minmax(220px, 1fr) auto;
+            align-items: center;
+            gap: 9px;
+        }
+
+        .header-sync {
+            min-height: 34px;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 0 10px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            color: var(--ink-muted);
+            background: var(--surface-soft);
+            white-space: nowrap;
+        }
+
+        .header-sync-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--ink-muted);
+        }
+
+        .header-sync strong {
+            font-size: 9px;
+            font-weight: 600;
+        }
+
+        .header-sync[data-state="online"] {
+            color: #bdebc9;
+            border-color: rgba(121, 223, 153, 0.2);
+        }
+
+        .header-sync[data-state="online"] .header-sync-dot {
+            background: var(--success);
+            box-shadow: 0 0 0 3px rgba(121, 223, 153, 0.1);
+        }
+
+        .header-sync[data-state="busy"] .header-sync-dot {
+            background: var(--gold);
+            animation: syncPulse 1.4s ease-in-out infinite;
+        }
+
+        .readiness-panel {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(390px, 0.8fr);
+            gap: 22px;
+            align-items: center;
+            margin-bottom: 26px;
+            padding: 18px 20px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: var(--surface);
+        }
+
+        .readiness-status {
+            display: grid;
+            grid-template-columns: 42px minmax(0, 1fr);
+            gap: 13px;
+            align-items: center;
+        }
+
+        .readiness-mark {
+            width: 42px;
+            height: 42px;
+            display: grid;
+            place-items: center;
+            border-radius: 50%;
+            background: #172321;
+            border: 1px solid rgba(117, 234, 220, 0.17);
+        }
+
+        .readiness-mark span {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--aqua);
+        }
+
+        .readiness-panel[data-state="due"] {
+            border-color: rgba(255, 142, 122, 0.34);
+            background: #171112;
+        }
+
+        .readiness-panel[data-state="due"] .readiness-mark {
+            background: #321b19;
+            border-color: rgba(255, 142, 122, 0.24);
+        }
+
+        .readiness-panel[data-state="due"] .readiness-mark span {
+            background: var(--coral);
+        }
+
+        .readiness-panel[data-state="monitor"] .readiness-mark span {
+            background: var(--gold);
+        }
+
+        .readiness-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .readiness-stats div {
+            min-height: 64px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 10px 12px;
+            border-right: 1px solid var(--line);
+            background: var(--surface-soft);
+        }
+
+        .readiness-stats div:last-child {
+            border-right: 0;
+        }
+
+        .readiness-stats strong {
+            color: var(--ink);
+            font-size: 15px;
+            font-weight: 700;
+        }
+
+        .readiness-stats span {
+            margin-top: 4px;
+            color: var(--ink-muted);
+            font-size: 8px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .session-grid {
+            grid-template-columns: 0.8fr 0.8fr 1fr 1.1fr auto;
+        }
+
+        .measurement-delta {
+            min-height: 15px;
+            margin: -6px 0 8px;
+            color: var(--ink-muted);
+            font-size: 8px;
+            font-weight: 600;
+        }
+
+        .input-tile.measurement-growth {
+            border-color: rgba(255, 142, 122, 0.52);
+        }
+
+        .input-tile.measurement-growth .measurement-delta {
+            color: #ffb2a6;
+        }
+
+        .input-tile.measurement-wear .measurement-delta {
+            color: #c8d8a1;
+        }
+
+        .measurement-diagnostics {
+            margin-top: 12px;
+            padding: 14px;
+            border: 1px solid rgba(243, 203, 114, 0.28);
+            border-radius: 8px;
+            background: rgba(243, 203, 114, 0.07);
+            color: #f4dfaf;
+        }
+
+        .measurement-diagnostics[data-level="critical"] {
+            border-color: rgba(255, 142, 122, 0.36);
+            background: rgba(255, 142, 122, 0.08);
+            color: #ffc2b8;
+        }
+
+        .measurement-diagnostics strong {
+            display: block;
+            font-size: 12px;
+        }
+
+        .measurement-diagnostics ul {
+            display: grid;
+            gap: 5px;
+            margin: 9px 0;
+            padding-left: 18px;
+            color: var(--ink-soft);
+            font-size: 11px;
+            line-height: 1.45;
+        }
+
+        .measurement-diagnostics small {
+            color: var(--ink-muted);
+            font-size: 9px;
+        }
+
+        .insight-settings {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-top: 7px;
+            padding-top: 8px;
+            border-top: 1px solid var(--line);
+        }
+
+        .insight-settings > label:not(.slide-alert-toggle) {
+            display: grid;
+            gap: 7px;
+            padding: 11px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: var(--surface-soft);
+        }
+
+        .insight-settings > label > span {
+            color: var(--ink-muted);
+            font-size: 8px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .insight-settings label > div {
+            display: grid;
+            grid-template-columns: 70px minmax(0, 1fr);
+            align-items: center;
+            gap: 8px;
+        }
+
+        .insight-settings input[type="number"] {
+            min-height: 36px;
+            padding: 0 9px;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .insight-settings small {
+            color: var(--ink-muted);
+            font-size: 8px;
+            line-height: 1.35;
+        }
+
+        .slide-alert-toggle {
+            grid-column: 1 / -1;
+            min-height: 54px;
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            padding: 10px 12px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: var(--surface-soft);
+        }
+
+        .slide-alert-toggle input {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--aqua);
+        }
+
+        .slide-alert-toggle span,
+        .slide-alert-toggle strong,
+        .slide-alert-toggle small {
+            display: block;
+            text-transform: none;
+        }
+
+        .slide-alert-toggle strong {
+            color: var(--ink-soft);
+            font-size: 10px;
+        }
+
+        .slide-alert-toggle small {
+            margin-top: 3px;
+        }
+
+        .forecast-card {
+            margin-bottom: 18px !important;
+            background: #101416;
+        }
+
+        .confidence-pill {
+            min-height: 30px;
+            display: inline-flex;
+            align-items: center;
+            padding: 0 10px;
+            border: 1px solid var(--line);
+            border-radius: 999px;
+            color: var(--ink-muted);
+            background: var(--surface-soft);
+            font-size: 9px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .confidence-pill[data-level="high"] {
+            color: #bdebc9;
+            border-color: rgba(121, 223, 153, 0.24);
+        }
+
+        .confidence-pill[data-level="medium"] {
+            color: #f4dfaf;
+            border-color: rgba(243, 203, 114, 0.24);
+        }
+
+        .forecast-metrics {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin: 16px 0 10px;
+        }
+
+        .forecast-metrics div {
+            min-height: 76px;
+            padding: 12px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: var(--surface-soft);
+        }
+
+        .forecast-metrics span,
+        .forecast-metrics strong {
+            display: block;
+        }
+
+        .forecast-metrics span {
+            color: var(--ink-muted);
+            font-size: 8px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .forecast-metrics strong {
+            margin-top: 8px;
+            color: var(--ink);
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .forecast-formula {
+            padding: 10px 12px;
+            border-left: 2px solid var(--aqua);
+            color: var(--ink-muted);
+            background: var(--surface-soft);
+            font-size: 10px;
+            line-height: 1.5;
+        }
+
+        .condition-rate-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 10px;
+        }
+
+        .condition-rate-list span {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            min-height: 30px;
+            padding: 0 9px;
+            border: 1px solid var(--line);
+            border-radius: 7px;
+            color: var(--ink-muted);
+            background: var(--surface-soft);
+            font-size: 9px;
+        }
+
+        .condition-rate-list b {
+            color: var(--ink-soft);
+            font-weight: 600;
+        }
+
+        .forecast-details {
+            margin-top: 12px;
+            border-top: 1px solid var(--line);
+        }
+
+        .forecast-details summary {
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            list-style: none;
+            color: var(--ink-soft);
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .forecast-details summary::-webkit-details-marker {
+            display: none;
+        }
+
+        .forecast-details summary i {
+            width: 8px;
+            height: 8px;
+            border-right: 1.5px solid var(--ink-muted);
+            border-bottom: 1.5px solid var(--ink-muted);
+            transform: rotate(45deg) translateY(-2px);
+        }
+
+        .forecast-details[open] summary i {
+            transform: rotate(225deg) translate(-2px, -2px);
+        }
+
+        .forecast-ledger {
+            padding: 4px 0 12px;
+        }
+
+        .forecast-ledger-title {
+            margin-bottom: 8px;
+            color: var(--aqua);
+            font-size: 8px;
+            font-weight: 700;
+            letter-spacing: 0;
+            text-transform: uppercase;
+        }
+
+        .forecast-science-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 6px;
+        }
+
+        .forecast-science-grid div {
+            min-height: 54px;
+            padding: 9px;
+            border: 1px solid var(--line);
+            border-radius: 7px;
+            background: rgba(255, 255, 255, 0.018);
+        }
+
+        .forecast-science-grid span,
+        .forecast-science-grid strong {
+            display: block;
+        }
+
+        .forecast-science-grid span {
+            color: var(--ink-muted);
+            font-size: 7px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .forecast-science-grid strong {
+            margin-top: 6px;
+            color: var(--ink-soft);
+            font-size: 10px;
+            font-weight: 650;
+        }
+
+        .forecast-wheel-list {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 8px;
+            padding-top: 4px;
+        }
+
+        .forecast-wheel-row {
+            padding: 11px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: var(--surface-soft);
+        }
+
+        .forecast-wheel-row[data-state="low"] {
+            border-color: rgba(243, 203, 114, 0.25);
+        }
+
+        .forecast-wheel-row[data-state="retire"] {
+            border-color: rgba(255, 142, 122, 0.35);
+        }
+
+        .forecast-wheel-heading {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            color: var(--ink-soft);
+            font-size: 10px;
+        }
+
+        .forecast-wheel-heading span {
+            color: var(--lime);
+            font-weight: 700;
+        }
+
+        .forecast-life-bar {
+            height: 5px;
+            margin: 9px 0;
+            overflow: hidden;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.07);
+        }
+
+        .forecast-life-bar i {
+            display: block;
+            height: 100%;
+            border-radius: inherit;
+            background: var(--aqua);
+        }
+
+        .forecast-wheel-row[data-state="low"] .forecast-life-bar i {
+            background: var(--gold);
+        }
+
+        .forecast-wheel-row[data-state="retire"] .forecast-life-bar i {
+            background: var(--coral);
+        }
+
+        .forecast-wheel-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 5px 8px;
+        }
+
+        .forecast-wheel-stats span {
+            color: var(--ink-muted);
+            font-size: 8px;
+        }
+
+        .forecast-wheel-stats b {
+            display: block;
+            margin-top: 2px;
+            color: var(--ink-soft);
+            font-size: 9px;
+            font-weight: 600;
+        }
+
+        .session-load-pill {
+            min-width: 92px;
+            min-height: 42px;
+            display: grid;
+            align-content: center;
+            justify-items: end;
+            padding: 6px 10px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: var(--surface-soft);
+        }
+
+        .session-load-pill span,
+        .session-load-pill strong {
+            display: block;
+        }
+
+        .session-load-pill span {
+            color: var(--ink-muted);
+            font-size: 7px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .session-load-pill strong {
+            margin-top: 3px;
+            color: var(--ink-soft);
+            font-size: 10px;
+        }
+
+        .session-load-pill[data-level="high"] strong,
+        .session-load-pill[data-level="extreme"] strong {
+            color: var(--gold);
+        }
+
+        .intelligence-studio {
+            padding-bottom: 16px;
+        }
+
+        .intelligence-tabs {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 3px;
+            margin: 18px 0 14px;
+            padding: 3px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: #090c0d;
+        }
+
+        .intelligence-tabs button {
+            min-height: 38px;
+            border: 0;
+            border-radius: 6px;
+            color: var(--ink-muted);
+            background: transparent;
+            font: inherit;
+            font-size: 10px;
+            font-weight: 650;
+            cursor: pointer;
+        }
+
+        .intelligence-tabs button.active {
+            color: #07100f;
+            background: var(--aqua);
+        }
+
+        .intelligence-panel[hidden] {
+            display: none !important;
+        }
+
+        .outlook-analysis-grid,
+        .driver-legacy-mount {
+            display: grid;
+            grid-template-columns: minmax(0, 1.45fr) minmax(280px, .55fr);
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .intelligence-subsection {
+            min-width: 0;
+            padding: 14px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, .018);
+        }
+
+        .subsection-heading,
+        .timeline-toolbar,
+        .value-toolbar,
+        .drivers-intro {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+        }
+
+        .subsection-heading span,
+        .subsection-heading strong,
+        .timeline-toolbar span,
+        .timeline-toolbar strong,
+        .value-toolbar > div span,
+        .value-toolbar > div strong,
+        .drivers-intro span,
+        .drivers-intro strong {
+            display: block;
+        }
+
+        .subsection-heading span,
+        .timeline-toolbar span,
+        .value-toolbar > div span,
+        .drivers-intro span {
+            color: var(--aqua);
+            font-size: 8px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .subsection-heading strong,
+        .timeline-toolbar strong,
+        .value-toolbar > div strong,
+        .drivers-intro strong {
+            margin-top: 4px;
+            color: var(--ink-soft);
+            font-size: 12px;
+        }
+
+        .subsection-heading > b {
+            color: var(--ink-muted);
+            font-size: 9px;
+        }
+
+        .subsection-heading > b[data-state="safe"] {
+            color: #9ee6bb;
+        }
+
+        .subsection-heading > b[data-state="warning"] {
+            color: var(--coral);
+        }
+
+        #rockerGeometryCanvas,
+        #measurementTimelineCanvas {
+            width: 100%;
+            height: auto;
+            display: block;
+            margin-top: 10px;
+        }
+
+        .chart-key {
+            display: flex;
+            gap: 14px;
+            color: var(--ink-muted);
+            font-size: 8px;
+        }
+
+        .chart-key span {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .chart-key i {
+            width: 16px;
+            height: 2px;
+            background: var(--ink);
+        }
+
+        .chart-key i.projected {
+            background: var(--aqua);
+        }
+
+        .effectiveness-section {
+            display: grid;
+            align-content: start;
+        }
+
+        .effectiveness-track {
+            height: 7px;
+            margin: 22px 0 12px;
+            overflow: hidden;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, .08);
+        }
+
+        .effectiveness-track i {
+            display: block;
+            width: 0;
+            height: 100%;
+            border-radius: inherit;
+            background: var(--gold);
+            transition: width .2s ease;
+        }
+
+        .effectiveness-track i[data-state="good"] {
+            background: var(--aqua);
+        }
+
+        .effectiveness-track i[data-state="warning"] {
+            background: var(--coral);
+        }
+
+        .effectiveness-section p,
+        .drivers-intro small {
+            margin: 0;
+            color: var(--ink-muted);
+            font-size: 9px;
+            line-height: 1.5;
+        }
+
+        .cause-analysis {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+            margin-top: 14px;
+        }
+
+        .cause-group {
+            min-width: 0;
+            padding: 12px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: var(--surface-soft);
+        }
+
+        .cause-group-title {
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .cause-group-title strong {
+            color: var(--ink-soft);
+            font-size: 10px;
+        }
+
+        .cause-group-title span,
+        .cause-empty {
+            color: var(--ink-muted);
+            font-size: 8px;
+        }
+
+        .cause-row {
+            display: grid;
+            grid-template-columns: minmax(72px, .7fr) minmax(80px, 1fr) 42px;
+            align-items: center;
+            gap: 8px;
+            min-height: 25px;
+            color: var(--ink-muted);
+            font-size: 8px;
+        }
+
+        .cause-row > span {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .cause-row i {
+            height: 4px;
+            overflow: hidden;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, .07);
+        }
+
+        .cause-row i b {
+            display: block;
+            height: 100%;
+            background: var(--aqua);
+        }
+
+        .cause-row > strong {
+            color: var(--ink-soft);
+            text-align: right;
+        }
+
+        .driver-legacy-mount {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .driver-legacy-mount .section-title {
+            font-size: 15px;
+        }
+
+        .timeline-toolbar .select-wrap {
+            width: min(260px, 42%);
+        }
+
+        .timeline-stats,
+        .cost-stats {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 7px;
+            margin-top: 12px;
+        }
+
+        .timeline-stats > div,
+        .cost-stats > div {
+            min-height: 62px;
+            padding: 10px;
+            border: 1px solid var(--line);
+            border-radius: 7px;
+            background: var(--surface-soft);
+        }
+
+        .timeline-stats span,
+        .timeline-stats strong,
+        .cost-stats span,
+        .cost-stats strong {
+            display: block;
+        }
+
+        .timeline-stats span,
+        .cost-stats span {
+            color: var(--ink-muted);
+            font-size: 7px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .timeline-stats strong,
+        .cost-stats strong {
+            margin-top: 7px;
+            color: var(--ink-soft);
+            font-size: 11px;
+        }
+
+        .value-toolbar > label {
+            display: grid;
+            gap: 5px;
+            color: var(--ink-muted);
+            font-size: 8px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .value-toolbar > label > div {
+            width: 150px;
+            display: grid;
+            grid-template-columns: auto 1fr;
+            align-items: center;
+            border: 1px solid var(--line);
+            border-radius: 7px;
+            background: var(--input-bg);
+        }
+
+        .value-toolbar > label b {
+            padding-left: 10px;
+            color: var(--ink-muted);
+        }
+
+        .value-toolbar input {
+            min-width: 0;
+            border: 0;
+            background: transparent;
+        }
+
+        #costFormula {
+            margin-top: 12px;
+        }
+
+        .profile-comparison {
+            margin-top: 12px;
+            border-top: 1px solid var(--line);
+        }
+
+        .profile-comparison-title,
+        .profile-comparison-row {
+            display: grid;
+            grid-template-columns: minmax(150px, 1fr) minmax(100px, .45fr) minmax(100px, .45fr);
+            align-items: center;
+            gap: 10px;
+            min-height: 40px;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .profile-comparison-title strong,
+        .profile-comparison-title span,
+        .profile-comparison-row strong,
+        .profile-comparison-row span {
+            font-size: 9px;
+        }
+
+        .profile-comparison-title strong,
+        .profile-comparison-row strong {
+            color: var(--ink-soft);
+        }
+
+        .profile-comparison-title span,
+        .profile-comparison-row span {
+            color: var(--ink-muted);
+        }
+
+        .profile-comparison-row[data-active="true"] strong {
+            color: var(--aqua);
+        }
+
+        .measurement-diagnostics li {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(180px, .45fr);
+            align-items: center;
+            gap: 12px;
+        }
+
+        /* Arc labels need their own readable track; never let them compete with wheel chips. */
+        .loop-line {
+            min-width: 0;
+        }
+
+        .loop-line span {
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .arc-loop-line-2 {
+            grid-template-columns: minmax(84px, 1.25fr) repeat(2, minmax(0, 1fr));
+        }
+
+        .arc-loop-line-6 {
+            grid-template-columns: minmax(84px, 1.25fr) repeat(6, minmax(28px, 1fr));
+        }
+
+        .arc-loop-line .loop-label {
+            min-width: 0;
+            padding: 0 7px;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        .recheck-field {
+            display: grid;
+            gap: 4px;
+        }
+
+        .recheck-field > span,
+        .recheck-field > small {
+            color: var(--ink-muted);
+            font-size: 8px;
+        }
+
+        .recheck-field > div {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            align-items: center;
+            border: 1px solid var(--line);
+            border-radius: 7px;
+            background: #090c0d;
+        }
+
+        .recheck-field input {
+            min-width: 0;
+            border: 0;
+            background: transparent;
+        }
+
+        .recheck-field input[data-state="matched"] {
+            color: #9ee6bb;
+        }
+
+        .recheck-field input[data-state="mismatch"] {
+            color: var(--coral);
+        }
+
+        .recheck-field b {
+            padding-right: 10px;
+            color: var(--ink-muted);
+            font-size: 9px;
+        }
+
+        @media (max-width: 820px) {
+            .header-tools {
+                grid-template-columns: minmax(0, 1fr) auto;
+            }
+
+            .header-sync {
+                padding: 0 8px;
+            }
+
+            .header-sync strong {
+                max-width: 86px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            .readiness-panel {
+                grid-template-columns: 1fr;
+                gap: 14px;
+                padding: 16px;
+            }
+
+            .session-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .session-grid #saveSessionBtn {
+                grid-column: 1 / -1;
+                min-width: 0;
+            }
+
+            .forecast-metrics {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .forecast-science-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .forecast-wheel-list {
+                grid-template-columns: 1fr;
+            }
+
+            .outlook-analysis-grid,
+            .driver-legacy-mount {
+                grid-template-columns: 1fr;
+            }
+
+            .timeline-stats,
+            .cost-stats {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .measurement-diagnostics li {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header-tools {
+                grid-template-columns: 1fr;
+            }
+
+            .header-sync {
+                justify-self: start;
+            }
+
+            .readiness-stats {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .readiness-stats div:nth-child(2) {
+                border-right: 0;
+            }
+
+            .readiness-stats div:nth-child(-n+2) {
+                border-bottom: 1px solid var(--line);
+            }
+
+            .insight-settings {
+                grid-template-columns: 1fr;
+            }
+
+            .slide-alert-toggle {
+                grid-column: 1;
+            }
+
+            .forecast-wheel-stats {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .cause-analysis {
+                grid-template-columns: 1fr;
+            }
+
+            .subsection-heading,
+            .timeline-toolbar,
+            .value-toolbar,
+            .drivers-intro {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .timeline-toolbar .select-wrap,
+            .value-toolbar > label,
+            .value-toolbar > label > div {
+                width: 100%;
+            }
+
+            .intelligence-tabs button {
+                min-height: 36px;
+                font-size: 9px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -2000,33 +4546,91 @@
                     <div class="subtitle">Precision wheel intelligence</div>
                 </div>
             </div>
-            <label class="select-wrap" aria-label="Active wheel setup">
-                <select id="setSelector"></select>
-            </label>
+            <div class="header-tools">
+                <label class="select-wrap" aria-label="Active wheel setup">
+                    <select id="setSelector"></select>
+                </label>
+                <div class="header-sync" id="headerSyncBadge" data-state="offline" role="status" aria-live="polite">
+                    <span class="header-sync-dot"></span>
+                    <strong id="headerSyncText">Checking cloud</strong>
+                </div>
+            </div>
         </header>
 
         <main class="view-shell">
             <section id="view-calibrate" class="app-view active" aria-labelledby="tab-calibrate">
+                <section class="cockpit-hero" aria-label="Current wheel setup overview">
+                    <div class="cockpit-copy">
+                        <div class="section-kicker">Ready to skate</div>
+                        <div class="cockpit-rotation"><span id="cockpitRotation">0</span><small>rotation</small></div>
+                        <div class="cockpit-profile" id="cockpitProfile">Endless 90 ES</div>
+                        <div class="cockpit-condition"><span class="condition-dot"></span><span id="cockpitCondition">Rocker geometry protected</span></div>
+                    </div>
+                    <div class="cockpit-visual" aria-hidden="true">
+                        <div class="cockpit-wheel-art"></div>
+                        <div class="orbit orbit-one"></div>
+                        <div class="orbit orbit-two"></div>
+                    </div>
+                    <div class="cockpit-metrics">
+                        <div class="cockpit-metric">
+                            <span>Wheel spread</span>
+                            <strong id="cockpitSpread">0.0 mm</strong>
+                        </div>
+                        <div class="cockpit-metric">
+                            <span>Frame limit</span>
+                            <strong id="cockpitLimit">2.0 mm</strong>
+                        </div>
+                        <div class="cockpit-metric">
+                            <span>Time tracked</span>
+                            <strong id="cockpitTime">0 min</strong>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="readiness-panel" id="readinessPanel" data-state="baseline" aria-label="Rotation readiness">
+                    <div class="readiness-status">
+                        <div class="readiness-mark" aria-hidden="true"><span></span></div>
+                        <div>
+                            <div class="section-kicker">Rotation intelligence</div>
+                            <div class="section-title" id="readinessTitle">Building your baseline</div>
+                            <div class="mini-copy" id="readinessCopy">Save sessions and measurements to begin a data-based recommendation.</div>
+                        </div>
+                    </div>
+                    <div class="readiness-stats">
+                        <div><strong id="readinessSessions">0</strong><span>Sessions</span></div>
+                        <div><strong id="readinessMinutes">0</strong><span>Minutes</span></div>
+                        <div><strong id="readinessMiles">0.0</strong><span>Miles</span></div>
+                        <div><strong id="readinessEstimatedWear">--</strong><span>Est. wear</span></div>
+                    </div>
+                </section>
+
                 <div class="card calibration-card">
                     <div class="section-header">
                         <div>
-                            <div class="section-kicker">Live measurement</div>
-                            <div class="section-title">Caliper Inputs</div>
+                            <div class="section-kicker">Wheel scan</div>
+                            <div class="section-title">Fresh measurements</div>
                             <div class="mini-copy" id="caliperSummary">Endless 90 ES / 2.0 mm limit</div>
                         </div>
                         <button id="renameToggleBtn" class="pill-btn" type="button">Rename</button>
                     </div>
 
-                    <div class="caliper-grid" id="leftInputContainer"></div>
-                    <div class="caliper-grid" id="rightInputContainer"></div>
+                    <div class="measurement-rail">
+                        <div class="rail-heading"><span>Left skate</span><small>Front</small><i></i><small>Back</small></div>
+                        <div class="caliper-grid" id="leftInputContainer"></div>
+                    </div>
+                    <div class="measurement-rail">
+                        <div class="rail-heading"><span>Right skate</span><small>Front</small><i></i><small>Back</small></div>
+                        <div class="caliper-grid" id="rightInputContainer"></div>
+                    </div>
 
                     <div class="session-panel embedded-tool">
                         <div class="section-header">
                             <div>
-                                <div class="section-kicker">Activity</div>
-                                <div class="section-title">Log this skate</div>
+                                <div class="section-kicker">Ride journal</div>
+                                <div class="section-title">Capture this session</div>
                                 <div class="mini-copy" id="sessionSummary">Saved against the current rotation.</div>
                             </div>
+                            <div class="session-load-pill" id="sessionLoadPreview" data-level="none"><span>Load</span><strong>--</strong></div>
                         </div>
                         <div class="session-grid">
                             <input id="sessionMinutes" type="number" inputmode="numeric" min="0" max="480" step="5" placeholder="Minutes skated" aria-label="Minutes skated">
@@ -2036,6 +4640,16 @@
                                     <option value="normal">Normal</option>
                                     <option value="slide-heavy">Slide-heavy</option>
                                     <option value="cruising">Cruising</option>
+                                </select>
+                            </label>
+                            <label class="select-wrap" aria-label="Skating surface">
+                                <select id="sessionSurface">
+                                    <option value="unrecorded">Surface not recorded</option>
+                                    <option value="smooth">Smooth pavement</option>
+                                    <option value="rough">Rough pavement</option>
+                                    <option value="indoor">Indoor floor</option>
+                                    <option value="skatepark">Skatepark</option>
+                                    <option value="mixed">Mixed surfaces</option>
                                 </select>
                             </label>
                             <button class="ghost-btn" id="saveSessionBtn" type="button">Save Session</button>
@@ -2055,6 +4669,7 @@
                             </div>
                         </div>
                         <div id="previewMoveList" class="preview-list"></div>
+                        <div id="measurementDiagnostics" class="measurement-diagnostics" hidden></div>
                         <div class="preview-actions">
                             <button class="action-btn" id="confirmRotationBtn" type="button">Confirm Rotation</button>
                             <button class="ghost-btn" id="cancelRotationBtn" type="button">Cancel</button>
@@ -2067,18 +4682,19 @@
                 <div class="card mapping-card">
                     <div class="section-header">
                         <div>
-                            <div class="section-kicker">Current mounting plan</div>
-                            <div class="section-title">Target Mapping</div>
+                            <div class="section-kicker">Installation view</div>
+                            <div class="section-title">Mounting plan</div>
+                            <div class="mini-copy">Front to back, exactly as the wheels sit under each boot.</div>
                         </div>
                         <div class="section-value rotation-badge" id="rotationCountLabel">0 rotations</div>
                     </div>
                     <div class="skate-viewport">
                         <div class="frame-column">
-                            <h3>Left Frame</h3>
+                            <div class="frame-label"><span>Left frame</span><small>Front</small><i></i><small>Back</small></div>
                             <div id="targetLeftContainer" class="target-stack"></div>
                         </div>
                         <div class="frame-column">
-                            <h3>Right Frame</h3>
+                            <div class="frame-label"><span>Right frame</span><small>Front</small><i></i><small>Back</small></div>
                             <div id="targetRightContainer" class="target-stack"></div>
                         </div>
                     </div>
@@ -2086,9 +4702,15 @@
             </section>
 
             <section id="view-profiles" class="app-view" aria-labelledby="tab-profiles" aria-hidden="true">
+                <div class="profile-page-heading">
+                    <div class="section-kicker">Equipment lab</div>
+                    <h2>Your skate system</h2>
+                    <p>Everything that defines this setup, from frame geometry to real-world wear.</p>
+                </div>
+
                 <div class="card profile-create-card">
                     <div class="section-kicker">New equipment</div>
-                    <div class="section-title">Create Profile</div>
+                    <div class="section-title">Build another setup</div>
                     <div class="creator-grid" style="margin-top: 10px;">
                         <input type="text" id="newSetName" placeholder="My street setup" autocomplete="off">
                         <div class="creator-row">
@@ -2130,10 +4752,11 @@
                 </div>
 
                 <div class="card active-profile-card">
+                    <div class="profile-art" aria-hidden="true"></div>
                     <div class="section-header">
                         <div>
-                            <div class="section-kicker">Equipment</div>
-                            <div class="section-title">Active Profile</div>
+                            <div class="section-kicker">Active equipment</div>
+                            <div class="section-title">Setup identity</div>
                         </div>
                         <button class="ghost-btn" id="deleteProfileBtn" type="button">Delete</button>
                     </div>
@@ -2191,27 +4814,118 @@
                                 <strong id="profileCountStat">1</strong>
                             </div>
                         </div>
-                        <div class="profile-actions">
-                            <button class="ghost-btn" id="resetSizesBtn" type="button">Reset Active Wheels To Base Size</button>
-                            <div class="backup-actions">
-                                <button class="ghost-btn" id="exportDataBtn" type="button">Backup Now</button>
-                                <button class="ghost-btn" id="importDataBtn" type="button">Restore Backup</button>
-                            </div>
-                            <button class="ghost-btn" id="restoreArchiveBtn" type="button">Recover Last Local Save</button>
-                            <div class="mini-copy" id="backupReminder">No external backup yet.</div>
-                            <input type="file" id="importDataFile" accept="application/json,.json" style="display:none">
-                            <button class="danger-btn" id="factoryResetBtn" type="button">Factory Reset</button>
+                        <div class="insight-settings">
+                            <label>
+                                <span>Retirement loss</span>
+                                <div><input id="retirementLossInput" type="number" inputmode="decimal" min="2" max="20" step="0.5" value="10"><small>mm below factory size</small></div>
+                            </label>
+                            <label>
+                                <span>Wear-check alert</span>
+                                <div><input id="rotationAlertInput" type="number" inputmode="decimal" min="0.1" max="3" step="0.1" value="0.4"><small>estimated mm loss</small></div>
+                            </label>
+                            <label class="slide-alert-toggle">
+                                <input id="alwaysMeasureAfterSlide" type="checkbox" checked>
+                                <span><strong>Measure after slide-heavy sessions</strong><small>Recommended for your skating style</small></span>
+                            </label>
                         </div>
+                        <details class="profile-maintenance">
+                            <summary><span>Maintenance &amp; recovery</span><i aria-hidden="true"></i></summary>
+                            <div class="profile-actions">
+                                <button class="ghost-btn" id="resetSizesBtn" type="button">Reset Active Wheels To Base Size</button>
+                                <div class="backup-actions">
+                                    <button class="ghost-btn" id="exportDataBtn" type="button">Backup Now</button>
+                                    <button class="ghost-btn" id="importDataBtn" type="button">Restore Backup</button>
+                                </div>
+                                <button class="ghost-btn" id="restoreArchiveBtn" type="button">Recover Last Local Save</button>
+                                <div class="mini-copy" id="backupReminder">No external backup yet.</div>
+                                <input type="file" id="importDataFile" accept="application/json,.json" style="display:none">
+                                <button class="danger-btn" id="factoryResetBtn" type="button">Factory Reset</button>
+                            </div>
+                        </details>
                     </div>
                 </div>
 
-                <div class="card loop-card">
+                <div class="card loop-card profile-lab-card">
                     <div class="section-kicker">Locked physics</div>
                     <div class="section-title" style="margin-bottom: 10px;">Rocket Loop</div>
                     <div id="loopDisplay" class="loop-grid" aria-label="Forced rocket loop"></div>
                 </div>
 
-                <div class="card">
+                <div class="card forecast-card profile-lab-card intelligence-studio">
+                    <div class="section-header">
+                        <div>
+                            <div class="section-kicker">Wheel intelligence</div>
+                            <div class="section-title">Performance lab</div>
+                            <div class="mini-copy" id="forecastSummary">More measured wear samples are needed for a forecast.</div>
+                        </div>
+                        <div class="confidence-pill" id="forecastConfidence">No baseline</div>
+                    </div>
+
+                    <div class="intelligence-tabs" role="tablist" aria-label="Wheel intelligence views">
+                        <button type="button" role="tab" aria-selected="true" data-intelligence-tab="outlook">Outlook</button>
+                        <button type="button" role="tab" aria-selected="false" data-intelligence-tab="drivers">Drivers</button>
+                        <button type="button" role="tab" aria-selected="false" data-intelligence-tab="history">History</button>
+                        <button type="button" role="tab" aria-selected="false" data-intelligence-tab="value">Value</button>
+                    </div>
+
+                    <div class="intelligence-panel active" data-intelligence-panel="outlook">
+                        <div class="forecast-metrics">
+                            <div><span>Typical wear rate</span><strong id="forecastWearRate">--</strong></div>
+                            <div><span>Planning range</span><strong id="forecastConservativeRate">--</strong></div>
+                            <div><span>Estimated skate time</span><strong id="forecastHours">--</strong></div>
+                            <div><span>Estimated sessions</span><strong id="forecastSessions">--</strong></div>
+                        </div>
+                        <div class="forecast-formula" id="forecastFormula">Forecasts use measured diameter loss divided by recorded skating time.</div>
+                        <div class="condition-rate-list" id="forecastConditionRates"></div>
+                        <div class="outlook-analysis-grid">
+                            <section class="intelligence-subsection geometry-section">
+                                <div class="subsection-heading"><div><span>Rocker simulator</span><strong id="geometrySummary">Awaiting a timed baseline</strong></div><b id="geometryStatus">--</b></div>
+                                <canvas id="rockerGeometryCanvas" width="760" height="230" aria-label="Current and projected wheel geometry"></canvas>
+                                <div class="chart-key"><span><i class="current"></i>Current</span><span><i class="projected"></i>After a typical session</span></div>
+                            </section>
+                            <section class="intelligence-subsection effectiveness-section">
+                                <div class="subsection-heading"><div><span>Rotation effectiveness</span><strong id="effectivenessSummary">Needs two measured cycles</strong></div><b id="effectivenessScore">--</b></div>
+                                <div class="effectiveness-track"><i id="effectivenessFill"></i></div>
+                                <p id="effectivenessDetail">The loop stays locked. This score evaluates diameter balance after each cycle.</p>
+                            </section>
+                        </div>
+                        <details class="forecast-details">
+                            <summary><span>Every wheel statistic</span><i aria-hidden="true"></i></summary>
+                            <div class="forecast-ledger">
+                                <div class="forecast-ledger-title">Model ledger</div>
+                                <div id="forecastScienceStats" class="forecast-science-grid"></div>
+                            </div>
+                            <div id="forecastWheelList" class="forecast-wheel-list"></div>
+                        </details>
+                    </div>
+
+                    <div class="intelligence-panel" data-intelligence-panel="drivers" hidden>
+                        <div class="drivers-intro"><div><span>Wear-cause analysis</span><strong id="causeSummary">More observations are needed.</strong></div><small>Multipliers compare each factor with this profile's average wheel wear.</small></div>
+                        <div id="causeAnalysis" class="cause-analysis"></div>
+                        <div id="driverLegacyMount" class="driver-legacy-mount"></div>
+                    </div>
+
+                    <div class="intelligence-panel" data-intelligence-panel="history" hidden>
+                        <div class="timeline-toolbar">
+                            <div><span>Measurement timeline</span><strong id="timelineSummary">Choose a wheel to inspect its diameter history.</strong></div>
+                            <label class="select-wrap" aria-label="Timeline wheel"><select id="timelineWheelSelect"></select></label>
+                        </div>
+                        <canvas id="measurementTimelineCanvas" width="1100" height="310" aria-label="Wheel diameter over measured rotations"></canvas>
+                        <div id="timelineStats" class="timeline-stats"></div>
+                    </div>
+
+                    <div class="intelligence-panel" data-intelligence-panel="value" hidden>
+                        <div class="value-toolbar">
+                            <div><span>Cost intelligence</span><strong>One optional number unlocks the ownership math.</strong></div>
+                            <label><span>Wheel-set price</span><div><b>$</b><input id="wheelSetPriceInput" type="number" inputmode="decimal" min="0" max="2000" step="1" placeholder="0"></div></label>
+                        </div>
+                        <div id="costStats" class="cost-stats"></div>
+                        <div id="costComparison" class="profile-comparison"></div>
+                        <div class="forecast-formula" id="costFormula">Price stays private inside this profile and follows the same automatic cloud save.</div>
+                    </div>
+                </div>
+
+                <div class="card heat-card profile-lab-card">
                     <div class="section-header">
                         <div>
                             <div class="section-kicker">Frame analysis</div>
@@ -2222,7 +4936,7 @@
                     <div id="heatMap" class="heat-map"></div>
                 </div>
 
-                <div class="card">
+                <div class="card wear-card profile-lab-card">
                     <div class="section-header">
                         <div>
                             <div class="section-kicker">Wear intelligence</div>
@@ -2281,7 +4995,7 @@
                 <div class="system-lifeline" hidden aria-hidden="true">
                     <div class="section-header">
                         <div>
-                            <div class="section-title">🛠️ SYSTEM DATA LIFE-LINE</div>
+                            <div class="section-title">ðŸ› ï¸ SYSTEM DATA LIFE-LINE</div>
                             <div class="mini-copy">Copy this backbone before replacing the app file or moving to another browser.</div>
                         </div>
                     </div>
@@ -2299,6 +5013,18 @@
             </section>
 
             <section id="view-logs" class="app-view" aria-labelledby="tab-logs" aria-hidden="true">
+                <section class="logs-overview" aria-label="Skating history overview">
+                    <div>
+                        <div class="section-kicker">Your skating record</div>
+                        <h2>Wheel life, remembered.</h2>
+                        <p>Sessions and rotations stay connected, so every millimeter has a story.</p>
+                    </div>
+                    <div class="history-stats">
+                        <div><strong id="historySessions">0</strong><span>Sessions</span></div>
+                        <div><strong id="historyDistance">0.0</strong><span>Miles</span></div>
+                        <div><strong id="historyRotations">0</strong><span>Rotations</span></div>
+                    </div>
+                </section>
                 <div class="card logs-card">
                     <div class="section-header">
                         <div>
@@ -2379,6 +5105,12 @@
         const LEFT_SLOTS = FOUR_WHEEL_LEFT_SLOTS;
         const RIGHT_SLOTS = FOUR_WHEEL_RIGHT_SLOTS;
         const DUROMETER_OPTIONS = Object.freeze(["84A", "85A", "86A", "87A", "89A", "98A"]);
+        const SESSION_SURFACES = Object.freeze(["unrecorded", "smooth", "rough", "indoor", "skatepark", "mixed"]);
+        const DEFAULT_RETIREMENT_LOSS_MM = 10;
+        const DEFAULT_ROTATION_ALERT_MM = 0.4;
+        const DEFAULT_WHEEL_SET_PRICE = 0;
+        const SESSION_TYPE_LOAD = Object.freeze({ normal: 1, "slide-heavy": 1.8, cruising: 0.75 });
+        const SURFACE_LOAD = Object.freeze({ unrecorded: 1, smooth: 0.95, rough: 1.25, indoor: 0.8, skatepark: 1.15, mixed: 1.1 });
         const DEFAULT_SETUP_ID = "default_setup";
 
         const FOUR_WHEEL_SLOT_WHEEL_KEYS = Object.freeze({
@@ -2558,6 +5290,7 @@
         let lastCloudRemoteSummary = "";
         let magicLinkCooldownUntil = 0;
         let supabaseLibraryPromise = null;
+        let activeIntelligenceTab = "outlook";
 
         const els = {};
 
@@ -2565,6 +5298,7 @@
 
         function initApp() {
             cacheElements();
+            buildVisualShell();
             cloudConfig = loadCloudConfig();
             appState = loadState();
             bindEvents();
@@ -2578,16 +5312,47 @@
             });
         }
 
+        function buildVisualShell() {
+            const view = document.getElementById("view-profiles");
+            if (!view || view.querySelector(".profile-equipment-layout")) return;
+
+            const activeCard = view.querySelector(".active-profile-card");
+            const createCard = view.querySelector(".profile-create-card");
+            const loopCard = view.querySelector(".loop-card");
+            const heatCard = view.querySelector(".heat-card");
+            const wearCard = view.querySelector(".wear-card");
+            const driverMount = document.getElementById("driverLegacyMount");
+            if (!activeCard || !createCard || !loopCard || !heatCard || !wearCard || !driverMount) return;
+
+            const equipmentLayout = document.createElement("div");
+            equipmentLayout.className = "profile-equipment-layout";
+            const sideStack = document.createElement("div");
+            sideStack.className = "profile-side-stack";
+            view.insertBefore(equipmentLayout, createCard);
+            equipmentLayout.appendChild(activeCard);
+            sideStack.appendChild(createCard);
+            sideStack.appendChild(loopCard);
+            equipmentLayout.appendChild(sideStack);
+
+            heatCard.classList.remove("card", "profile-lab-card");
+            wearCard.classList.remove("card", "profile-lab-card");
+            heatCard.classList.add("intelligence-subsection");
+            wearCard.classList.add("intelligence-subsection");
+            driverMount.appendChild(heatCard);
+            driverMount.appendChild(wearCard);
+        }
+
         function cacheElements() {
             [
                 "setSelector", "leftInputContainer", "rightInputContainer", "renameToggleBtn",
                 "mainSubmitBtn", "statusBanner", "rotationCountLabel", "caliperSummary",
-                "sessionMinutes", "sessionMiles", "sessionType", "sessionSummary", "saveSessionBtn",
+                "sessionMinutes", "sessionMiles", "sessionType", "sessionSurface", "sessionSummary", "sessionLoadPreview", "saveSessionBtn",
                 "undoRotationBtn", "rotationPreview",
-                "previewSummary", "previewMoveList", "confirmRotationBtn", "cancelRotationBtn",
+                "previewSummary", "previewMoveList", "measurementDiagnostics", "confirmRotationBtn", "cancelRotationBtn",
                 "newSetName", "newSetSize", "newSetFrame", "createSetBtn", "activeSetName",
                 "newWheelModel", "newWheelDurometer", "activeWheelModel", "activeWheelDurometer",
                 "activeFrameSelect", "activeBaseSize", "frameLimitStat", "spreadStat",
+                "retirementLossInput", "rotationAlertInput", "alwaysMeasureAfterSlide",
                 "savedStat", "profileCountStat", "resetSizesBtn", "factoryResetBtn",
                 "deleteProfileBtn", "clearLogsBtn", "logList", "logSummary", "sessionLogList",
                 "sessionLogSummary", "clearSessionLogsBtn", "toast",
@@ -2597,7 +5362,15 @@
                 "saveCloudSettingsBtn", "sendMagicLinkBtn", "completeLoginLinkBtn", "signInPasswordBtn", "createPasswordAccountBtn",
                 "syncCloudNowBtn", "pullCloudBtn", "cloudSignOutBtn",
                 "wearSummary", "wearRankingList", "heatSummary", "heatMap",
-                "targetLeftContainer", "targetRightContainer", "loopDisplay"
+                "targetLeftContainer", "targetRightContainer", "loopDisplay",
+                "cockpitRotation", "cockpitProfile", "cockpitCondition", "cockpitSpread", "cockpitLimit", "cockpitTime",
+                "historySessions", "historyDistance", "historyRotations",
+                "readinessPanel", "readinessTitle", "readinessCopy", "readinessSessions", "readinessMinutes", "readinessMiles", "readinessEstimatedWear",
+                "forecastSummary", "forecastConfidence", "forecastWearRate", "forecastConservativeRate", "forecastHours", "forecastSessions", "forecastFormula", "forecastConditionRates", "forecastScienceStats", "forecastWheelList",
+                "geometrySummary", "geometryStatus", "rockerGeometryCanvas", "effectivenessSummary", "effectivenessScore", "effectivenessFill", "effectivenessDetail",
+                "causeSummary", "causeAnalysis", "timelineWheelSelect", "timelineSummary", "measurementTimelineCanvas", "timelineStats",
+                "wheelSetPriceInput", "costStats", "costComparison", "costFormula",
+                "headerSyncBadge", "headerSyncText"
             ].forEach((id) => {
                 els[id] = document.getElementById(id);
             });
@@ -2618,6 +5391,7 @@
             els.sessionMinutes.addEventListener("input", updateSessionMeta);
             els.sessionMiles.addEventListener("input", updateSessionMeta);
             els.sessionType.addEventListener("change", updateSessionMeta);
+            els.sessionSurface.addEventListener("change", updateSessionMeta);
             els.saveSessionBtn.addEventListener("click", saveSessionEntry);
             els.createSetBtn.addEventListener("click", createNewWheelSet);
             els.newSetSize.addEventListener("change", () => {
@@ -2629,6 +5403,13 @@
             els.activeWheelDurometer.addEventListener("change", updateActiveWheelMeta);
             els.activeFrameSelect.addEventListener("change", updateActiveFrame);
             els.activeBaseSize.addEventListener("change", updateActiveBaseSize);
+            els.retirementLossInput.addEventListener("change", updateInsightSettings);
+            els.rotationAlertInput.addEventListener("change", updateInsightSettings);
+            els.alwaysMeasureAfterSlide.addEventListener("change", updateInsightSettings);
+            els.wheelSetPriceInput.addEventListener("input", updateWheelSetPrice);
+            els.timelineWheelSelect.addEventListener("change", () => renderMeasurementTimeline(calculatePredictiveModel(getActiveSet())));
+            document.querySelector(".intelligence-tabs").addEventListener("click", handleIntelligenceTab);
+            els.rotationPreview.addEventListener("input", handleDiagnosticRecheck);
             els.resetSizesBtn.addEventListener("click", resetActiveWheelsToBaseSize);
             els.deleteProfileBtn.addEventListener("click", deleteActiveProfile);
             els.factoryResetBtn.addEventListener("click", factoryResetApp);
@@ -2735,6 +5516,10 @@
                 frameKey,
                 wheelModel: cleanName(options.wheelModel, "Endless"),
                 wheelDurometer: normalizeDurometer(options.wheelDurometer || "87A"),
+                retirementLossMm: normalizeThreshold(options.retirementLossMm, DEFAULT_RETIREMENT_LOSS_MM, 2, 20, 1),
+                rotationAlertMm: normalizeThreshold(options.rotationAlertMm, DEFAULT_ROTATION_ALERT_MM, 0.1, 3, 1),
+                alwaysMeasureAfterSlide: options.alwaysMeasureAfterSlide !== false,
+                wheelSetPrice: normalizeMoney(options.wheelSetPrice, DEFAULT_WHEEL_SET_PRICE),
                 baseSize,
                 wheelNames,
                 sizes,
@@ -2843,7 +5628,14 @@
                     maxLoss: 0,
                     totalMinutes: 0,
                     totalMiles: 0,
-                    slideSamples: 0
+                    timedLoss: 0,
+                    distanceLoss: 0,
+                    timedSamples: 0,
+                    slideSamples: 0,
+                    lossByType: { normal: 0, "slide-heavy": 0, cruising: 0 },
+                    minutesByType: { normal: 0, "slide-heavy": 0, cruising: 0 },
+                    lossBySurface: { unrecorded: 0, smooth: 0, rough: 0, indoor: 0, skatepark: 0, mixed: 0 },
+                    minutesBySurface: { unrecorded: 0, smooth: 0, rough: 0, indoor: 0, skatepark: 0, mixed: 0 }
                 };
             });
             return stats;
@@ -2859,6 +5651,9 @@
                 const maxLoss = Number(incoming.maxLoss);
                 const totalMinutes = Number(incoming.totalMinutes);
                 const totalMiles = Number(incoming.totalMiles);
+                const timedLoss = Number(incoming.timedLoss);
+                const distanceLoss = Number(incoming.distanceLoss);
+                const timedSamples = Number(incoming.timedSamples);
                 const slideSamples = Number(incoming.slideSamples);
 
                 stats[slot] = {
@@ -2868,10 +5663,31 @@
                     maxLoss: Number.isFinite(maxLoss) ? Math.max(0, maxLoss) : 0,
                     totalMinutes: Number.isFinite(totalMinutes) ? Math.max(0, totalMinutes) : 0,
                     totalMiles: Number.isFinite(totalMiles) ? Math.max(0, totalMiles) : 0,
-                    slideSamples: Number.isFinite(slideSamples) ? Math.max(0, Math.round(slideSamples)) : 0
+                    timedLoss: Number.isFinite(timedLoss)
+                        ? Math.max(0, timedLoss)
+                        : Number.isFinite(totalMinutes) && totalMinutes > 0 && Number.isFinite(totalLoss) ? Math.max(0, totalLoss) : 0,
+                    distanceLoss: Number.isFinite(distanceLoss)
+                        ? Math.max(0, distanceLoss)
+                        : Number.isFinite(totalMiles) && totalMiles > 0 && Number.isFinite(totalLoss) ? Math.max(0, totalLoss) : 0,
+                    timedSamples: Number.isFinite(timedSamples)
+                        ? Math.max(0, Math.round(timedSamples))
+                        : Number.isFinite(totalMinutes) && totalMinutes > 0 && Number.isFinite(samples) ? Math.max(0, Math.round(samples)) : 0,
+                    slideSamples: Number.isFinite(slideSamples) ? Math.max(0, Math.round(slideSamples)) : 0,
+                    lossByType: normalizeBreakdown(incoming.lossByType, ["normal", "slide-heavy", "cruising"]),
+                    minutesByType: normalizeBreakdown(incoming.minutesByType, ["normal", "slide-heavy", "cruising"]),
+                    lossBySurface: normalizeBreakdown(incoming.lossBySurface, SESSION_SURFACES),
+                    minutesBySurface: normalizeBreakdown(incoming.minutesBySurface, SESSION_SURFACES)
                 };
             });
             return stats;
+        }
+
+        function normalizeBreakdown(value, keys) {
+            return keys.reduce((result, key) => {
+                const number = Number(value && value[key]);
+                result[key] = Number.isFinite(number) ? Math.max(0, number) : 0;
+                return result;
+            }, {});
         }
 
         function normalizeSessionMeta(value) {
@@ -2882,7 +5698,11 @@
             const type = ["normal", "slide-heavy", "cruising"].includes(value && value.type)
                 ? value.type
                 : "normal";
-            return { minutes, miles, type };
+            const surface = SESSION_SURFACES.includes(value && value.surface)
+                ? value.surface
+                : "unrecorded";
+            const loadScore = calculateSessionLoad({ minutes, miles, type, surface });
+            return { minutes, miles, type, surface, loadScore };
         }
 
         function normalizeSessionEntries(value) {
@@ -2902,6 +5722,8 @@
                 minutes: session.minutes,
                 miles: session.miles,
                 type: session.type,
+                surface: session.surface,
+                loadScore: Number.isFinite(Number(value.loadScore)) ? Number(value.loadScore) : session.loadScore,
                 frameKey: getFrameKeyForValue(value.frameKey),
                 wheelModel: cleanName(value.wheelModel, ""),
                 wheelDurometer: normalizeDurometer(value.wheelDurometer || "87A"),
@@ -2964,6 +5786,33 @@
             if (type === "slide-heavy") return "Slide-heavy";
             if (type === "cruising") return "Cruising";
             return "Normal";
+        }
+
+        function getSurfaceLabel(surface) {
+            if (surface === "smooth") return "Smooth pavement";
+            if (surface === "rough") return "Rough pavement";
+            if (surface === "indoor") return "Indoor floor";
+            if (surface === "skatepark") return "Skatepark";
+            if (surface === "mixed") return "Mixed surfaces";
+            return "Surface not recorded";
+        }
+
+        function calculateSessionLoad(sessionLike) {
+            const minutes = Math.max(0, Number(sessionLike && sessionLike.minutes || 0));
+            const miles = Math.max(0, Number(sessionLike && sessionLike.miles || 0));
+            const type = SESSION_TYPE_LOAD[sessionLike && sessionLike.type] ? sessionLike.type : "normal";
+            const surface = SURFACE_LOAD[sessionLike && sessionLike.surface] ? sessionLike.surface : "unrecorded";
+            const workload = (minutes / 10) + miles;
+            return Number((workload * SESSION_TYPE_LOAD[type] * SURFACE_LOAD[surface]).toFixed(1));
+        }
+
+        function getLoadBand(score) {
+            const value = Number(score || 0);
+            if (value <= 0) return { level: "none", label: "--" };
+            if (value < 6) return { level: "light", label: "Light" };
+            if (value < 12) return { level: "moderate", label: "Moderate" };
+            if (value < 20) return { level: "high", label: "High" };
+            return { level: "extreme", label: "Extreme" };
         }
 
         function getTargetFrameSide(slot) {
@@ -3834,18 +6683,23 @@
 
             if (!hasCloudConfig()) {
                 if (cloudCard) cloudCard.dataset.cloudState = "offline";
+                updateHeaderSync("offline", "Cloud not connected");
                 renderCloudStatus("Cloud protection is not connected.");
             } else if (!window.supabase || !window.supabase.createClient) {
                 if (cloudCard) cloudCard.dataset.cloudState = "offline";
+                updateHeaderSync("busy", "Connecting");
                 renderCloudStatus("Cloud protection is waiting to connect.");
             } else if (cloudBusy) {
                 if (cloudCard) cloudCard.dataset.cloudState = "busy";
+                updateHeaderSync("busy", "Saving");
                 renderCloudStatus("Saving your latest changes...");
             } else if (cloudSession && cloudSession.user) {
                 if (cloudCard) cloudCard.dataset.cloudState = "online";
+                updateHeaderSync("online", lastCloudPushAt ? `Saved ${relativeTime(new Date(lastCloudPushAt).toISOString())}` : "Cloud protected");
                 renderCloudStatus(`Saved automatically as ${cloudSession.user.email || "your account"}.`);
             } else {
                 if (cloudCard) cloudCard.dataset.cloudState = "offline";
+                updateHeaderSync("offline", "Sign in to cloud");
                 renderCloudStatus("Sign in once to protect and sync your data.");
             }
             renderCloudDebugStatus();
@@ -3853,6 +6707,12 @@
 
         function renderCloudStatus(message) {
             if (els.cloudSyncStatus) els.cloudSyncStatus.textContent = message;
+        }
+
+        function updateHeaderSync(state, label) {
+            if (!els.headerSyncBadge || !els.headerSyncText) return;
+            els.headerSyncBadge.dataset.state = state;
+            els.headerSyncText.textContent = label;
         }
 
         function renderCloudDebugStatus() {
@@ -3947,6 +6807,10 @@
                 frameKey,
                 wheelModel: cleanName(set.wheelModel, "Endless"),
                 wheelDurometer: normalizeDurometer(set.wheelDurometer || "87A"),
+                retirementLossMm: normalizeThreshold(set.retirementLossMm, DEFAULT_RETIREMENT_LOSS_MM, 2, 20, 1),
+                rotationAlertMm: normalizeThreshold(set.rotationAlertMm, DEFAULT_ROTATION_ALERT_MM, 0.1, 3, 1),
+                alwaysMeasureAfterSlide: set.alwaysMeasureAfterSlide !== false,
+                wheelSetPrice: normalizeMoney(set.wheelSetPrice, DEFAULT_WHEEL_SET_PRICE),
                 baseSize,
                 wheelNames,
                 sizes,
@@ -4279,6 +7143,741 @@
             renderWearRanking();
             renderSessionLogs();
             renderLogs();
+            renderExperienceSummary();
+            renderPredictiveAnalytics();
+        }
+
+        function renderExperienceSummary() {
+            const set = getActiveSet();
+            const frame = getFrame(set);
+            const spread = calculateSpread(set);
+            const sessions = Array.isArray(set.sessions) ? set.sessions : [];
+            const totalMinutes = sessions.reduce((sum, session) => sum + Number(session.minutes || 0), 0);
+            const totalMiles = sessions.reduce((sum, session) => sum + Number(session.miles || 0), 0);
+            const safe = spread.gap <= frame.safetyLimit;
+
+            els.cockpitRotation.textContent = String(set.rotationCount || 0);
+            els.cockpitRotation.parentElement.querySelector("small").textContent = Number(set.rotationCount || 0) === 1 ? "rotation" : "rotations";
+            els.cockpitProfile.textContent = `${frame.name} / ${set.wheelModel} ${normalizeDurometer(set.wheelDurometer)}`;
+            els.cockpitCondition.textContent = safe ? "Rocker geometry protected" : "Wheel spread needs attention";
+            els.cockpitSpread.textContent = formatMm(spread.gap);
+            els.cockpitLimit.textContent = formatMm(frame.safetyLimit);
+            els.cockpitTime.textContent = `${totalMinutes} min`;
+
+            els.historySessions.textContent = String(sessions.length);
+            els.historyDistance.textContent = formatMiles(totalMiles);
+            els.historyRotations.textContent = String(set.rotationCount || 0);
+
+            const cockpit = document.querySelector(".cockpit-hero");
+            if (cockpit) cockpit.dataset.condition = safe ? "safe" : "warning";
+        }
+
+        function renderPredictiveAnalytics() {
+            const model = calculatePredictiveModel(getActiveSet());
+            renderRotationReadiness(model);
+            renderWheelLifeForecast(model);
+            renderRockerGeometry(model);
+            renderRotationEffectiveness(model);
+            renderCauseAnalysis(model);
+            renderMeasurementTimeline(model);
+            renderCostIntelligence(model);
+            renderIntelligenceTabs();
+        }
+
+        function calculatePredictiveModel(set) {
+            const ranking = getWearRanking(set);
+            const sessions = normalizeSessionEntries(set.sessions);
+            const currentSessions = getSessionsForRotation(set, set.rotationCount);
+            const snapshots = normalizeRotationSnapshots(set.rotationSnapshots);
+            const timedObservations = collectTimedWearObservations(set, snapshots);
+            const sampleCount = ranking.reduce((sum, item) => sum + item.samples, 0);
+            const timedSampleCount = ranking.reduce((sum, item) => sum + item.timedSamples, 0);
+            const totalLoss = ranking.reduce((sum, item) => sum + item.totalLoss, 0);
+            const timedLoss = ranking.reduce((sum, item) => sum + item.timedLoss, 0);
+            const distanceLoss = ranking.reduce((sum, item) => sum + item.distanceLoss, 0);
+            const totalMinutes = ranking.reduce((sum, item) => sum + item.totalMinutes, 0);
+            const totalMiles = ranking.reduce((sum, item) => sum + item.totalMiles, 0);
+            const typicalMmPerHour = totalMinutes > 0 ? timedLoss / (totalMinutes / 60) : 0;
+            const typicalMmPerMile = totalMiles > 0 ? distanceLoss / totalMiles : 0;
+            const conservativeMmPerHour = Math.max(...ranking.map((item) => item.mmPerHour || 0), 0);
+            const timedSessions = sessions.filter((session) => session.minutes > 0);
+            const averageSessionMinutes = timedSessions.length
+                ? timedSessions.reduce((sum, session) => sum + session.minutes, 0) / timedSessions.length
+                : 0;
+            const averageSessionMiles = sessions.length
+                ? sessions.reduce((sum, session) => sum + session.miles, 0) / sessions.length
+                : 0;
+            const averageSessionLoad = sessions.length
+                ? sessions.reduce((sum, session) => sum + Number(session.loadScore || 0), 0) / sessions.length
+                : 0;
+            const typeRates = Object.fromEntries(["normal", "slide-heavy", "cruising"].map((type) => [
+                type,
+                calculateBreakdownRate(ranking, "lossByType", "minutesByType", type)
+            ]));
+            const surfaceRates = Object.fromEntries(SESSION_SURFACES.map((surface) => [
+                surface,
+                calculateBreakdownRate(ranking, "lossBySurface", "minutesBySurface", surface)
+            ]));
+
+            let estimatedCurrentWear = 0;
+            currentSessions.forEach((session) => {
+                if (session.minutes > 0) {
+                    let rate = typeRates[session.type] || typicalMmPerHour;
+                    const surfaceRate = surfaceRates[session.surface] || 0;
+                    if (rate > 0 && surfaceRate > 0 && typicalMmPerHour > 0) {
+                        rate *= clamp(surfaceRate / typicalMmPerHour, 0.5, 2);
+                    }
+                    estimatedCurrentWear += rate * (session.minutes / 60);
+                } else if (session.miles > 0) {
+                    estimatedCurrentWear += typicalMmPerMile * session.miles;
+                }
+            });
+
+            const retirementLossMm = normalizeThreshold(set.retirementLossMm, DEFAULT_RETIREMENT_LOSS_MM, 2, 20, 1);
+            const measuredRotations = snapshots.filter((snapshot) => snapshot.measuredSlots).length;
+            const rateRange = calculateWearRateRange(typicalMmPerHour, timedObservations, measuredRotations);
+            const wheelStats = getSlotOrderForFrame(set.frameKey).map((slot) => {
+                const wheel = getWheelViewForSlot(set, slot);
+                const factorySize = getDefaultSizeForSlot(set.frameKey, slot, set.baseSize);
+                const retirementSize = Math.max(40, Number((factorySize - retirementLossMm).toFixed(1)));
+                const usedMm = Math.max(0, Number((factorySize - wheel.size).toFixed(2)));
+                const remainingMm = Math.max(0, Number((wheel.size - retirementSize).toFixed(2)));
+                const remainingPercent = retirementLossMm > 0 ? clamp((remainingMm / retirementLossMm) * 100, 0, 100) : 0;
+                return {
+                    slot,
+                    wheelKey: wheel.wheelKey,
+                    name: wheel.name,
+                    currentSize: wheel.size,
+                    factorySize,
+                    retirementSize,
+                    usedMm,
+                    remainingMm,
+                    remainingPercent,
+                    typicalHours: typicalMmPerHour > 0 ? remainingMm / typicalMmPerHour : 0,
+                    conservativeHours: rateRange.high > 0 ? remainingMm / rateRange.high : 0,
+                    optimisticHours: rateRange.low > 0 ? remainingMm / rateRange.low : 0,
+                    typicalSessions: typicalMmPerHour > 0 && averageSessionMinutes > 0
+                        ? (remainingMm / typicalMmPerHour) / (averageSessionMinutes / 60)
+                        : 0,
+                    lowSessions: rateRange.high > 0 && averageSessionMinutes > 0
+                        ? (remainingMm / rateRange.high) / (averageSessionMinutes / 60)
+                        : 0,
+                    highSessions: rateRange.low > 0 && averageSessionMinutes > 0
+                        ? (remainingMm / rateRange.low) / (averageSessionMinutes / 60)
+                        : 0
+                };
+            });
+            const limitingWheel = wheelStats.slice().sort((a, b) => a.remainingMm - b.remainingMm)[0];
+            const currentMinutes = currentSessions.reduce((sum, session) => sum + session.minutes, 0);
+            const currentMiles = currentSessions.reduce((sum, session) => sum + session.miles, 0);
+            const hasHeavySlide = currentSessions.some((session) => session.type === "slide-heavy");
+            const profileMinutes = sessions.reduce((sum, session) => sum + session.minutes, 0);
+            const profileMiles = sessions.reduce((sum, session) => sum + session.miles, 0);
+            const spread = calculateSpread(set);
+            const averageDiameter = wheelStats.length
+                ? wheelStats.reduce((sum, wheel) => sum + wheel.currentSize, 0) / wheelStats.length
+                : 0;
+
+            return {
+                set,
+                ranking,
+                sessions,
+                snapshots,
+                timedObservations,
+                currentSessions,
+                sampleCount,
+                timedSampleCount,
+                totalLoss,
+                timedLoss,
+                distanceLoss,
+                totalMinutes,
+                totalMiles,
+                typicalMmPerHour,
+                typicalMmPerMile,
+                conservativeMmPerHour,
+                averageSessionMinutes,
+                averageSessionMiles,
+                averageSessionLoad,
+                rateRange,
+                typeRates,
+                surfaceRates,
+                estimatedCurrentWear: Number(estimatedCurrentWear.toFixed(3)),
+                retirementLossMm,
+                wheelStats,
+                limitingWheel,
+                currentMinutes,
+                currentMiles,
+                hasHeavySlide,
+                profileMinutes,
+                profileMiles,
+                measuredRotations,
+                averageDiameter,
+                spread
+            };
+        }
+
+        function calculateBreakdownRate(ranking, lossField, minutesField, key) {
+            const loss = ranking.reduce((sum, item) => sum + Number(item[lossField] && item[lossField][key] || 0), 0);
+            const minutes = ranking.reduce((sum, item) => sum + Number(item[minutesField] && item[minutesField][key] || 0), 0);
+            return minutes > 0 ? loss / (minutes / 60) : 0;
+        }
+
+        function collectTimedWearObservations(set, snapshots) {
+            const observations = [];
+            snapshots.forEach((snapshot) => {
+                const session = normalizeSessionMeta(snapshot.session);
+                if (!snapshot.measuredSlots || session.minutes <= 0) return;
+                Object.entries(snapshot.measuredSlots).forEach(([slot, measured]) => {
+                    const loss = Math.max(0, Number(measured && measured.loss || 0));
+                    observations.push({
+                        rotationNumber: Number(snapshot.rotationNumber || 0),
+                        createdAt: snapshot.createdAt,
+                        slot,
+                        wheelKey: measured.wheelKey,
+                        loss,
+                        minutes: session.minutes,
+                        miles: session.miles,
+                        type: session.type,
+                        surface: session.surface,
+                        rate: loss / (session.minutes / 60)
+                    });
+                });
+            });
+            return observations;
+        }
+
+        function calculateWearRateRange(mean, observations, measuredRotations) {
+            if (!(mean > 0)) return { low: 0, high: 0, margin: 0 };
+            const rates = observations.map((item) => item.rate).filter(Number.isFinite);
+            const sampleMean = rates.length ? rates.reduce((sum, value) => sum + value, 0) / rates.length : mean;
+            const variance = rates.length > 1
+                ? rates.reduce((sum, value) => sum + Math.pow(value - sampleMean, 2), 0) / (rates.length - 1)
+                : 0;
+            const standardErrorRatio = sampleMean > 0 && rates.length > 1
+                ? (Math.sqrt(variance) / Math.sqrt(rates.length)) / sampleMean
+                : 0;
+            const baselineFloor = 0.45 / Math.sqrt(Math.max(1, measuredRotations));
+            const margin = clamp(Math.max(0.08, baselineFloor, 1.28 * standardErrorRatio), 0.08, 0.75);
+            return {
+                low: Math.max(mean * 0.25, mean * (1 - margin)),
+                high: mean * (1 + margin),
+                margin
+            };
+        }
+
+        function renderRotationReadiness(model) {
+            const set = model.set;
+            const alertMm = normalizeThreshold(set.rotationAlertMm, DEFAULT_ROTATION_ALERT_MM, 0.1, 3, 1);
+            let state = "ready";
+            let title = "Ready for your next session";
+            let copy = model.timedSampleCount > 0
+                ? `The wear-check alert is set to ${formatMm(alertMm)} estimated loss.`
+                : "The app needs a measured rotation with recorded time before it can estimate wear.";
+
+            if (model.hasHeavySlide && set.alwaysMeasureAfterSlide !== false) {
+                state = "due";
+                title = "Rotation due after heavy sliding";
+                copy = "Measure all wheels now, then preview the Rocket Loop before your next skate.";
+            } else if (model.estimatedCurrentWear >= alertMm && model.timedSampleCount > 0) {
+                state = "due";
+                title = "Wear-check threshold reached";
+                copy = `${formatMm(model.estimatedCurrentWear)} estimated loss has reached your ${formatMm(alertMm)} alert.`;
+            } else if (model.currentSessions.length > 0 && model.timedSampleCount === 0) {
+                state = "baseline";
+                title = "Sessions recorded; baseline pending";
+                copy = "Measure and confirm the next rotation to convert these sessions into an observed wear rate.";
+            } else if (model.currentSessions.length > 0 && model.typicalMmPerHour > 0) {
+                state = "monitor";
+                title = "Continue, then measure on schedule";
+                const remaining = Math.max(0, alertMm - model.estimatedCurrentWear);
+                const hours = remaining / model.typicalMmPerHour;
+                copy = `${formatMm(model.estimatedCurrentWear)} estimated loss so far. About ${formatForecastDuration(hours)} remains before your alert.`;
+            }
+
+            els.readinessPanel.dataset.state = state;
+            els.readinessTitle.textContent = title;
+            els.readinessCopy.textContent = copy;
+            els.readinessSessions.textContent = String(model.currentSessions.length);
+            els.readinessMinutes.textContent = String(Math.round(model.currentMinutes));
+            els.readinessMiles.textContent = formatMiles(model.currentMiles);
+            els.readinessEstimatedWear.textContent = model.timedSampleCount > 0 ? formatMm(model.estimatedCurrentWear) : "--";
+        }
+
+        function renderWheelLifeForecast(model) {
+            const confidence = getForecastConfidence(model.timedSampleCount);
+            els.forecastConfidence.textContent = confidence.label;
+            els.forecastConfidence.dataset.level = confidence.level;
+            els.forecastWearRate.textContent = model.typicalMmPerHour > 0 ? `${formatNumber(model.typicalMmPerHour)} mm/hr` : "--";
+            els.forecastConservativeRate.textContent = model.rateRange.high > 0
+                ? `${formatNumber(model.rateRange.low)}â€“${formatNumber(model.rateRange.high)}`
+                : "--";
+
+            if (!model.limitingWheel || model.timedSampleCount === 0 || model.typicalMmPerHour <= 0) {
+                els.forecastSummary.textContent = "Confirm a measured rotation with recorded skating time to establish the first observed wear rate.";
+                els.forecastHours.textContent = "--";
+                els.forecastSessions.textContent = "--";
+            } else if (model.limitingWheel.remainingMm <= 0) {
+                els.forecastSummary.textContent = `${model.limitingWheel.name} at ${model.limitingWheel.slot} is at or below your configured retirement diameter.`;
+                els.forecastHours.textContent = "Retirement point";
+                els.forecastSessions.textContent = "0";
+            } else {
+                const conservativeHours = model.limitingWheel.conservativeHours;
+                const optimisticHours = model.limitingWheel.optimisticHours;
+                els.forecastSummary.textContent = `${model.limitingWheel.name} at ${model.limitingWheel.slot} is the limiting wheel with ${formatMm(model.limitingWheel.remainingMm)} remaining above your floor.`;
+                els.forecastHours.textContent = formatForecastRange(conservativeHours, optimisticHours, "time");
+                els.forecastSessions.textContent = model.limitingWheel.typicalSessions > 0
+                    ? `${Math.max(1, Math.floor(model.limitingWheel.lowSessions))}â€“${Math.max(1, Math.ceil(model.limitingWheel.highSessions))}`
+                    : "--";
+            }
+
+            els.forecastFormula.textContent = model.sampleCount > 0
+                ? model.timedSampleCount > 0
+                    ? `${model.timedSampleCount} timed slot samples / ${formatNumber(model.timedLoss)} mm time-qualified loss / ${Math.round(model.totalMinutes)} slot-minutes. Forecast applies only to this ${model.set.wheelDurometer} profile.`
+                    : `${model.sampleCount} measurements are saved, but none include skating time. Add minutes to a session before the next measured rotation.`
+                : `No hardness assumption is being made. The forecast will learn only from this profile's measured loss and recorded time.`;
+
+            const fastestSlot = model.ranking.find((item) => item.samples > 0);
+            const ledgerStats = [
+                ["Measured rotations", String(model.measuredRotations)],
+                ["Slot samples", String(model.sampleCount)],
+                ["Timed samples", String(model.timedSampleCount)],
+                ["Observed loss", formatMm(model.totalLoss)],
+                ["Time-qualified loss", formatMm(model.timedLoss)],
+                ["Measured wheel-hours", model.totalMinutes > 0 ? formatNumber(model.totalMinutes / 60) : "--"],
+                ["Loss / wheel-hour", model.typicalMmPerHour > 0 ? `${formatNumber(model.typicalMmPerHour)} mm` : "--"],
+                ["Loss / wheel-mile", model.typicalMmPerMile > 0 ? `${formatNumber(model.typicalMmPerMile)} mm` : "--"],
+                ["Rate uncertainty", model.rateRange.margin > 0 ? `Â±${Math.round(model.rateRange.margin * 100)}%` : "--"],
+                ["Tracked sessions", String(model.sessions.length)],
+                ["Tracked skate time", model.profileMinutes > 0 ? `${Math.round(model.profileMinutes)} min` : "--"],
+                ["Tracked distance", model.profileMiles > 0 ? formatMiles(model.profileMiles) : "--"],
+                ["Average session", model.averageSessionMinutes > 0 ? `${Math.round(model.averageSessionMinutes)} min` : "--"],
+                ["Fastest position", fastestSlot ? `${fastestSlot.slot} / ${formatNumber(fastestSlot.mmPerHour)} mm/hr` : "--"],
+                ["Average diameter", model.averageDiameter > 0 ? formatMm(model.averageDiameter) : "--"],
+                ["Current spread", formatMm(model.spread.gap)],
+                ["Retirement rule", `${formatMm(model.retirementLossMm)} below factory`]
+            ];
+            els.forecastScienceStats.innerHTML = ledgerStats.map(([label, value]) => `
+                <div><span>${escapeHtml(label)}</span><strong>${escapeHtml(value)}</strong></div>
+            `).join("");
+
+            const conditionRates = [
+                ...["slide-heavy", "normal", "cruising"].map((key) => ({ label: getSessionTypeLabel(key), rate: model.typeRates[key] })),
+                ...SESSION_SURFACES.filter((key) => key !== "unrecorded").map((key) => ({ label: getSurfaceLabel(key), rate: model.surfaceRates[key] }))
+            ].filter((item) => item.rate > 0);
+            els.forecastConditionRates.innerHTML = conditionRates.length
+                ? conditionRates.map((item) => `<span><b>${escapeHtml(item.label)}</b>${escapeHtml(formatNumber(item.rate))} mm/hr</span>`).join("")
+                : `<span><b>Condition rates</b>Appear after measured rotations include session type and surface.</span>`;
+
+            els.forecastWheelList.innerHTML = model.wheelStats.map((wheel) => {
+                const state = wheel.remainingMm <= 0 ? "retire" : wheel.remainingPercent <= 20 ? "low" : "healthy";
+                const sessionText = wheel.typicalSessions > 0
+                    ? `${Math.max(1, Math.floor(wheel.lowSessions))}â€“${Math.max(1, Math.ceil(wheel.highSessions))} sessions`
+                    : "Awaiting rate";
+                return `
+                    <div class="forecast-wheel-row" data-state="${state}">
+                        <div class="forecast-wheel-heading"><strong>${escapeHtml(wheel.slot)} / ${escapeHtml(wheel.name)}</strong><span>${formatMm(wheel.currentSize)}</span></div>
+                        <div class="forecast-life-bar"><i style="width:${Math.round(wheel.remainingPercent)}%"></i></div>
+                        <div class="forecast-wheel-stats">
+                            <span>Factory <b>${formatMm(wheel.factorySize)}</b></span>
+                            <span>Current <b>${formatMm(wheel.currentSize)}</b></span>
+                            <span>Used <b>${formatMm(wheel.usedMm)}</b></span>
+                            <span>Floor <b>${formatMm(wheel.retirementSize)}</b></span>
+                            <span>Remaining <b>${formatMm(wheel.remainingMm)}</b></span>
+                            <span>Life left <b>${Math.round(wheel.remainingPercent)}%</b></span>
+                            <span>Typical time <b>${wheel.typicalHours > 0 ? escapeHtml(formatForecastDuration(wheel.typicalHours)) : "Awaiting rate"}</b></span>
+                            <span>Conservative <b>${wheel.conservativeHours > 0 ? escapeHtml(formatForecastDuration(wheel.conservativeHours)) : "Awaiting rate"}</b></span>
+                            <span>Sessions <b>${escapeHtml(sessionText)}</b></span>
+                        </div>
+                    </div>
+                `;
+            }).join("");
+        }
+
+        function handleIntelligenceTab(event) {
+            const button = event.target.closest("[data-intelligence-tab]");
+            if (!button) return;
+            activeIntelligenceTab = button.dataset.intelligenceTab;
+            renderIntelligenceTabs();
+            const model = calculatePredictiveModel(getActiveSet());
+            if (activeIntelligenceTab === "outlook") renderRockerGeometry(model);
+            if (activeIntelligenceTab === "history") renderMeasurementTimeline(model);
+            requestAnimationFrame(() => document.querySelector(".intelligence-studio").scrollIntoView({ block: "start" }));
+        }
+
+        function renderIntelligenceTabs() {
+            document.querySelectorAll("[data-intelligence-tab]").forEach((button) => {
+                const active = button.dataset.intelligenceTab === activeIntelligenceTab;
+                button.classList.toggle("active", active);
+                button.setAttribute("aria-selected", String(active));
+            });
+            document.querySelectorAll("[data-intelligence-panel]").forEach((panel) => {
+                const active = panel.dataset.intelligencePanel === activeIntelligenceTab;
+                panel.classList.toggle("active", active);
+                panel.hidden = !active;
+            });
+        }
+
+        function renderRockerGeometry(model) {
+            const durationHours = model.averageSessionMinutes > 0 ? model.averageSessionMinutes / 60 : 1;
+            const rankingBySlot = Object.fromEntries(model.ranking.map((item) => [item.slot, item]));
+            const current = {};
+            const projected = {};
+            getSlotOrderForFrame(model.set.frameKey).forEach((slot) => {
+                const size = getWheelViewForSlot(model.set, slot).size;
+                const rate = rankingBySlot[slot] && rankingBySlot[slot].mmPerHour > 0
+                    ? rankingBySlot[slot].mmPerHour
+                    : model.typicalMmPerHour;
+                current[slot] = size;
+                projected[slot] = Number((size - Math.max(0, rate) * durationHours).toFixed(2));
+            });
+            const projectedSpread = calculateSpreadFromValues(model.set, projected);
+            const safe = projectedSpread.gap <= getFrame(model.set).safetyLimit;
+            els.geometryStatus.textContent = model.timedSampleCount > 0 ? (safe ? "Protected" : "Review") : "Baseline pending";
+            els.geometryStatus.dataset.state = model.timedSampleCount > 0 ? (safe ? "safe" : "warning") : "pending";
+            els.geometrySummary.textContent = model.timedSampleCount > 0
+                ? `${Math.round(durationHours * 60)}-minute projection Â· ${formatMm(projectedSpread.gap)} spread`
+                : "Current geometry shown; projection begins after a timed rotation.";
+            drawRockerGeometry(els.rockerGeometryCanvas, model.set, current, projected, model.timedSampleCount > 0);
+        }
+
+        function calculateSpreadFromValues(set, values) {
+            const groupSpread = (slots) => {
+                const sizes = slots.map((slot) => Number(values[slot])).filter(Number.isFinite);
+                if (!sizes.length) return { max: 0, min: 0, gap: 0 };
+                const max = Math.max(...sizes);
+                const min = Math.min(...sizes);
+                return { max, min, gap: Number((max - min).toFixed(2)) };
+            };
+            if (isArcFrame(set.frameKey)) {
+                const outer = groupSpread(ARC_OUTER_SLOTS);
+                const inner = groupSpread(ARC_INNER_SLOTS);
+                return { max: Math.max(outer.max, inner.max), min: Math.min(outer.min, inner.min), gap: Math.max(outer.gap, inner.gap), groups: { outer84: outer, inner76: inner } };
+            }
+            return groupSpread(getSlotOrderForFrame(set.frameKey));
+        }
+
+        function drawRockerGeometry(canvas, set, current, projected, showProjection) {
+            const context = canvas.getContext("2d");
+            const width = canvas.width;
+            const height = canvas.height;
+            context.clearRect(0, 0, width, height);
+            const allValues = [...Object.values(current), ...(showProjection ? Object.values(projected) : [])];
+            const min = Math.min(...allValues) - 0.2;
+            const max = Math.max(...allValues) + 0.2;
+            const range = Math.max(0.5, max - min);
+            const frames = [getLeftSlotsForFrame(set.frameKey), getRightSlotsForFrame(set.frameKey)];
+            const colors = { current: "#ecf2f3", projected: "#63e0d4" };
+            const y = (value) => 28 + ((max - value) / range) * (height - 72);
+
+            frames.forEach((slots, frameIndex) => {
+                const left = 34 + frameIndex * (width / 2);
+                const frameWidth = width / 2 - 68;
+                const x = (index) => slots.length === 1 ? left + frameWidth / 2 : left + (index / (slots.length - 1)) * frameWidth;
+                const drawLine = (values, color, dashed) => {
+                    context.beginPath();
+                    context.strokeStyle = color;
+                    context.lineWidth = 4;
+                    context.setLineDash(dashed ? [10, 8] : []);
+                    slots.forEach((slot, index) => {
+                        const px = x(index);
+                        const py = y(values[slot]);
+                        if (index === 0) context.moveTo(px, py); else context.lineTo(px, py);
+                    });
+                    context.stroke();
+                    context.setLineDash([]);
+                    slots.forEach((slot, index) => {
+                        context.beginPath();
+                        context.fillStyle = color;
+                        context.arc(x(index), y(values[slot]), 6, 0, Math.PI * 2);
+                        context.fill();
+                    });
+                };
+                drawLine(current, colors.current, false);
+                if (showProjection) drawLine(projected, colors.projected, true);
+                context.fillStyle = "#899397";
+                context.font = "600 18px system-ui";
+                context.textAlign = "center";
+                slots.forEach((slot, index) => context.fillText(slot, x(index), height - 16));
+                context.fillStyle = "#b7c0c2";
+                context.font = "700 17px system-ui";
+                context.fillText(frameIndex === 0 ? "LEFT" : "RIGHT", left + frameWidth / 2, 18);
+            });
+            context.strokeStyle = "rgba(255,255,255,.09)";
+            context.lineWidth = 2;
+            context.beginPath();
+            context.moveTo(width / 2, 18);
+            context.lineTo(width / 2, height - 14);
+            context.stroke();
+        }
+
+        function renderRotationEffectiveness(model) {
+            const snapshot = model.snapshots.find((item) => item.beforeSlots && item.measuredSlots);
+            if (!snapshot) {
+                els.effectivenessSummary.textContent = "Needs one completed measured cycle";
+                els.effectivenessScore.textContent = "--";
+                els.effectivenessFill.style.width = "0%";
+                els.effectivenessDetail.textContent = "The locked loop is unchanged. This score will compare diameter balance before and after each wear cycle.";
+                return;
+            }
+            const before = calculateBalanceDeviation(model.set, snapshot.beforeSlots);
+            const after = calculateBalanceDeviation(model.set, snapshot.measuredSlots);
+            const change = before > 0.01 ? (before - after) / before : after <= 0.01 ? 0 : -1;
+            const score = Math.round(clamp(50 + change * 50, 0, 100));
+            els.effectivenessScore.textContent = `${score}/100`;
+            els.effectivenessFill.style.width = `${score}%`;
+            els.effectivenessFill.dataset.state = score >= 60 ? "good" : score >= 40 ? "neutral" : "warning";
+            els.effectivenessSummary.textContent = Math.abs(change) < 0.02
+                ? "Diameter balance held steady"
+                : change > 0
+                    ? `Diameter imbalance improved ${Math.round(change * 100)}%`
+                    : `Diameter imbalance widened ${Math.round(Math.abs(change) * 100)}%`;
+            els.effectivenessDetail.textContent = `Cycle ${snapshot.previousRotationNumber || 0} â†’ ${snapshot.rotationNumber || 0}: deviation ${formatMm(before)} to ${formatMm(after)}. The route remains the locked Rocket Loop.`;
+        }
+
+        function calculateBalanceDeviation(set, slotRecords) {
+            const groups = isArcFrame(set.frameKey)
+                ? [ARC_OUTER_SLOTS, ARC_INNER_SLOTS]
+                : [getSlotOrderForFrame(set.frameKey)];
+            let weighted = 0;
+            let count = 0;
+            groups.forEach((slots) => {
+                const values = slots.map((slot) => Number(slotRecords[slot] && slotRecords[slot].size)).filter(Number.isFinite);
+                if (!values.length) return;
+                const mean = values.reduce((sum, value) => sum + value, 0) / values.length;
+                const deviation = Math.sqrt(values.reduce((sum, value) => sum + Math.pow(value - mean, 2), 0) / values.length);
+                weighted += deviation * values.length;
+                count += values.length;
+            });
+            return count ? weighted / count : 0;
+        }
+
+        function renderCauseAnalysis(model) {
+            const average = model.typicalMmPerHour;
+            const positionItems = model.ranking.filter((item) => item.mmPerHour > 0).map((item) => ({ label: item.slot, multiplier: average > 0 ? item.mmPerHour / average : 0, samples: item.timedSamples }));
+            const typeItems = ["slide-heavy", "normal", "cruising"].filter((key) => model.typeRates[key] > 0).map((key) => ({ label: getSessionTypeLabel(key), multiplier: model.typeRates[key] / average }));
+            const surfaceItems = SESSION_SURFACES.filter((key) => key !== "unrecorded" && model.surfaceRates[key] > 0).map((key) => ({ label: getSurfaceLabel(key), multiplier: model.surfaceRates[key] / average }));
+            const wheelItems = calculateWheelEffects(model);
+            const allItems = [...positionItems, ...typeItems, ...surfaceItems, ...wheelItems].filter((item) => Number.isFinite(item.multiplier));
+            const highest = allItems.slice().sort((a, b) => b.multiplier - a.multiplier)[0];
+            els.causeSummary.textContent = highest && average > 0
+                ? `${highest.label} is the strongest observed wear multiplier at ${formatMultiplier(highest.multiplier)}.`
+                : "Timed measurements across more conditions will separate the causes.";
+            els.causeAnalysis.innerHTML = [
+                renderCauseGroup("Position", positionItems),
+                renderCauseGroup("Session style", typeItems),
+                renderCauseGroup("Surface", surfaceItems),
+                renderCauseGroup("Individual wheel", wheelItems)
+            ].join("");
+        }
+
+        function calculateWheelEffects(model) {
+            const slotRates = Object.fromEntries(model.ranking.map((item) => [item.slot, item.mmPerHour || model.typicalMmPerHour]));
+            const groups = {};
+            model.timedObservations.forEach((observation) => {
+                const expected = (slotRates[observation.slot] || model.typicalMmPerHour) * (observation.minutes / 60);
+                const item = groups[observation.wheelKey] || { actual: 0, expected: 0, samples: 0 };
+                item.actual += observation.loss;
+                item.expected += expected;
+                item.samples += 1;
+                groups[observation.wheelKey] = item;
+            });
+            return Object.entries(groups).map(([wheelKey, item]) => ({
+                label: cleanName(model.set.wheelNames[wheelKey], getDefaultWheelName(wheelKey)),
+                multiplier: item.expected > 0 ? item.actual / item.expected : 0,
+                samples: item.samples
+            })).filter((item) => item.multiplier > 0).sort((a, b) => b.multiplier - a.multiplier);
+        }
+
+        function renderCauseGroup(title, items) {
+            const sorted = items.slice().sort((a, b) => b.multiplier - a.multiplier);
+            return `
+                <section class="cause-group">
+                    <div class="cause-group-title"><strong>${escapeHtml(title)}</strong><span>${sorted.length ? "profile average = 1.0Ã—" : "awaiting contrast"}</span></div>
+                    <div class="cause-bars">${sorted.length ? sorted.map((item) => `
+                        <div class="cause-row">
+                            <span>${escapeHtml(item.label)}</span>
+                            <i><b style="width:${Math.round(clamp(item.multiplier / 2, 0.04, 1) * 100)}%"></b></i>
+                            <strong>${escapeHtml(formatMultiplier(item.multiplier))}</strong>
+                        </div>
+                    `).join("") : `<div class="cause-empty">More timed variety needed</div>`}</div>
+                </section>
+            `;
+        }
+
+        function formatMultiplier(value) {
+            return `${Number(value || 0).toFixed(2)}Ã—`;
+        }
+
+        function renderMeasurementTimeline(model) {
+            const wheelKeys = [...new Set(Object.values(model.set.trackingState).map((state) => state.wheelKey))];
+            const previous = els.timelineWheelSelect.value;
+            els.timelineWheelSelect.innerHTML = wheelKeys.map((wheelKey) => `<option value="${escapeHtml(wheelKey)}">${escapeHtml(cleanName(model.set.wheelNames[wheelKey], getDefaultWheelName(wheelKey)))}</option>`).join("");
+            const preferred = wheelKeys.includes(previous)
+                ? previous
+                : model.limitingWheel && wheelKeys.includes(model.limitingWheel.wheelKey)
+                    ? model.limitingWheel.wheelKey
+                    : wheelKeys[0];
+            els.timelineWheelSelect.value = preferred || "";
+            const points = getWheelTimeline(model.set, preferred, model.snapshots);
+            drawMeasurementTimeline(els.measurementTimelineCanvas, points);
+            if (!points.length) {
+                els.timelineSummary.textContent = "The first confirmed measurement will start this wheel's line.";
+                els.timelineStats.innerHTML = renderCompactStats([["Measurements", "0"], ["Diameter change", "--"], ["Positions visited", "--"], ["Observed rate", "--"]]);
+                return;
+            }
+            const first = points[0];
+            const last = points[points.length - 1];
+            const loss = Math.max(0, first.size - last.size);
+            const positions = [...new Set(points.map((point) => point.slot).filter(Boolean))];
+            const wheelObservations = model.timedObservations.filter((item) => item.wheelKey === preferred);
+            const wheelMinutes = wheelObservations.reduce((sum, item) => sum + item.minutes, 0);
+            const wheelLoss = wheelObservations.reduce((sum, item) => sum + item.loss, 0);
+            const wheelRate = wheelMinutes > 0 ? wheelLoss / (wheelMinutes / 60) : 0;
+            els.timelineSummary.textContent = `${cleanName(model.set.wheelNames[preferred], getDefaultWheelName(preferred))}: ${formatMm(first.size)} â†’ ${formatMm(last.size)} across ${points.length} measurements.`;
+            els.timelineStats.innerHTML = renderCompactStats([
+                ["Measurements", String(points.length)],
+                ["Diameter change", formatMm(loss)],
+                ["Positions visited", positions.join(", ") || "--"],
+                ["Observed rate", wheelRate > 0 ? `${formatNumber(wheelRate)} mm/hr` : "Untimed"]
+            ]);
+        }
+
+        function getWheelTimeline(set, wheelKey, snapshots) {
+            if (!wheelKey) return [];
+            const points = [];
+            snapshots.slice().sort((a, b) => Number(a.rotationNumber || 0) - Number(b.rotationNumber || 0)).forEach((snapshot) => {
+                if (!snapshot.measuredSlots) return;
+                Object.entries(snapshot.measuredSlots).some(([slot, record]) => {
+                    if (record.wheelKey !== wheelKey) return false;
+                    points.push({ rotation: Number(snapshot.rotationNumber || 0), size: Number(record.size), slot, createdAt: snapshot.createdAt });
+                    return true;
+                });
+            });
+            if (!points.length) {
+                const slot = getSlotOrderForFrame(set.frameKey).find((candidate) => set.trackingState[candidate] && set.trackingState[candidate].wheelKey === wheelKey);
+                if (slot) points.push({ rotation: Number(set.rotationCount || 0), size: Number(set.sizes[wheelKey]), slot, createdAt: set.updatedAt });
+            }
+            return points;
+        }
+
+        function drawMeasurementTimeline(canvas, points) {
+            const context = canvas.getContext("2d");
+            const width = canvas.width;
+            const height = canvas.height;
+            context.clearRect(0, 0, width, height);
+            if (!points.length) return;
+            const sizes = points.map((point) => point.size);
+            const min = Math.min(...sizes) - 0.3;
+            const max = Math.max(...sizes) + 0.3;
+            const range = Math.max(0.6, max - min);
+            const left = 58;
+            const right = width - 34;
+            const top = 28;
+            const bottom = height - 48;
+            const x = (index) => points.length === 1 ? (left + right) / 2 : left + (index / (points.length - 1)) * (right - left);
+            const y = (value) => top + ((max - value) / range) * (bottom - top);
+            context.strokeStyle = "rgba(255,255,255,.08)";
+            context.lineWidth = 2;
+            for (let line = 0; line < 4; line += 1) {
+                const py = top + (line / 3) * (bottom - top);
+                context.beginPath(); context.moveTo(left, py); context.lineTo(right, py); context.stroke();
+            }
+            context.beginPath();
+            context.strokeStyle = "#63e0d4";
+            context.lineWidth = 5;
+            points.forEach((point, index) => index ? context.lineTo(x(index), y(point.size)) : context.moveTo(x(index), y(point.size)));
+            context.stroke();
+            points.forEach((point, index) => {
+                context.beginPath(); context.fillStyle = "#f3cb72"; context.arc(x(index), y(point.size), 7, 0, Math.PI * 2); context.fill();
+                context.fillStyle = "#aab3b6"; context.font = "600 18px system-ui"; context.textAlign = "center";
+                context.fillText(`R${point.rotation}`, x(index), height - 16);
+            });
+        }
+
+        function renderCostIntelligence(model) {
+            const price = normalizeMoney(model.set.wheelSetPrice, 0);
+            const hours = model.profileMinutes / 60;
+            const averageRemaining = model.wheelStats.length
+                ? model.wheelStats.reduce((sum, wheel) => sum + wheel.remainingPercent, 0) / model.wheelStats.length
+                : 0;
+            const remainingMiles = model.limitingWheel && model.limitingWheel.typicalSessions > 0 && model.averageSessionMiles > 0
+                ? model.limitingWheel.typicalSessions * model.averageSessionMiles
+                : 0;
+            const replacementDate = estimateReplacementDate(model);
+            els.costStats.innerHTML = renderCompactStats([
+                ["Purchase price", price > 0 ? formatCurrency(price) : "Not set"],
+                ["Cost / tracked hour", price > 0 && hours > 0 ? formatCurrency(price / hours) : "--"],
+                ["Cost / tracked mile", price > 0 && model.profileMiles > 0 ? formatCurrency(price / model.profileMiles) : "--"],
+                ["Modeled life left", `${Math.round(averageRemaining)}%`],
+                ["Remaining distance", remainingMiles > 0 ? `~${formatMiles(remainingMiles)} mi` : "--"],
+                ["Replacement estimate", replacementDate || "Need more dates"],
+                ["Average session load", model.averageSessionLoad > 0 ? formatNumber(model.averageSessionLoad) : "--"],
+                ["Tracked investment", `${model.sessions.length} sessions / ${formatMiles(model.profileMiles)} mi`]
+            ]);
+            const comparison = appState.sets.map((set) => {
+                const profileModel = set.id === model.set.id ? model : calculatePredictiveModel(set);
+                const profilePrice = normalizeMoney(set.wheelSetPrice, 0);
+                return {
+                    name: `${set.wheelModel} ${normalizeDurometer(set.wheelDurometer)}`,
+                    active: set.id === model.set.id,
+                    rate: profileModel.typicalMmPerHour,
+                    costPerMile: profilePrice > 0 && profileModel.profileMiles > 0 ? profilePrice / profileModel.profileMiles : 0
+                };
+            });
+            els.costComparison.innerHTML = `
+                <div class="profile-comparison-title"><strong>Profile comparison</strong><span>Tracked evidence only</span></div>
+                ${comparison.map((item) => `
+                    <div class="profile-comparison-row" data-active="${item.active}">
+                        <strong>${escapeHtml(item.name)}</strong>
+                        <span>${item.rate > 0 ? `${escapeHtml(formatNumber(item.rate))} mm/hr` : "Wear rate pending"}</span>
+                        <span>${item.costPerMile > 0 ? `${escapeHtml(formatCurrency(item.costPerMile))}/mi` : "Cost pending"}</span>
+                    </div>
+                `).join("")}
+            `;
+            els.costFormula.textContent = price > 0
+                ? "Cost rates use the purchase price divided by this profile's tracked time and distance. Replacement timing remains a forecast, not a warranty."
+                : "Add the wheel-set price once. It stays inside this profile and follows the same automatic cloud save.";
+        }
+
+        function estimateReplacementDate(model) {
+            if (!model.limitingWheel || model.limitingWheel.typicalSessions <= 0 || model.sessions.length < 2) return "";
+            const dates = model.sessions.map((session) => new Date(session.createdAt).getTime()).filter(Number.isFinite).sort((a, b) => a - b);
+            const spanDays = (dates[dates.length - 1] - dates[0]) / 86400000;
+            if (spanDays < 1) return "";
+            const sessionsPerWeek = (dates.length - 1) / (spanDays / 7);
+            if (!(sessionsPerWeek > 0)) return "";
+            const daysRemaining = (model.limitingWheel.typicalSessions / sessionsPerWeek) * 7;
+            return new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric", year: "numeric" }).format(new Date(Date.now() + daysRemaining * 86400000));
+        }
+
+        function renderCompactStats(items) {
+            return items.map(([label, value]) => `<div><span>${escapeHtml(label)}</span><strong>${escapeHtml(value)}</strong></div>`).join("");
+        }
+
+        function formatCurrency(value) {
+            return new Intl.NumberFormat(undefined, { style: "currency", currency: "USD", maximumFractionDigits: 2 }).format(Number(value || 0));
+        }
+
+        function getForecastConfidence(sampleCount) {
+            if (sampleCount <= 0) return { level: "none", label: "No baseline" };
+            if (sampleCount < 16) return { level: "low", label: "Early estimate" };
+            if (sampleCount < 40) return { level: "medium", label: "Developing" };
+            return { level: "high", label: "Established" };
+        }
+
+        function formatForecastDuration(hours) {
+            if (!Number.isFinite(hours) || hours <= 0) return "0 min";
+            if (hours < 1) return `${Math.max(1, Math.round(hours * 60))} min`;
+            return `${formatNumber(hours)} hr`;
+        }
+
+        function formatForecastRange(lowHours, highHours, kind) {
+            const low = Number.isFinite(lowHours) && lowHours > 0 ? lowHours : highHours;
+            const high = Number.isFinite(highHours) && highHours > 0 ? highHours : lowHours;
+            if (!low || !high) return "--";
+            if (Math.abs(high - low) < 0.08) return formatForecastDuration(high);
+            void kind;
+            return `${formatForecastDuration(Math.min(low, high))} - ${formatForecastDuration(Math.max(low, high))}`;
         }
 
         function renderSetSelector() {
@@ -4305,7 +7904,16 @@
             els.sessionMinutes.value = session.minutes ? String(session.minutes) : "";
             els.sessionMiles.value = session.miles ? String(session.miles) : "";
             els.sessionType.value = session.type;
+            els.sessionSurface.value = session.surface;
             els.sessionSummary.textContent = `Next saved session attaches to rotation ${set.rotationCount}.`;
+            renderSessionLoadPreview(session);
+        }
+
+        function renderSessionLoadPreview(sessionLike) {
+            const session = normalizeSessionMeta(sessionLike);
+            const band = getLoadBand(session.loadScore);
+            els.sessionLoadPreview.dataset.level = band.level;
+            els.sessionLoadPreview.querySelector("strong").textContent = session.loadScore > 0 ? `${band.label} ${formatNumber(session.loadScore)}` : "--";
         }
 
         function renderUndoState() {
@@ -4324,6 +7932,9 @@
             if (!preview) {
                 els.previewSummary.textContent = "Review before saving.";
                 els.previewMoveList.innerHTML = "";
+                els.measurementDiagnostics.hidden = true;
+                els.measurementDiagnostics.innerHTML = "";
+                els.confirmRotationBtn.textContent = "Confirm Rotation";
                 return;
             }
 
@@ -4335,6 +7946,71 @@
 
             els.previewSummary.textContent = `${sessionText}.${warningText}`;
             els.previewMoveList.innerHTML = renderPreviewScript(preview);
+            renderMeasurementDiagnostics(preview.measurementDiagnostics);
+            els.confirmRotationBtn.textContent = preview.measurementDiagnostics.items.length > 0
+                ? "Confirm Rechecked Rotation"
+                : "Confirm Rotation";
+            updateRecheckState();
+        }
+
+        function renderMeasurementDiagnostics(diagnostics) {
+            const items = diagnostics && Array.isArray(diagnostics.items) ? diagnostics.items : [];
+            els.measurementDiagnostics.hidden = items.length === 0;
+            if (items.length === 0) {
+                els.measurementDiagnostics.innerHTML = "";
+                return;
+            }
+
+            const title = diagnostics.criticalCount > 0
+                ? "Check these measurements before saving"
+                : "Unusual wear detected";
+            els.measurementDiagnostics.innerHTML = `
+                <strong>${escapeHtml(title)}</strong>
+                <ul>${items.map((item) => `
+                    <li>
+                        <div><b>${escapeHtml(item.slot)}</b> ${escapeHtml(item.message)}</div>
+                        <label class="recheck-field">
+                            <span>Second reading</span>
+                            <div><input type="number" inputmode="decimal" min="40" max="130" step="0.1" data-recheck-slot="${escapeHtml(item.slot)}" value="${escapeHtml(pendingRotationPreview && pendingRotationPreview.rechecks && pendingRotationPreview.rechecks[item.slot] || "")}" placeholder="${escapeHtml(formatNumber(item.firstSize))}"><b>mm</b></div>
+                            <small data-recheck-status="${escapeHtml(item.slot)}">Required only for this unusual reading</small>
+                        </label>
+                    </li>
+                `).join("")}</ul>
+                <small>When the two readings agree within 0.1 mm, the app saves their average.</small>
+            `;
+            els.measurementDiagnostics.dataset.level = diagnostics.criticalCount > 0 ? "critical" : "advisory";
+        }
+
+        function handleDiagnosticRecheck(event) {
+            const input = event.target.closest("[data-recheck-slot]");
+            if (!input || !pendingRotationPreview) return;
+            const value = Number(input.value);
+            pendingRotationPreview.rechecks[input.dataset.recheckSlot] = Number.isFinite(value) ? value : null;
+            updateRecheckState();
+        }
+
+        function updateRecheckState() {
+            const preview = pendingRotationPreview;
+            if (!preview || !preview.measurementDiagnostics) {
+                els.confirmRotationBtn.disabled = false;
+                return;
+            }
+            let ready = true;
+            preview.measurementDiagnostics.items.forEach((item) => {
+                const value = Number(preview.rechecks && preview.rechecks[item.slot]);
+                const status = els.measurementDiagnostics.querySelector(`[data-recheck-status="${item.slot}"]`);
+                const input = els.measurementDiagnostics.querySelector(`[data-recheck-slot="${item.slot}"]`);
+                const hasValue = Number.isFinite(value) && value >= 40;
+                const matched = hasValue && Math.abs(value - item.firstSize) <= 0.1;
+                ready = ready && matched;
+                if (input) input.dataset.state = !hasValue ? "pending" : matched ? "matched" : "mismatch";
+                if (status) status.textContent = !hasValue
+                    ? "Enter one recheck"
+                    : matched
+                        ? `Matched Â· saves ${formatMm((value + item.firstSize) / 2)}`
+                        : `Readings differ by ${formatMm(Math.abs(value - item.firstSize))} Â· measure once more`;
+            });
+            els.confirmRotationBtn.disabled = preview.measurementDiagnostics.items.length > 0 && !ready;
         }
 
         function renderPreviewScript(preview) {
@@ -4429,10 +8105,18 @@
             const logoActive = wheel.apexSide === "logo" ? " active" : "";
             const blankActive = wheel.apexSide === "blank" ? " active" : "";
             const inputSize = Number.isFinite(Number(wheel.inputSize)) ? wheel.inputSize : wheel.size;
+            const deltaView = getMeasurementDeltaView(inputSize, wheel.size);
             return `
-                <div class="input-tile">
-                    <label for="size-${wheel.slot}">${escapeHtml(wheel.slot)} / ${escapeHtml(wheel.name)}</label>
-                    <input id="size-${wheel.slot}" type="number" inputmode="decimal" min="40" max="130" step="0.1" value="${formatNumber(inputSize)}" data-size-slot="${escapeHtml(wheel.slot)}" aria-label="${escapeHtml(wheel.slot)} caliper measurement">
+                <div class="input-tile${deltaView.className}" data-wheel-slot="${escapeHtml(wheel.slot)}">
+                    <div class="wheel-tile-heading">
+                        <span class="slot-chip">${escapeHtml(wheel.slot)}</span>
+                        <label for="size-${wheel.slot}">${escapeHtml(wheel.name)}</label>
+                    </div>
+                    <div class="measurement-value">
+                        <input id="size-${wheel.slot}" type="number" inputmode="decimal" min="40" max="130" step="0.1" value="${formatNumber(inputSize)}" data-size-slot="${escapeHtml(wheel.slot)}" aria-label="${escapeHtml(wheel.slot)} caliper measurement">
+                        <span>mm</span>
+                    </div>
+                    <div class="measurement-delta" data-delta-slot="${escapeHtml(wheel.slot)}">${escapeHtml(deltaView.label)}</div>
                     <input class="name-edit-input" type="text" value="${escapeHtml(wheel.name)}" data-name-slot="${escapeHtml(wheel.slot)}" aria-label="${escapeHtml(wheel.slot)} wheel name" maxlength="18" autocomplete="off">
                     <div class="apex-diagnostic" aria-label="Thickest shoulder side for ${escapeHtml(wheel.name)}">
                         <div class="apex-label">Thickest Shoulder Side:</div>
@@ -4443,6 +8127,17 @@
                     </div>
                 </div>
             `;
+        }
+
+        function getMeasurementDeltaView(value, savedValue) {
+            const delta = Number((Number(value) - Number(savedValue)).toFixed(2));
+            if (!Number.isFinite(delta) || Math.abs(delta) < 0.05) {
+                return { label: `Saved ${formatMm(savedValue)}`, className: "" };
+            }
+            if (delta > 0) {
+                return { label: `${formatNumber(delta)} mm larger than saved`, className: " measurement-growth" };
+            }
+            return { label: `${formatNumber(Math.abs(delta))} mm wear entered`, className: " measurement-wear" };
         }
 
         function renderTargets() {
@@ -4462,9 +8157,11 @@
             const flipClass = mountInstruction.sideFlipped ? " flipped" : "";
             return `
                 <div id="target-${escapeHtml(slot)}" class="mount-slot">
-                    <div class="mount-lbl">${escapeHtml(slot)}</div>
-                    <div class="mount-name">${escapeHtml(wheel.name)}</div>
-                    <div class="mount-val">${formatMm(wheel.size)}</div>
+                    <div class="mount-wheel">
+                        <div class="mount-lbl">${escapeHtml(slot)}</div>
+                        <div class="mount-name">${escapeHtml(wheel.name)}</div>
+                        <div class="mount-val">${formatMm(wheel.size)}</div>
+                    </div>
                     <div class="mount-flip${flipClass}">${escapeHtml(mountInstruction.label)}</div>
                 </div>
             `;
@@ -4501,6 +8198,10 @@
             els.activeWheelDurometer.value = normalizeDurometer(set.wheelDurometer);
             els.activeFrameSelect.value = set.frameKey;
             els.activeBaseSize.value = String(set.baseSize);
+            els.retirementLossInput.value = formatNumber(set.retirementLossMm);
+            els.rotationAlertInput.value = formatNumber(set.rotationAlertMm);
+            els.alwaysMeasureAfterSlide.checked = set.alwaysMeasureAfterSlide !== false;
+            els.wheelSetPriceInput.value = set.wheelSetPrice > 0 ? formatNumber(set.wheelSetPrice) : "";
             els.frameLimitStat.textContent = formatMm(getFrame(set).safetyLimit);
             els.spreadStat.textContent = formatMm(spread.gap);
             els.profileCountStat.textContent = String(appState.sets.length);
@@ -4517,11 +8218,18 @@
                 const arrows = slots.map((slot) => `<span>${escapeHtml(slot)}</span>`).join("");
                 const cols = slots.length + (isArcFrame(set.frameKey) ? 1 : 0);
                 return `
-                    <div class="loop-line" style="--loop-cols:${cols}">
+                    <div class="loop-line${isArcFrame(set.frameKey) ? ` arc-loop-line-${slots.length}` : ""}" style="--loop-cols:${cols}">
                         ${label}${arrows}
                     </div>
                 `;
             }).join("");
+        }
+
+        function getTopWearGroup(ranking) {
+            const measured = ranking.filter((item) => item.samples > 0 && item.totalLoss > 0);
+            if (!measured.length) return [];
+            const topMetric = getWearMetric(measured[0]);
+            return measured.filter((item) => Math.abs(getWearMetric(item) - topMetric) < 0.01);
         }
 
         function renderWearRanking() {
@@ -4529,9 +8237,12 @@
             const ranking = getWearRanking(set);
             const sampled = ranking.filter((item) => item.samples > 0);
             const worn = ranking.filter((item) => item.totalLoss > 0);
+            const topWearGroup = getTopWearGroup(ranking);
 
             els.wearSummary.textContent = worn.length
-                ? `${worn[0].slot} is wearing fastest at ${formatWearRate(worn[0])}.`
+                ? topWearGroup.length > 1
+                    ? `Timed wear is currently even across ${topWearGroup.map((item) => item.slot).join(", ")} at ${formatWearRate(topWearGroup[0])}.`
+                    : `${worn[0].slot} is wearing fastest at ${formatWearRate(worn[0])}.`
                 : sampled.length
                     ? "Samples recorded; no measurable loss yet."
                     : "No wear samples yet.";
@@ -4565,9 +8276,12 @@
             const bySlot = Object.fromEntries(ranking.map((item) => [item.slot, item]));
             const maxAverage = Math.max(...ranking.map((item) => getWearMetric(item)), 0);
             const hottest = ranking.find((item) => item.samples > 0 && item.totalLoss > 0);
+            const topWearGroup = getTopWearGroup(ranking);
 
             els.heatSummary.textContent = hottest
-                ? `${hottest.slot} is currently the hottest wear position.`
+                ? topWearGroup.length > 1
+                    ? `Measured heat is currently even across ${topWearGroup.map((item) => item.slot).join(", ")}.`
+                    : `${hottest.slot} is currently the hottest wear position.`
                 : "No wear samples yet.";
 
             els.heatMap.innerHTML = [
@@ -4694,7 +8408,7 @@
                         <span>Rotation ${escapeHtml(session.rotationNumber)}</span>
                         <span>${escapeHtml(formatDate(session.createdAt))}</span>
                     </div>
-                    <div class="log-meta">${escapeHtml(formatSessionMeta(session))}</div>
+                    <div class="log-meta">${escapeHtml(formatSessionMeta(session))} Â· Load ${escapeHtml(formatNumber(session.loadScore))}</div>
                 </article>
             `).join("");
         }
@@ -4794,6 +8508,7 @@
                     set.caliperDrafts = set.caliperDrafts || {};
                     set.caliperDrafts[sizeSlot] = clamp(parsed, 40, 130);
                     set.updatedAt = new Date().toISOString();
+                    updateMeasurementDelta(sizeSlot, parsed, set);
                     saveStateDebounced();
                 }
             }
@@ -4807,6 +8522,18 @@
                 renderTargets();
                 saveStateDebounced();
             }
+        }
+
+        function updateMeasurementDelta(slot, value, set) {
+            const wheelKey = set.trackingState[slot] && set.trackingState[slot].wheelKey;
+            if (!wheelKey) return;
+            const tile = document.querySelector(`[data-wheel-slot="${slot}"]`);
+            const label = document.querySelector(`[data-delta-slot="${slot}"]`);
+            if (!tile || !label) return;
+            const deltaView = getMeasurementDeltaView(value, set.sizes[wheelKey]);
+            tile.classList.toggle("measurement-growth", deltaView.className.includes("measurement-growth"));
+            tile.classList.toggle("measurement-wear", deltaView.className.includes("measurement-wear"));
+            label.textContent = deltaView.label;
         }
 
         function handleApexSelection(event) {
@@ -4859,8 +8586,10 @@
             set.lastSessionMeta = normalizeSessionMeta({
                 minutes: els.sessionMinutes.value,
                 miles: els.sessionMiles.value,
-                type: els.sessionType.value
+                type: els.sessionType.value,
+                surface: els.sessionSurface.value
             });
+            renderSessionLoadPreview(set.lastSessionMeta);
             set.updatedAt = new Date().toISOString();
             clearPendingRotationPreview();
             saveStateDebounced();
@@ -4871,7 +8600,8 @@
             const sessionMeta = normalizeSessionMeta({
                 minutes: els.sessionMinutes.value,
                 miles: els.sessionMiles.value,
-                type: els.sessionType.value
+                type: els.sessionType.value,
+                surface: els.sessionSurface.value
             });
 
             if (sessionMeta.minutes <= 0 && sessionMeta.miles <= 0) {
@@ -4887,6 +8617,8 @@
 
             renderSessionFields();
             renderSessionLogs();
+            renderExperienceSummary();
+            renderPredictiveAnalytics();
             saveStateNow();
             queueCloudSave(100);
             showToast(`Session saved to rotation ${set.rotationCount}.`);
@@ -4901,6 +8633,8 @@
                 minutes: session.minutes,
                 miles: session.miles,
                 type: session.type,
+                surface: session.surface,
+                loadScore: session.loadScore,
                 frameKey: set.frameKey,
                 wheelModel: set.wheelModel || "",
                 wheelDurometer: normalizeDurometer(set.wheelDurometer),
@@ -4934,11 +8668,13 @@
             const miles = savedSessions.reduce((sum, session) => sum + Number(session.miles || 0), 0);
             const hasSlideHeavy = savedSessions.some((session) => session.type === "slide-heavy");
             const allCruising = savedSessions.every((session) => session.type === "cruising");
+            const surfaces = [...new Set(savedSessions.map((session) => session.surface).filter((surface) => surface !== "unrecorded"))];
 
             return normalizeSessionMeta({
                 minutes,
                 miles,
-                type: hasSlideHeavy ? "slide-heavy" : allCruising ? "cruising" : "normal"
+                type: hasSlideHeavy ? "slide-heavy" : allCruising ? "cruising" : "normal",
+                surface: surfaces.length === 1 ? surfaces[0] : surfaces.length > 1 ? "mixed" : "unrecorded"
             });
         }
 
@@ -4961,6 +8697,7 @@
             const warning = spread.gap > getFrame(set).safetyLimit;
             const nextTrackingState = applyRocketLoop(set.trackingState, set);
             const sessionMeta = getWearSessionMetaForRotation(set);
+            const measurementDiagnostics = getMeasurementDiagnostics(set, freshMeasurements);
 
             pendingRotationPreview = {
                 setId: set.id,
@@ -4969,6 +8706,8 @@
                 warning,
                 nextTrackingState,
                 sessionMeta,
+                measurementDiagnostics,
+                rechecks: {},
                 moves: buildRotationPreviewMoves(previewSet, nextTrackingState)
             };
 
@@ -4984,10 +8723,24 @@
             }
 
             const preview = pendingRotationPreview;
-            set.undoSnapshot = createUndoSnapshot(set);
             const freshMeasurements = clonePlain(preview.measurements);
-            const spread = preview.spread;
-            const warning = preview.warning;
+            for (const item of preview.measurementDiagnostics.items) {
+                const recheck = Number(preview.rechecks && preview.rechecks[item.slot]);
+                if (!Number.isFinite(recheck) || recheck < 40) {
+                    showToast(`Recheck ${item.slot} before confirming.`);
+                    return;
+                }
+                if (Math.abs(recheck - item.firstSize) > 0.1) {
+                    showToast(`${item.slot} readings do not match yet.`);
+                    return;
+                }
+                freshMeasurements[item.slot].size = Number(((recheck + item.firstSize) / 2).toFixed(1));
+            }
+            const verifiedSet = cloneProfileForPreview(set);
+            hydrateSizesFromMeasurements(verifiedSet, freshMeasurements);
+            const spread = calculateSpread(verifiedSet);
+            const warning = spread.gap > getFrame(set).safetyLimit;
+            set.undoSnapshot = createUndoSnapshot(set);
             const nextTrackingState = preview.nextTrackingState;
             const sizeSnapshot = createRotationSizeSnapshot(set, freshMeasurements, nextTrackingState, spread, warning, preview.sessionMeta);
 
@@ -5119,6 +8872,10 @@
                     frameKey: set.frameKey,
                     wheelModel: set.wheelModel,
                     wheelDurometer: set.wheelDurometer,
+                    retirementLossMm: set.retirementLossMm,
+                    rotationAlertMm: set.rotationAlertMm,
+                    alwaysMeasureAfterSlide: set.alwaysMeasureAfterSlide,
+                    wheelSetPrice: set.wheelSetPrice,
                     baseSize: set.baseSize,
                     wheelNames: set.wheelNames,
                     sizes: set.sizes,
@@ -5160,6 +8917,10 @@
             set.frameKey = frameKey;
             set.wheelModel = cleanName(profile.wheelModel, "Endless");
             set.wheelDurometer = normalizeDurometer(profile.wheelDurometer);
+            set.retirementLossMm = normalizeThreshold(profile.retirementLossMm, DEFAULT_RETIREMENT_LOSS_MM, 2, 20, 1);
+            set.rotationAlertMm = normalizeThreshold(profile.rotationAlertMm, DEFAULT_ROTATION_ALERT_MM, 0.1, 3, 1);
+            set.alwaysMeasureAfterSlide = profile.alwaysMeasureAfterSlide !== false;
+            set.wheelSetPrice = normalizeMoney(profile.wheelSetPrice, DEFAULT_WHEEL_SET_PRICE);
             set.baseSize = toWheelSize(profile.baseSize, FRAME_PRESETS[frameKey].defaultSize);
             set.wheelNames = clonePlain(profile.wheelNames || {});
             set.sizes = clonePlain(profile.sizes || {});
@@ -5204,6 +8965,48 @@
             return freshMeasurements;
         }
 
+        function getMeasurementDiagnostics(set, measurements) {
+            const stats = normalizeWearStats(set.wearStats, set.frameKey);
+            const items = [];
+            let criticalCount = 0;
+
+            Object.entries(measurements).forEach(([slot, measurement]) => {
+                const savedSize = toWheelSize(set.sizes[measurement.wheelKey], measurement.size);
+                const delta = Number((measurement.size - savedSize).toFixed(2));
+                const loss = Math.max(0, Number((-delta).toFixed(2)));
+                const slotStats = stats[slot] || createEmptyWearStats(set.frameKey)[slot];
+                const averageLoss = slotStats.samples > 0 ? slotStats.totalLoss / slotStats.samples : 0;
+                const unusualLossThreshold = slotStats.samples >= 2
+                    ? Math.max(1, Number(slotStats.maxLoss || 0) * 2, averageLoss * 3)
+                    : 1.5;
+
+                if (delta > 0.2) {
+                    criticalCount += 1;
+                    items.push({
+                        slot,
+                        level: "critical",
+                        firstSize: measurement.size,
+                        savedSize,
+                        message: `is ${formatNumber(delta)} mm larger than its saved diameter. Recheck this caliper reading.`
+                    });
+                } else if (loss > unusualLossThreshold) {
+                    items.push({
+                        slot,
+                        level: "advisory",
+                        firstSize: measurement.size,
+                        savedSize,
+                        message: `lost ${formatNumber(loss)} mm, above its ${formatNumber(unusualLossThreshold)} mm history-based review threshold.`
+                    });
+                }
+            });
+
+            return {
+                items,
+                criticalCount,
+                advisoryCount: items.length - criticalCount
+            };
+        }
+
         function readVisibleMeasurements(set) {
             return collectFreshMeasurementsBuffer(set);
         }
@@ -5220,7 +9023,7 @@
             Object.entries(measurements).forEach(([slot, measurement]) => {
                 const previousSize = toWheelSize(set.baselineSizes && set.baselineSizes[measurement.wheelKey], measurement.size);
                 const loss = Math.max(0, Number((previousSize - measurement.size).toFixed(2)));
-                const slotStats = set.wearStats[slot] || { totalLoss: 0, samples: 0, lastLoss: 0, maxLoss: 0, totalMinutes: 0, totalMiles: 0, slideSamples: 0 };
+                const slotStats = set.wearStats[slot] || createEmptyWearStats(set.frameKey)[slot];
 
                 slotStats.totalLoss = Number((Number(slotStats.totalLoss || 0) + loss).toFixed(2));
                 slotStats.samples = Number(slotStats.samples || 0) + 1;
@@ -5229,6 +9032,17 @@
                 slotStats.totalMinutes = Number((Number(slotStats.totalMinutes || 0) + session.minutes).toFixed(1));
                 slotStats.totalMiles = Number((Number(slotStats.totalMiles || 0) + session.miles).toFixed(2));
                 slotStats.slideSamples = Number(slotStats.slideSamples || 0) + (session.type === "slide-heavy" ? 1 : 0);
+                if (session.minutes > 0) {
+                    slotStats.timedLoss = Number((Number(slotStats.timedLoss || 0) + loss).toFixed(2));
+                    slotStats.timedSamples = Number(slotStats.timedSamples || 0) + 1;
+                    slotStats.lossByType[session.type] = Number((Number(slotStats.lossByType[session.type] || 0) + loss).toFixed(2));
+                    slotStats.lossBySurface[session.surface] = Number((Number(slotStats.lossBySurface[session.surface] || 0) + loss).toFixed(2));
+                }
+                if (session.miles > 0) {
+                    slotStats.distanceLoss = Number((Number(slotStats.distanceLoss || 0) + loss).toFixed(2));
+                }
+                slotStats.minutesByType[session.type] = Number((Number(slotStats.minutesByType[session.type] || 0) + session.minutes).toFixed(1));
+                slotStats.minutesBySurface[session.surface] = Number((Number(slotStats.minutesBySurface[session.surface] || 0) + session.minutes).toFixed(1));
                 set.wearStats[slot] = slotStats;
             });
         }
@@ -5342,6 +9156,25 @@
             saveStateDebounced();
         }
 
+        function updateInsightSettings() {
+            const set = getActiveSet();
+            set.retirementLossMm = normalizeThreshold(els.retirementLossInput.value, set.retirementLossMm, 2, 20, 1);
+            set.rotationAlertMm = normalizeThreshold(els.rotationAlertInput.value, set.rotationAlertMm, 0.1, 3, 1);
+            set.alwaysMeasureAfterSlide = Boolean(els.alwaysMeasureAfterSlide.checked);
+            set.updatedAt = new Date().toISOString();
+            renderProfile();
+            renderPredictiveAnalytics();
+            saveStateNow();
+        }
+
+        function updateWheelSetPrice() {
+            const set = getActiveSet();
+            set.wheelSetPrice = normalizeMoney(els.wheelSetPriceInput.value, set.wheelSetPrice);
+            set.updatedAt = new Date().toISOString();
+            renderCostIntelligence(calculatePredictiveModel(set));
+            saveStateDebounced();
+        }
+
         function updateActiveFrame() {
             const set = getActiveSet();
             const nextFrameKey = getFrameKeyForValue(els.activeFrameSelect.value);
@@ -5378,13 +9211,21 @@
                 frameKey,
                 baseSize: FRAME_PRESETS[frameKey].defaultSize,
                 wheelModel: set.wheelModel,
-                wheelDurometer: set.wheelDurometer
+                wheelDurometer: set.wheelDurometer,
+                retirementLossMm: set.retirementLossMm,
+                rotationAlertMm: set.rotationAlertMm,
+                alwaysMeasureAfterSlide: set.alwaysMeasureAfterSlide,
+                wheelSetPrice: set.wheelSetPrice
             });
 
             set.defaultProfileKey = "";
             set.defaultProfileRevision = 0;
             set.frameKey = rebuilt.frameKey;
             set.baseSize = rebuilt.baseSize;
+            set.retirementLossMm = rebuilt.retirementLossMm;
+            set.rotationAlertMm = rebuilt.rotationAlertMm;
+            set.alwaysMeasureAfterSlide = rebuilt.alwaysMeasureAfterSlide;
+            set.wheelSetPrice = rebuilt.wheelSetPrice;
             set.wheelNames = rebuilt.wheelNames;
             set.sizes = rebuilt.sizes;
             set.baselineSizes = rebuilt.baselineSizes;
@@ -5551,10 +9392,17 @@
                     maxLoss: Number(item.maxLoss || 0),
                     totalMinutes: Number(item.totalMinutes || 0),
                     totalMiles: Number(item.totalMiles || 0),
+                    timedLoss: Number(item.timedLoss || 0),
+                    distanceLoss: Number(item.distanceLoss || 0),
+                    timedSamples: Number(item.timedSamples || 0),
                     slideSamples: Number(item.slideSamples || 0),
+                    lossByType: clonePlain(item.lossByType || {}),
+                    minutesByType: clonePlain(item.minutesByType || {}),
+                    lossBySurface: clonePlain(item.lossBySurface || {}),
+                    minutesBySurface: clonePlain(item.minutesBySurface || {}),
                     averageLoss: samples > 0 ? totalLoss / samples : 0,
-                    mmPerHour: Number(item.totalMinutes || 0) > 0 ? totalLoss / (Number(item.totalMinutes || 0) / 60) : 0,
-                    mmPerMile: Number(item.totalMiles || 0) > 0 ? totalLoss / Number(item.totalMiles || 0) : 0
+                    mmPerHour: Number(item.totalMinutes || 0) > 0 ? Number(item.timedLoss || 0) / (Number(item.totalMinutes || 0) / 60) : 0,
+                    mmPerMile: Number(item.totalMiles || 0) > 0 ? Number(item.distanceLoss || 0) / Number(item.totalMiles || 0) : 0
                 };
             }).sort((a, b) => {
                 const aRate = a.mmPerHour || a.mmPerMile || a.averageLoss;
@@ -5607,6 +9455,7 @@
             if (session.minutes > 0) parts.push(`${session.minutes} min`);
             if (session.miles > 0) parts.push(`${formatMiles(session.miles)} mi`);
             parts.push(getSessionTypeLabel(session.type));
+            if (session.surface !== "unrecorded") parts.push(getSurfaceLabel(session.surface));
             return parts.join(" / ");
         }
 
@@ -5623,6 +9472,19 @@
 
         function clamp(value, min, max) {
             return Math.min(max, Math.max(min, value));
+        }
+
+        function normalizeThreshold(value, fallback, min, max, decimals = 1) {
+            const parsed = Number(value);
+            const fallbackNumber = Number.isFinite(Number(fallback)) ? Number(fallback) : min;
+            const safe = Number.isFinite(parsed) ? parsed : fallbackNumber;
+            return Number(clamp(safe, min, max).toFixed(decimals));
+        }
+
+        function normalizeMoney(value, fallback = 0) {
+            const parsed = Number(value);
+            const safe = Number.isFinite(parsed) ? parsed : Number(fallback || 0);
+            return Number(clamp(safe, 0, 2000).toFixed(2));
         }
 
         function formatMm(value) {
