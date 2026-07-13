@@ -11,6 +11,10 @@ create table if not exists public.skatetech_app_state (
 
 alter table public.skatetech_app_state enable row level security;
 
+grant usage on schema public to authenticated;
+grant select, insert, update, delete on public.skatetech_app_state to authenticated;
+revoke all on public.skatetech_app_state from anon;
+
 drop policy if exists "Users can read their SkateTech state" on public.skatetech_app_state;
 create policy "Users can read their SkateTech state"
 on public.skatetech_app_state

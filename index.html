@@ -1119,16 +1119,885 @@
                 right: 8px;
             }
         }
+
+        /* 2026 premium interface layer */
+        :root {
+            --bg: #08090b;
+            --panel: rgba(25, 26, 30, 0.82);
+            --panel-strong: rgba(36, 37, 42, 0.9);
+            --field: rgba(12, 13, 16, 0.92);
+            --border: rgba(255, 255, 255, 0.09);
+            --border-strong: rgba(255, 255, 255, 0.16);
+            --text: #f5f5f7;
+            --muted: #9899a1;
+            --soft: #d8d8dd;
+            --accent: #57d8c8;
+            --accent-strong: #8bf4e5;
+            --accent-blue: #75a7f7;
+            --accent-soft: rgba(87, 216, 200, 0.12);
+            --success: #79df99;
+            --warning: #f2c66d;
+            --danger: #ff7d73;
+            --shadow: 0 20px 60px rgba(0, 0, 0, 0.34);
+            --inner-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.065);
+            --nav-height: 76px;
+        }
+
+        html {
+            background: #08090b;
+        }
+
+        body {
+            min-height: 100svh;
+            padding: calc(env(safe-area-inset-top) + 18px) 18px calc(var(--nav-height) + env(safe-area-inset-bottom) + 38px);
+            background:
+                linear-gradient(180deg, rgba(117, 167, 247, 0.055) 0, transparent 240px),
+                #08090b;
+            color: var(--text);
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", sans-serif;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0 0 auto;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.12);
+            pointer-events: none;
+            z-index: 50;
+        }
+
+        [hidden] {
+            display: none !important;
+        }
+
+        .app {
+            width: min(100%, 1040px);
+        }
+
+        .app-header {
+            min-height: 74px;
+            grid-template-columns: minmax(0, 1fr) minmax(260px, 420px);
+            gap: 24px;
+            margin-bottom: 28px;
+            padding: 7px 4px;
+        }
+
+        .brand-zone {
+            gap: 13px;
+        }
+
+        .brand-logo {
+            width: 52px;
+            height: 52px;
+            border-radius: 13px;
+            border-color: rgba(255, 255, 255, 0.14);
+            box-shadow: 0 12px 34px rgba(0, 0, 0, 0.5), var(--inner-highlight);
+        }
+
+        h1 {
+            font-size: 27px;
+            line-height: 1.05;
+            font-weight: 750;
+        }
+
+        .subtitle {
+            margin-top: 6px;
+            font-size: 12px;
+            color: #8f9098;
+            font-weight: 520;
+        }
+
+        .app-header .select-wrap select {
+            min-height: 54px;
+            padding-left: 17px;
+            background: rgba(20, 21, 25, 0.72);
+            border-color: rgba(255, 255, 255, 0.095);
+            box-shadow: var(--inner-highlight);
+            font-size: 14px;
+        }
+
+        .app-view {
+            transform: translate3d(0, 10px, 0);
+            transition: opacity 260ms ease, transform 260ms ease, visibility 260ms;
+        }
+
+        .app-view.active {
+            transform: translate3d(0, 0, 0);
+        }
+
+        .card {
+            margin-bottom: 18px;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.085);
+            background: rgba(24, 25, 29, 0.78);
+            box-shadow: var(--shadow), var(--inner-highlight);
+            backdrop-filter: blur(28px) saturate(1.16);
+            -webkit-backdrop-filter: blur(28px) saturate(1.16);
+        }
+
+        .section-header {
+            margin-bottom: 17px;
+            align-items: flex-start;
+        }
+
+        .section-kicker {
+            margin-bottom: 5px;
+            color: var(--accent);
+            font-size: 9px;
+            line-height: 1.2;
+            font-weight: 760;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .section-title {
+            color: var(--text);
+            font-size: 19px;
+            line-height: 1.15;
+            font-weight: 690;
+            letter-spacing: 0;
+            text-transform: none;
+        }
+
+        .section-value {
+            font-size: 12px;
+            color: var(--soft);
+        }
+
+        .mini-copy {
+            margin-top: 4px;
+            color: #92939b;
+            font-size: 12px;
+            line-height: 1.45;
+            font-weight: 480;
+        }
+
+        select,
+        input[type="text"],
+        input[type="number"],
+        input[type="email"],
+        input[type="password"],
+        input[type="url"],
+        textarea {
+            width: 100%;
+            min-height: 50px;
+            border: 1px solid rgba(255, 255, 255, 0.09);
+            border-radius: 8px;
+            outline: none;
+            color: var(--text);
+            background: rgba(10, 11, 14, 0.72);
+            box-shadow: var(--inner-highlight);
+            transition: border-color 180ms ease, background 180ms ease, box-shadow 180ms ease;
+        }
+
+        input[type="email"],
+        input[type="password"],
+        input[type="url"] {
+            padding: 0 14px;
+            font-size: 14px;
+        }
+
+        select:focus,
+        input:focus,
+        textarea:focus {
+            border-color: rgba(87, 216, 200, 0.62);
+            background: rgba(13, 17, 19, 0.92);
+            box-shadow: 0 0 0 4px rgba(87, 216, 200, 0.09), var(--inner-highlight);
+        }
+
+        .pill-btn,
+        .ghost-btn,
+        .danger-btn {
+            min-height: 42px;
+            padding: 0 15px;
+            border-radius: 8px;
+            border-color: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.045);
+            color: #e7e7eb;
+            font-size: 12px;
+            font-weight: 650;
+            box-shadow: var(--inner-highlight);
+        }
+
+        .pill-btn:hover,
+        .ghost-btn:hover {
+            border-color: rgba(255, 255, 255, 0.18);
+            background: rgba(255, 255, 255, 0.075);
+        }
+
+        .danger-btn {
+            color: #ffaaa4;
+            border-color: rgba(255, 125, 115, 0.26);
+            background: rgba(255, 125, 115, 0.08);
+        }
+
+        .action-btn {
+            min-height: 54px;
+            border-radius: 8px;
+            color: #051413;
+            background: #82e9dc;
+            box-shadow: 0 13px 32px rgba(87, 216, 200, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.38);
+            font-size: 14px;
+            font-weight: 760;
+        }
+
+        .action-btn:hover {
+            filter: brightness(1.04);
+        }
+
+        .caliper-grid {
+            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .input-tile {
+            min-height: 160px;
+            padding: 14px 10px 11px;
+            border-radius: 8px;
+            border-color: rgba(255, 255, 255, 0.075);
+            background: rgba(10, 11, 14, 0.58);
+            box-shadow: var(--inner-highlight);
+        }
+
+        .input-tile:focus-within {
+            border-color: rgba(87, 216, 200, 0.48);
+            background: rgba(12, 17, 18, 0.88);
+        }
+
+        .input-tile label {
+            margin-bottom: 4px;
+            color: #a2a3aa;
+            font-size: 10px;
+            font-weight: 650;
+        }
+
+        .input-tile input[type="number"] {
+            min-height: 52px;
+            font-size: 27px;
+            line-height: 1;
+            font-weight: 690;
+            color: #fbfbfd;
+        }
+
+        .apex-diagnostic {
+            margin-top: 8px;
+            padding-top: 10px;
+            border-top-color: rgba(255, 255, 255, 0.065);
+        }
+
+        .apex-label {
+            margin-bottom: 6px;
+            font-size: 8px;
+            color: #777880;
+            font-weight: 650;
+        }
+
+        .apex-options {
+            gap: 4px;
+            padding: 3px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .apex-btn {
+            min-height: 31px;
+            border: none;
+            border-radius: 6px;
+            background: transparent;
+            font-size: 9px;
+            font-weight: 680;
+        }
+
+        .apex-btn.active {
+            color: #071716;
+            background: #89eada;
+            box-shadow: 0 4px 14px rgba(87, 216, 200, 0.15);
+        }
+
+        .embedded-tool {
+            margin: 18px 0 14px;
+            padding: 16px;
+            border-radius: 8px;
+            border-color: rgba(255, 255, 255, 0.075);
+            background: rgba(8, 9, 11, 0.48);
+            box-shadow: var(--inner-highlight);
+        }
+
+        .session-grid,
+        .rotation-actions,
+        .preview-actions {
+            gap: 10px;
+        }
+
+        .rotation-actions {
+            margin-top: 4px;
+        }
+
+        .rotation-preview {
+            margin-top: 16px;
+            margin-bottom: 0;
+            padding: 16px;
+            border-radius: 8px;
+            background: rgba(8, 13, 14, 0.76);
+            border-color: rgba(87, 216, 200, 0.24);
+        }
+
+        .status-banner {
+            padding: 14px 16px;
+            margin-bottom: 18px;
+            border-radius: 8px;
+            font-size: 12px;
+        }
+
+        .status-banner.ok {
+            background: rgba(44, 109, 76, 0.18);
+            border-color: rgba(121, 223, 153, 0.28);
+            color: #c9f3d6;
+        }
+
+        .rotation-badge {
+            padding: 7px 10px;
+            border-radius: 999px;
+            background: rgba(87, 216, 200, 0.1);
+            color: var(--accent-strong);
+            border: 1px solid rgba(87, 216, 200, 0.18);
+        }
+
+        .skate-viewport {
+            gap: 10px;
+        }
+
+        .frame-column {
+            padding: 10px;
+            border-color: rgba(255, 255, 255, 0.075);
+            border-radius: 8px;
+            background: rgba(7, 8, 10, 0.5);
+        }
+
+        .frame-column h3 {
+            margin: 2px 0 10px;
+            font-size: 9px;
+            font-weight: 690;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+        }
+
+        .mount-slot {
+            min-height: 104px;
+            padding: 13px 9px;
+            border-radius: 8px;
+            background: rgba(25, 26, 30, 0.86);
+            border-color: rgba(255, 255, 255, 0.085);
+            box-shadow: var(--inner-highlight);
+        }
+
+        .mount-lbl {
+            color: #81828a;
+            font-size: 9px;
+            font-weight: 700;
+        }
+
+        .mount-name {
+            margin: 6px 0 4px;
+            font-size: 15px;
+            font-weight: 680;
+        }
+
+        .mount-val {
+            color: #83e5a0;
+            font-size: 13px;
+            font-weight: 680;
+        }
+
+        .mount-flip {
+            margin-top: 8px;
+            padding: 4px 7px;
+            border-radius: 6px;
+            font-size: 8px;
+            font-weight: 750;
+        }
+
+        .preview-script {
+            border-radius: 8px;
+            background: rgba(20, 22, 26, 0.84);
+            box-shadow: var(--inner-highlight);
+        }
+
+        .preview-script-title,
+        .preview-path-summary {
+            color: var(--accent-strong);
+        }
+
+        .creator-grid,
+        .form-grid,
+        .profile-actions {
+            margin-top: 14px;
+            gap: 11px;
+        }
+
+        .stat {
+            min-height: 78px;
+            padding: 14px;
+            border-radius: 8px;
+            background: rgba(9, 10, 13, 0.56);
+            border-color: rgba(255, 255, 255, 0.075);
+            box-shadow: var(--inner-highlight);
+        }
+
+        .stat span {
+            color: #7f8088;
+            font-size: 9px;
+            font-weight: 680;
+        }
+
+        .stat strong {
+            margin-top: 8px;
+            font-size: 19px;
+            font-weight: 680;
+        }
+
+        .profile-actions {
+            margin-top: 6px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.065);
+        }
+
+        #backupReminder {
+            text-align: center;
+            font-size: 10px;
+        }
+
+        .loop-line {
+            gap: 8px;
+        }
+
+        .loop-line span {
+            min-height: 48px;
+            border-radius: 8px;
+            background: rgba(9, 10, 13, 0.55);
+            border-color: rgba(255, 255, 255, 0.075);
+            font-size: 12px;
+            font-weight: 680;
+        }
+
+        .heat-tile,
+        .wear-row {
+            border-radius: 8px;
+            border-color: rgba(255, 255, 255, 0.08);
+            background: rgba(10, 11, 14, 0.58);
+            box-shadow: var(--inner-highlight);
+        }
+
+        .heat-tile {
+            min-height: 61px;
+            padding: 12px;
+        }
+
+        .wear-row {
+            min-height: 59px;
+            padding: 11px 13px;
+        }
+
+        .wear-fill {
+            background: linear-gradient(90deg, #59d5c7, #79a8ed, #efc56d);
+        }
+
+        .cloud-sync-card {
+            padding: 0;
+            overflow: hidden;
+            border-color: rgba(255, 255, 255, 0.075);
+        }
+
+        .cloud-overview {
+            min-height: 92px;
+            display: grid;
+            grid-template-columns: 48px minmax(0, 1fr) auto;
+            gap: 14px;
+            align-items: center;
+            padding: 18px 20px;
+        }
+
+        .cloud-mark {
+            width: 44px;
+            height: 44px;
+            display: grid;
+            place-items: center;
+            border-radius: 50%;
+            color: var(--accent);
+            background: rgba(87, 216, 200, 0.1);
+            border: 1px solid rgba(87, 216, 200, 0.18);
+        }
+
+        .cloud-mark svg {
+            width: 23px;
+            height: 23px;
+            stroke-width: 1.75;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .cloud-copy {
+            min-width: 0;
+        }
+
+        .cloud-copy .mini-copy {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .sync-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            min-height: 30px;
+            padding: 0 10px;
+            border-radius: 999px;
+            color: #a9abb2;
+            background: rgba(255, 255, 255, 0.045);
+            border: 1px solid rgba(255, 255, 255, 0.075);
+            font-size: 10px;
+            font-weight: 680;
+        }
+
+        .sync-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #74757c;
+        }
+
+        .cloud-sync-card[data-cloud-state="online"] .sync-dot {
+            background: var(--success);
+            box-shadow: 0 0 0 4px rgba(121, 223, 153, 0.1);
+        }
+
+        .cloud-sync-card[data-cloud-state="online"] .sync-pill {
+            color: #bff1ce;
+            border-color: rgba(121, 223, 153, 0.15);
+            background: rgba(121, 223, 153, 0.07);
+        }
+
+        .cloud-sync-card[data-cloud-state="busy"] .sync-dot {
+            background: var(--warning);
+            animation: syncPulse 1.4s ease-in-out infinite;
+        }
+
+        @keyframes syncPulse {
+            50% { opacity: 0.38; }
+        }
+
+        .cloud-disclosure {
+            border-top: 1px solid rgba(255, 255, 255, 0.065);
+        }
+
+        .cloud-disclosure summary {
+            min-height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 0 20px;
+            color: #9a9ba2;
+            cursor: pointer;
+            list-style: none;
+            font-size: 11px;
+            font-weight: 620;
+        }
+
+        .cloud-disclosure summary::-webkit-details-marker {
+            display: none;
+        }
+
+        .disclosure-chevron {
+            width: 8px;
+            height: 8px;
+            border-right: 1.5px solid currentColor;
+            border-bottom: 1.5px solid currentColor;
+            transform: rotate(45deg) translateY(-2px);
+            transition: transform 180ms ease;
+        }
+
+        .cloud-disclosure[open] .disclosure-chevron {
+            transform: rotate(225deg) translate(-2px, -2px);
+        }
+
+        .cloud-advanced {
+            padding: 2px 20px 20px;
+        }
+
+        .cloud-diagnostic {
+            margin-bottom: 12px;
+            padding: 10px 12px;
+            border-radius: 8px;
+            color: #a7a8ae;
+            background: rgba(8, 9, 11, 0.52);
+            font-size: 10px;
+            line-height: 1.45;
+        }
+
+        .cloud-grid {
+            grid-template-columns: 1fr 1fr;
+            gap: 9px;
+        }
+
+        #cloudLoginLinkInput {
+            grid-column: 1 / -1;
+            min-height: 74px;
+        }
+
+        .cloud-actions {
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .cloud-actions button {
+            min-width: 0;
+            padding: 0 8px;
+        }
+
+        .cloud-footnote {
+            margin-top: 12px;
+            color: #74757c;
+            font-size: 10px;
+            text-align: center;
+        }
+
+        .logs-card {
+            padding: 0;
+            border: 0;
+            background: transparent;
+            box-shadow: none;
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+        }
+
+        .logs-card > .section-header {
+            padding: 0 4px;
+        }
+
+        .log-list {
+            gap: 10px;
+        }
+
+        .log-item {
+            padding: 16px;
+            border-radius: 8px;
+            border-color: rgba(255, 255, 255, 0.08);
+            background: rgba(24, 25, 29, 0.78);
+            box-shadow: var(--shadow), var(--inner-highlight);
+        }
+
+        .log-top {
+            font-size: 13px;
+            font-weight: 680;
+        }
+
+        .log-meta {
+            margin-top: 8px;
+            color: #96979e;
+            font-size: 12px;
+        }
+
+        .empty-state {
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.025);
+        }
+
+        .nav-dock {
+            left: 18px;
+            right: 18px;
+            bottom: calc(14px + env(safe-area-inset-bottom));
+            max-width: 440px;
+            height: 64px;
+            gap: 3px;
+            padding: 6px;
+            border-radius: 22px;
+            background: rgba(28, 29, 34, 0.82);
+            border-color: rgba(255, 255, 255, 0.12);
+            box-shadow: 0 24px 70px rgba(0, 0, 0, 0.58), var(--inner-highlight);
+            backdrop-filter: blur(30px) saturate(1.35);
+            -webkit-backdrop-filter: blur(30px) saturate(1.35);
+        }
+
+        .nav-item {
+            min-height: 50px;
+            border-radius: 17px;
+            font-size: 9px;
+            font-weight: 630;
+        }
+
+        .nav-item svg {
+            width: 19px;
+            height: 19px;
+            stroke-width: 1.8;
+        }
+
+        .nav-item.active {
+            color: #ecfffc;
+            background: rgba(87, 216, 200, 0.13);
+            border-color: rgba(87, 216, 200, 0.22);
+            box-shadow: var(--inner-highlight);
+        }
+
+        .toast {
+            border-radius: 14px;
+            background: rgba(241, 245, 246, 0.94);
+            font-weight: 650;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+
+        @media (max-width: 720px) {
+            body {
+                padding: calc(env(safe-area-inset-top) + 12px) 12px calc(var(--nav-height) + env(safe-area-inset-bottom) + 32px);
+            }
+
+            .app-header {
+                min-height: 0;
+                grid-template-columns: 1fr;
+                gap: 13px;
+                margin-bottom: 18px;
+                padding: 4px 2px;
+            }
+
+            .brand-logo {
+                width: 46px;
+                height: 46px;
+                border-radius: 12px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            .app-header .select-wrap select {
+                min-height: 48px;
+            }
+
+            .card {
+                padding: 16px;
+                margin-bottom: 14px;
+            }
+
+            .section-title {
+                font-size: 17px;
+            }
+
+            .caliper-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 8px;
+            }
+
+            .input-tile {
+                min-height: 153px;
+                padding: 12px 7px 9px;
+            }
+
+            .input-tile input[type="number"] {
+                font-size: 25px;
+            }
+
+            .embedded-tool {
+                padding: 13px;
+            }
+
+            .session-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .skate-viewport {
+                gap: 8px;
+            }
+
+            .frame-column {
+                padding: 7px;
+            }
+
+            .mount-slot {
+                min-height: 104px;
+                padding-left: 6px;
+                padding-right: 6px;
+            }
+
+            .mount-name {
+                font-size: 13px;
+            }
+
+            .cloud-overview {
+                grid-template-columns: 42px minmax(0, 1fr);
+                padding: 16px;
+            }
+
+            .cloud-mark {
+                width: 40px;
+                height: 40px;
+            }
+
+            .sync-pill {
+                grid-column: 2;
+                justify-self: start;
+                min-height: 25px;
+                margin-top: -6px;
+            }
+
+            .cloud-disclosure summary,
+            .cloud-advanced {
+                padding-left: 16px;
+                padding-right: 16px;
+            }
+
+            .cloud-grid,
+            .cloud-actions {
+                grid-template-columns: 1fr;
+            }
+
+            .cloud-actions button {
+                min-height: 46px;
+            }
+
+            .nav-dock {
+                left: 12px;
+                right: 12px;
+            }
+        }
+
+        @media (max-width: 380px) {
+            body {
+                padding-left: 9px;
+                padding-right: 9px;
+            }
+
+            .rotation-actions,
+            .preview-actions,
+            .creator-row,
+            .stats-grid,
+            .backup-actions {
+                grid-template-columns: 1fr;
+            }
+
+            .session-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .heat-map {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="app" id="appRoot">
-        <header>
+        <header class="app-header">
             <div class="brand-zone">
                 <div class="brand-logo" aria-hidden="true"></div>
                 <div>
                     <h1>SkateTech OS</h1>
-                    <div class="subtitle">Rocker-safe wheel tracking</div>
+                    <div class="subtitle">Precision wheel intelligence</div>
                 </div>
             </div>
             <label class="select-wrap" aria-label="Active wheel setup">
@@ -1138,9 +2007,10 @@
 
         <main class="view-shell">
             <section id="view-calibrate" class="app-view active" aria-labelledby="tab-calibrate">
-                <div class="card">
+                <div class="card calibration-card">
                     <div class="section-header">
                         <div>
+                            <div class="section-kicker">Live measurement</div>
                             <div class="section-title">Caliper Inputs</div>
                             <div class="mini-copy" id="caliperSummary">Endless 90 ES / 2.0 mm limit</div>
                         </div>
@@ -1150,10 +2020,11 @@
                     <div class="caliper-grid" id="leftInputContainer"></div>
                     <div class="caliper-grid" id="rightInputContainer"></div>
 
-                    <div class="session-panel">
+                    <div class="session-panel embedded-tool">
                         <div class="section-header">
                             <div>
-                                <div class="section-title">Session</div>
+                                <div class="section-kicker">Activity</div>
+                                <div class="section-title">Log this skate</div>
                                 <div class="mini-copy" id="sessionSummary">Saved against the current rotation.</div>
                             </div>
                         </div>
@@ -1193,10 +2064,13 @@
 
                 <div id="statusBanner" class="status-banner" role="status"></div>
 
-                <div class="card">
+                <div class="card mapping-card">
                     <div class="section-header">
-                        <div class="section-title">Target Mapping</div>
-                        <div class="section-value" id="rotationCountLabel">0 rotations</div>
+                        <div>
+                            <div class="section-kicker">Current mounting plan</div>
+                            <div class="section-title">Target Mapping</div>
+                        </div>
+                        <div class="section-value rotation-badge" id="rotationCountLabel">0 rotations</div>
                     </div>
                     <div class="skate-viewport">
                         <div class="frame-column">
@@ -1212,7 +2086,8 @@
             </section>
 
             <section id="view-profiles" class="app-view" aria-labelledby="tab-profiles" aria-hidden="true">
-                <div class="card">
+                <div class="card profile-create-card">
+                    <div class="section-kicker">New equipment</div>
                     <div class="section-title">Create Profile</div>
                     <div class="creator-grid" style="margin-top: 10px;">
                         <input type="text" id="newSetName" placeholder="My street setup" autocomplete="off">
@@ -1254,9 +2129,12 @@
                     </div>
                 </div>
 
-                <div class="card">
+                <div class="card active-profile-card">
                     <div class="section-header">
-                        <div class="section-title">Active Profile</div>
+                        <div>
+                            <div class="section-kicker">Equipment</div>
+                            <div class="section-title">Active Profile</div>
+                        </div>
                         <button class="ghost-btn" id="deleteProfileBtn" type="button">Delete</button>
                     </div>
                     <div class="form-grid">
@@ -1327,7 +2205,8 @@
                     </div>
                 </div>
 
-                <div class="card">
+                <div class="card loop-card">
+                    <div class="section-kicker">Locked physics</div>
                     <div class="section-title" style="margin-bottom: 10px;">Rocket Loop</div>
                     <div id="loopDisplay" class="loop-grid" aria-label="Forced rocket loop"></div>
                 </div>
@@ -1335,6 +2214,7 @@
                 <div class="card">
                     <div class="section-header">
                         <div>
+                            <div class="section-kicker">Frame analysis</div>
                             <div class="section-title">Position Heat Map</div>
                             <div class="mini-copy" id="heatSummary">No wear samples yet.</div>
                         </div>
@@ -1345,6 +2225,7 @@
                 <div class="card">
                     <div class="section-header">
                         <div>
+                            <div class="section-kicker">Wear intelligence</div>
                             <div class="section-title">Wear Hotspots</div>
                             <div class="mini-copy" id="wearSummary">No wear samples yet.</div>
                         </div>
@@ -1352,35 +2233,52 @@
                     <div id="wearRankingList" class="wear-list"></div>
                 </div>
 
-                <div class="card cloud-sync-card">
-                    <div class="section-header">
-                        <div>
-                            <div class="section-title">Cloud Sync</div>
-                            <div class="mini-copy" id="cloudSyncStatus">Not connected.</div>
-                            <div class="mini-copy" id="cloudDebugStatus">No cloud check yet.</div>
+                <div class="card cloud-sync-card" data-cloud-state="offline">
+                    <div class="cloud-overview">
+                        <div class="cloud-mark" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <path d="M7.4 18.2h9.1a4.2 4.2 0 0 0 .5-8.4A5.7 5.7 0 0 0 6.2 8.5a4.9 4.9 0 0 0 1.2 9.7Z"></path>
+                                <path d="m9.3 13.4 2 2 3.8-4.1"></path>
+                            </svg>
                         </div>
+                        <div class="cloud-copy">
+                            <div class="section-kicker">Data protection</div>
+                            <div class="section-title">Cloud Sync</div>
+                            <div class="mini-copy" id="cloudSyncStatus">Checking account...</div>
+                        </div>
+                        <div class="sync-pill"><span class="sync-dot"></span><span>Automatic</span></div>
                     </div>
-                    <div class="cloud-grid">
-                        <input type="url" id="supabaseUrlInput" placeholder="Supabase project URL" autocomplete="off" spellcheck="false" aria-label="Supabase project URL">
-                        <input type="password" id="supabaseAnonInput" placeholder="Supabase anon public key" autocomplete="off" spellcheck="false" aria-label="Supabase anon public key">
-                        <input type="email" id="cloudEmailInput" placeholder="Your email for magic-link login" autocomplete="email" aria-label="Cloud sync email">
-                        <input type="password" id="cloudPasswordInput" placeholder="Optional cloud password" autocomplete="current-password" aria-label="Cloud sync password">
-                        <textarea id="cloudLoginLinkInput" class="backbone-field restore-field" placeholder="Paste login link here if email opens in browser instead of the home-screen app" spellcheck="false" aria-label="Paste Supabase login link"></textarea>
-                    </div>
-                    <div class="cloud-actions">
-                        <button class="ghost-btn" id="saveCloudSettingsBtn" type="button">Save Cloud Settings</button>
-                        <button class="ghost-btn" id="sendMagicLinkBtn" type="button">Send Login Link</button>
-                        <button class="ghost-btn" id="completeLoginLinkBtn" type="button">Finish Login From Link</button>
-                        <button class="ghost-btn" id="signInPasswordBtn" type="button">Sign In Password</button>
-                        <button class="ghost-btn" id="createPasswordAccountBtn" type="button">Set/Update Password</button>
-                        <button class="ghost-btn" id="syncCloudNowBtn" type="button">Sync Now</button>
-                        <button class="ghost-btn" id="pullCloudBtn" type="button">Pull Cloud Save</button>
-                        <button class="danger-btn" id="cloudSignOutBtn" type="button">Sign Out Cloud</button>
-                    </div>
-                    <div class="mini-copy">Use the Supabase anon public key only. Never paste a service-role key into the app.</div>
+
+                    <details class="cloud-disclosure">
+                        <summary>
+                            <span>Account &amp; recovery</span>
+                            <span class="disclosure-chevron" aria-hidden="true"></span>
+                        </summary>
+                        <div class="cloud-advanced">
+                            <div class="cloud-diagnostic" id="cloudDebugStatus">No cloud check yet.</div>
+                            <div class="cloud-grid">
+                                <input type="url" id="supabaseUrlInput" placeholder="Supabase project URL" autocomplete="off" spellcheck="false" aria-label="Supabase project URL">
+                                <input type="password" id="supabaseAnonInput" placeholder="Supabase publishable key" autocomplete="off" spellcheck="false" aria-label="Supabase publishable key">
+                                <input type="email" id="cloudEmailInput" placeholder="Account email" autocomplete="email" aria-label="Cloud sync email">
+                                <input type="password" id="cloudPasswordInput" placeholder="Account password" autocomplete="current-password" aria-label="Cloud sync password">
+                                <textarea id="cloudLoginLinkInput" class="backbone-field restore-field" placeholder="Paste a login link only when recovering access" spellcheck="false" aria-label="Paste Supabase login link"></textarea>
+                            </div>
+                            <div class="cloud-actions">
+                                <button class="ghost-btn" id="saveCloudSettingsBtn" type="button">Save Settings</button>
+                                <button class="ghost-btn" id="sendMagicLinkBtn" type="button">Email Login Link</button>
+                                <button class="ghost-btn" id="completeLoginLinkBtn" type="button">Use Pasted Link</button>
+                                <button class="ghost-btn" id="signInPasswordBtn" type="button">Sign In</button>
+                                <button class="ghost-btn" id="createPasswordAccountBtn" type="button">Update Password</button>
+                                <button class="ghost-btn" id="syncCloudNowBtn" type="button">Check Now</button>
+                                <button class="ghost-btn" id="pullCloudBtn" type="button">Restore From Cloud</button>
+                                <button class="danger-btn" id="cloudSignOutBtn" type="button">Sign Out</button>
+                            </div>
+                            <div class="cloud-footnote">Your skating data saves automatically when this account is connected.</div>
+                        </div>
+                    </details>
                 </div>
 
-                <div class="card system-lifeline">
+                <div class="system-lifeline" hidden aria-hidden="true">
                     <div class="section-header">
                         <div>
                             <div class="section-title">🛠️ SYSTEM DATA LIFE-LINE</div>
@@ -1401,9 +2299,10 @@
             </section>
 
             <section id="view-logs" class="app-view" aria-labelledby="tab-logs" aria-hidden="true">
-                <div class="card">
+                <div class="card logs-card">
                     <div class="section-header">
                         <div>
+                            <div class="section-kicker">Time on wheels</div>
                             <div class="section-title">Session Logs</div>
                             <div class="mini-copy" id="sessionLogSummary">No sessions yet.</div>
                         </div>
@@ -1412,9 +2311,10 @@
                     <div id="sessionLogList" class="log-list"></div>
                 </div>
 
-                <div class="card">
+                <div class="card logs-card">
                     <div class="section-header">
                         <div>
+                            <div class="section-kicker">Wheel history</div>
                             <div class="section-title">Rotation Logs</div>
                             <div class="mini-copy" id="logSummary">No rotations yet.</div>
                         </div>
@@ -2927,20 +3827,26 @@
         function renderCloudPanel() {
             if (!els.supabaseUrlInput) return;
             const config = cloudConfig || { url: "", anonKey: "", email: "" };
+            const cloudCard = document.querySelector(".cloud-sync-card");
             if (document.activeElement !== els.supabaseUrlInput) els.supabaseUrlInput.value = config.url || "";
             if (document.activeElement !== els.supabaseAnonInput) els.supabaseAnonInput.value = config.anonKey || "";
             if (document.activeElement !== els.cloudEmailInput) els.cloudEmailInput.value = config.email || "";
 
             if (!hasCloudConfig()) {
-                renderCloudStatus("Not connected. Add your Supabase URL and anon key.");
+                if (cloudCard) cloudCard.dataset.cloudState = "offline";
+                renderCloudStatus("Cloud protection is not connected.");
             } else if (!window.supabase || !window.supabase.createClient) {
-                renderCloudStatus("Cloud settings saved. Tap Send Login Link to load Supabase.");
+                if (cloudCard) cloudCard.dataset.cloudState = "offline";
+                renderCloudStatus("Cloud protection is waiting to connect.");
             } else if (cloudBusy) {
-                renderCloudStatus("Cloud sync in progress...");
+                if (cloudCard) cloudCard.dataset.cloudState = "busy";
+                renderCloudStatus("Saving your latest changes...");
             } else if (cloudSession && cloudSession.user) {
-                renderCloudStatus(`Signed in as ${cloudSession.user.email || "Supabase user"}.`);
+                if (cloudCard) cloudCard.dataset.cloudState = "online";
+                renderCloudStatus(`Saved automatically as ${cloudSession.user.email || "your account"}.`);
             } else {
-                renderCloudStatus("Cloud configured. Send a login link to start syncing.");
+                if (cloudCard) cloudCard.dataset.cloudState = "offline";
+                renderCloudStatus("Sign in once to protect and sync your data.");
             }
             renderCloudDebugStatus();
         }
