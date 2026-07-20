@@ -4772,6 +4772,7 @@
                                 <select id="newSetFrame">
                                     <option value="endless_90es">Endless 90 ES</option>
                                     <option value="endless_arc_es">Endless Arc ES</option>
+                                    <option value="symetrics_hypers">Symetrics Hyper S 84/90</option>
                                     <option value="wizard_nr90">Wizard NR90</option>
                                     <option value="nn_ninja">NN Ninja 90</option>
                                     <option value="custom_rocker">Custom Continuous Rocker</option>
@@ -4812,6 +4813,7 @@
                                 <select id="activeFrameSelect">
                                     <option value="endless_90es">Endless 90 ES</option>
                                     <option value="endless_arc_es">Endless Arc ES</option>
+                                    <option value="symetrics_hypers">Symetrics Hyper S 84/90</option>
                                     <option value="wizard_nr90">Wizard NR90</option>
                                     <option value="nn_ninja">NN Ninja 90</option>
                                     <option value="custom_rocker">Custom Continuous Rocker</option>
@@ -5133,6 +5135,8 @@
         const ARC_RIGHT_SLOTS = Object.freeze(["R1", "R2", "R3", "R4", "R5"]);
         const ARC_OUTER_SLOTS = Object.freeze(["L1", "L5", "R1", "R5"]);
         const ARC_INNER_SLOTS = Object.freeze(["L2", "L3", "L4", "R2", "R3", "R4"]);
+        const SYMETRICS_FRONT_SLOTS = Object.freeze(["L1", "L2", "R1", "R2"]);
+        const SYMETRICS_REAR_SLOTS = Object.freeze(["L3", "L4", "R3", "R4"]);
         const SLOT_ORDER = Object.freeze([...FOUR_WHEEL_LEFT_SLOTS, ...FOUR_WHEEL_RIGHT_SLOTS]);
         const LEFT_SLOTS = FOUR_WHEEL_LEFT_SLOTS;
         const RIGHT_SLOTS = FOUR_WHEEL_RIGHT_SLOTS;
@@ -5235,6 +5239,17 @@
                 slotCount: 5,
                 note: "Five-wheel asymmetric Arc layout: 84 mm outers and 76 mm inner wheels."
             }),
+            symetrics_hypers: Object.freeze({
+                name: "Symetrics Hyper S 84/90",
+                rockerType: "Asymmetric Progressive Hi-Lo (Flat Class)",
+                builtInDelta: 0.0,
+                maxTolerance: 1.5,
+                safetyLimit: 1.5,
+                defaultSize: 84,
+                slotCount: 4,
+                note: "Fixed progressive forward pitch. Front pairs lock at 84 mm; rear pairs lock at 90 mm. Rigid speed and urban platform.",
+                description: "Fixed progressive forward pitch. Front pairs lock at 84 mm; rear pairs lock at 90 mm. Rigid speed and urban platform."
+            }),
             wizard_nr90: Object.freeze({
                 name: "Wizard NR90",
                 safetyLimit: 1.8,
@@ -5299,6 +5314,24 @@
             Object.freeze({ line: "Inner 76", from: "R2", to: "L3" }),
             Object.freeze({ line: "Inner 76", from: "R3", to: "L4" }),
             Object.freeze({ line: "Inner 76", from: "R4", to: "L2" })
+        ]);
+
+        const SYMETRICS_LOOPS = Object.freeze([
+            Object.freeze(["84 Front Speed", "L1", "R2", "L1"]),
+            Object.freeze(["84 Front Pivot", "L2", "R1", "L2"]),
+            Object.freeze(["90 Rear Slide", "L3", "R4", "L3"]),
+            Object.freeze(["90 Rear Heel", "L4", "R3", "L4"])
+        ]);
+
+        const SYMETRICS_CONVEYOR_STEPS = Object.freeze([
+            Object.freeze({ line: "Front 84 Speed", from: "L1", to: "R2" }),
+            Object.freeze({ line: "Front 84 Speed", from: "R2", to: "L1" }),
+            Object.freeze({ line: "Front 84 Pivot", from: "L2", to: "R1" }),
+            Object.freeze({ line: "Front 84 Pivot", from: "R1", to: "L2" }),
+            Object.freeze({ line: "Rear 90 Slide", from: "L3", to: "R4" }),
+            Object.freeze({ line: "Rear 90 Slide", from: "R4", to: "L3" }),
+            Object.freeze({ line: "Rear 90 Heel", from: "L4", to: "R3" }),
+            Object.freeze({ line: "Rear 90 Heel", from: "R3", to: "L4" })
         ]);
 
         let appState = null;
@@ -5575,6 +5608,10 @@
             return frameKey === "endless_arc_es";
         }
 
+        function isSymetricsFrame(frameKey) {
+            return frameKey === "symetrics_hypers";
+        }
+
         function getFrameKeyForValue(value) {
             return FRAME_PRESETS[value] ? value : "endless_90es";
         }
@@ -5605,16 +5642,23 @@
         }
 
         function getDefaultSizeForSlot(frameKey, slot, fallbackSize) {
+            if (isSymetricsFrame(frameKey)) {
+                return SYMETRICS_FRONT_SLOTS.includes(slot) ? 84 : 90;
+            }
             if (!isArcFrame(frameKey)) return toWheelSize(fallbackSize, 90);
             return slot === "L1" || slot === "L5" || slot === "R1" || slot === "R5" ? 84 : 76;
         }
 
         function getConveyorStepsForFrame(frameKey) {
-            return isArcFrame(frameKey) ? ARC_CONVEYOR_STEPS : ROCKET_CONVEYOR_STEPS;
+            if (isArcFrame(frameKey)) return ARC_CONVEYOR_STEPS;
+            if (isSymetricsFrame(frameKey)) return SYMETRICS_CONVEYOR_STEPS;
+            return ROCKET_CONVEYOR_STEPS;
         }
 
         function getLoopRowsForFrame(frameKey) {
-            return isArcFrame(frameKey) ? ARC_LOOPS : ROCKET_LOOPS;
+            if (isArcFrame(frameKey)) return ARC_LOOPS;
+            if (isSymetricsFrame(frameKey)) return SYMETRICS_LOOPS;
+            return ROCKET_LOOPS;
         }
 
         function getTrackingStateForSlot(options, slot) {
@@ -5849,6 +5893,16 @@
 
         function getTargetFrameSide(slot) {
             return String(slot).startsWith("L") ? "left" : "right";
+        }
+
+        function getFrameDiameterGroup(frameKey, slot) {
+            if (isSymetricsFrame(frameKey)) {
+                return SYMETRICS_FRONT_SLOTS.includes(slot) ? "front84" : "rear90";
+            }
+            if (isArcFrame(frameKey)) {
+                return ARC_OUTER_SLOTS.includes(slot) ? "outer84" : "inner76";
+            }
+            return "standard";
         }
 
         function calculateMountSideFlipped(targetSlot, apexSide) {
@@ -7585,6 +7639,11 @@
                 const inner = groupSpread(ARC_INNER_SLOTS);
                 return { max: Math.max(outer.max, inner.max), min: Math.min(outer.min, inner.min), gap: Math.max(outer.gap, inner.gap), groups: { outer84: outer, inner76: inner } };
             }
+            if (isSymetricsFrame(set.frameKey)) {
+                const front = groupSpread(SYMETRICS_FRONT_SLOTS);
+                const rear = groupSpread(SYMETRICS_REAR_SLOTS);
+                return { max: Math.max(front.max, rear.max), min: Math.min(front.min, rear.min), gap: Math.max(front.gap, rear.gap), groups: { front84: front, rear90: rear } };
+            }
             return groupSpread(getSlotOrderForFrame(set.frameKey));
         }
 
@@ -7669,7 +7728,9 @@
         function calculateBalanceDeviation(set, slotRecords) {
             const groups = isArcFrame(set.frameKey)
                 ? [ARC_OUTER_SLOTS, ARC_INNER_SLOTS]
-                : [getSlotOrderForFrame(set.frameKey)];
+                : isSymetricsFrame(set.frameKey)
+                    ? [SYMETRICS_FRONT_SLOTS, SYMETRICS_REAR_SLOTS]
+                    : [getSlotOrderForFrame(set.frameKey)];
             let weighted = 0;
             let count = 0;
             groups.forEach((slots) => {
@@ -8081,6 +8142,31 @@
                 ];
             }
 
+            if (isSymetricsFrame(frameKey)) {
+                return [
+                    {
+                        title: "TRACK A: THE 84mm FRONT SPEED CHAIN",
+                        route: ["L1", "R2", "L1"],
+                        summaryLabel: "Full Path Summary"
+                    },
+                    {
+                        title: "TRACK B: THE 84mm FRONT PIVOT CHAIN",
+                        route: ["L2", "R1", "L2"],
+                        summaryLabel: "Full Path Summary"
+                    },
+                    {
+                        title: "TRACK C: THE 90mm REAR SLIDE CHAIN",
+                        route: ["L3", "R4", "L3"],
+                        summaryLabel: "Full Path Summary"
+                    },
+                    {
+                        title: "TRACK D: THE 90mm REAR HEEL CHAIN",
+                        route: ["L4", "R3", "L4"],
+                        summaryLabel: "Full Path Summary"
+                    }
+                ];
+            }
+
             return [
                 {
                     title: "TRACK A: THE FOUR-WHEEL CHAIN",
@@ -8251,14 +8337,15 @@
         function renderLoopDisplay() {
             const set = getActiveSet();
             const rows = getLoopRowsForFrame(set.frameKey);
+            const groupedFrame = isArcFrame(set.frameKey) || isSymetricsFrame(set.frameKey);
 
             els.loopDisplay.innerHTML = rows.map((row) => {
-                const label = isArcFrame(set.frameKey) ? `<span class="loop-label">${escapeHtml(row[0])}</span>` : "";
-                const slots = isArcFrame(set.frameKey) ? row.slice(1) : row;
+                const label = groupedFrame ? `<span class="loop-label">${escapeHtml(row[0])}</span>` : "";
+                const slots = groupedFrame ? row.slice(1) : row;
                 const arrows = slots.map((slot) => `<span>${escapeHtml(slot)}</span>`).join("");
-                const cols = slots.length + (isArcFrame(set.frameKey) ? 1 : 0);
+                const cols = slots.length + (groupedFrame ? 1 : 0);
                 return `
-                    <div class="loop-line${isArcFrame(set.frameKey) ? ` arc-loop-line-${slots.length}` : ""}" style="--loop-cols:${cols}">
+                    <div class="loop-line${groupedFrame ? ` arc-loop-line-${slots.length}` : ""}" style="--loop-cols:${cols}">
                         ${label}${arrows}
                     </div>
                 `;
@@ -9098,6 +9185,10 @@
                     throw new Error(`Missing wheel tracking state in source slot ${step.from}`);
                 }
 
+                if (getFrameDiameterGroup(set.frameKey, step.from) !== getFrameDiameterGroup(set.frameKey, step.to)) {
+                    throw new Error(`Locked diameter boundary crossed from ${step.from} to ${step.to}`);
+                }
+
                 const apexSide = normalizeApexSide(set && set.apexSides && set.apexSides[slotState.wheelKey]);
                 nextTrackingState[step.to] = {
                     wheelKey: slotState.wheelKey,
@@ -9122,7 +9213,11 @@
 
         function createRotationLog(set, spread, warning, sessionMeta, sizeSnapshot) {
             const frame = getFrame(set);
-            const title = warning ? "Safety override warning" : "Rocket Loop rotation";
+            const title = warning
+                ? "Safety override warning"
+                : isSymetricsFrame(set.frameKey)
+                    ? "Symetrics Hi-Lo rotation"
+                    : "Rocket Loop rotation";
             const session = normalizeSessionMeta(sessionMeta);
             const sessionText = ` Session: ${formatSessionMeta(session)}.`;
             const detail = warning
@@ -9145,7 +9240,7 @@
         function createNewWheelSet() {
             const name = cleanName(els.newSetName.value, "New Skate Setup");
             const frameKey = getFrameKeyForValue(els.newSetFrame.value);
-            const baseSize = isArcFrame(frameKey)
+            const baseSize = isArcFrame(frameKey) || isSymetricsFrame(frameKey)
                 ? FRAME_PRESETS[frameKey].defaultSize
                 : toWheelSize(els.newSetSize.value, FRAME_PRESETS[frameKey].defaultSize);
             const wheelModel = cleanName(els.newWheelModel.value, "Endless");
@@ -9170,7 +9265,7 @@
         function autoFillFrameSpecs() {
             const preset = FRAME_PRESETS[els.newSetFrame.value];
             if (!preset) return;
-            if (isArcFrame(els.newSetFrame.value)) {
+            if (isArcFrame(els.newSetFrame.value) || isSymetricsFrame(els.newSetFrame.value)) {
                 els.newSetSize.value = String(preset.defaultSize);
                 return;
             }
@@ -9221,8 +9316,12 @@
             if (nextFrameKey === set.frameKey) return;
 
             clearPendingRotationPreview();
-            if (getSlotOrderForFrame(nextFrameKey).length !== getSlotOrderForFrame(set.frameKey).length) {
-                if (!window.confirm("Changing between 4-wheel and 5-wheel frames rebuilds this profile's wheel slots and clears its rotation logs. Continue?")) {
+            const changesDiameterArchitecture = isSymetricsFrame(nextFrameKey) !== isSymetricsFrame(set.frameKey);
+            if (getSlotOrderForFrame(nextFrameKey).length !== getSlotOrderForFrame(set.frameKey).length || changesDiameterArchitecture) {
+                const prompt = changesDiameterArchitecture
+                    ? "Changing to or from the Symetrics Hyper S rebuilds this profile with its locked 84/90 wheel ecosystems and clears its rotation logs. Continue?"
+                    : "Changing between 4-wheel and 5-wheel frames rebuilds this profile's wheel slots and clears its rotation logs. Continue?";
+                if (!window.confirm(prompt)) {
                     els.activeFrameSelect.value = set.frameKey;
                     return;
                 }
@@ -9284,13 +9383,13 @@
         function updateActiveBaseSize() {
             const set = getActiveSet();
             clearPendingRotationPreview();
-            if (isArcFrame(set.frameKey)) {
-                set.baseSize = FRAME_PRESETS.endless_arc_es.defaultSize;
+            if (isArcFrame(set.frameKey) || isSymetricsFrame(set.frameKey)) {
+                set.baseSize = FRAME_PRESETS[set.frameKey].defaultSize;
                 els.activeBaseSize.value = String(set.baseSize);
                 set.updatedAt = new Date().toISOString();
                 renderProfile();
                 saveStateNow();
-                showToast("Arc ES keeps fixed 84/76 defaults.");
+                showToast(isArcFrame(set.frameKey) ? "Arc ES keeps fixed 84/76 defaults." : "Hyper S keeps fixed 84/90 defaults.");
                 return;
             }
             set.baseSize = toWheelSize(els.activeBaseSize.value, set.baseSize);
@@ -9397,6 +9496,20 @@
                     groups: {
                         outer84: outerSpread,
                         inner76: innerSpread
+                    }
+                };
+            }
+
+            if (isSymetricsFrame(set.frameKey)) {
+                const frontSpread = calculateSlotSpread(set, SYMETRICS_FRONT_SLOTS);
+                const rearSpread = calculateSlotSpread(set, SYMETRICS_REAR_SLOTS);
+                return {
+                    max: Math.max(frontSpread.max, rearSpread.max),
+                    min: Math.min(frontSpread.min, rearSpread.min),
+                    gap: Math.max(frontSpread.gap, rearSpread.gap),
+                    groups: {
+                        front84: frontSpread,
+                        rear90: rearSpread
                     }
                 };
             }
