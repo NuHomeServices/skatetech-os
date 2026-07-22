@@ -6626,9 +6626,10 @@
                 return;
             }
 
-            pendingCloudPush = false;
             const ok = await pushCloudState({ showToastOnSuccess: false, auto: true });
-            if (!ok && cloudSession) {
+            if (ok) {
+                pendingCloudPush = false;
+            } else if (cloudSession) {
                 pendingCloudPush = true;
                 queueCloudSave(8000);
             }
@@ -6707,6 +6708,13 @@
                 return false;
             }
 
+            // A local edit, including Undo, must reach the cloud before an
+            // automatic pull is allowed to replace it with an older remote copy.
+            if (options.auto && pendingCloudPush) {
+                renderCloudStatus("Saving your latest local change before checking the cloud.");
+                return false;
+            }
+
             try {
                 cloudBusy = true;
                 renderCloudStatus("Checking Supabase save...");
@@ -6726,6 +6734,11 @@
                     if (!created) return false;
                     if (options.showToastOnSuccess) showToast("No cloud save existed, so local data was uploaded.");
                     return true;
+                }
+
+                if (options.auto && pendingCloudPush) {
+                    renderCloudStatus("Saving your latest local change before checking the cloud.");
+                    return false;
                 }
 
                 const remoteState = normalizeState(data.payload);
